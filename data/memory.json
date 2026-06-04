@@ -1,0 +1,47 @@
+[
+  {
+    "id": "site-slider-decision",
+    "type": "decision",
+    "scope": "engine",
+    "key": "site_slider_behavior",
+    "value": "Public site has a controlled hero slider. Admin chooses posts via showInSlider and controls behavior in data/settings.json: enabled, autoplay, intervalMs, transitionMs, showControls, showDots, pauseOnHover, maxItems. /api/public/slider returns settings plus published selected posts sorted by sliderOrder and publish date.",
+    "createdAt": "2026-05-28T00:00:00.000Z",
+    "updatedAt": "2026-05-28T00:00:00.000Z"
+  },
+  {
+    "id": "telegram-media-decision",
+    "type": "decision",
+    "scope": "engine",
+    "key": "telegram_media_behavior",
+    "value": "Telegram imports must keep post photos: first image is coverImage, remaining images stay in media gallery on the full post page. Telegram album messages are grouped by media_group_id.",
+    "createdAt": "2026-05-28T00:00:00.000Z",
+    "updatedAt": "2026-05-28T00:00:00.000Z"
+  },
+  {
+    "id": "goal-cms-platform",
+    "type": "project",
+    "scope": "engine",
+    "key": "long_term_goal",
+    "value": "Создать собственный WordPress-подобный CMS-движок, который удобнее расширять под интеграции, автопубликации и AI-помощников.",
+    "createdAt": "2026-05-28T00:00:00.000Z",
+    "updatedAt": "2026-05-28T00:00:00.000Z"
+  },
+  {
+    "id": "architecture-choice",
+    "type": "decision",
+    "scope": "engine",
+    "key": "storage_v1",
+    "value": "Первая версия хранит данные в JSON-файлах, чтобы быстро стартовать без внешних зависимостей. Позже хранилище переносится на SQLite или PostgreSQL.",
+    "createdAt": "2026-05-28T00:00:00.000Z",
+    "updatedAt": "2026-05-28T00:00:00.000Z"
+  },
+  {
+    "id": "integration-priority",
+    "type": "priority",
+    "scope": "engine",
+    "key": "integration_order",
+    "value": "Сначала Telegram для постов, затем Bitrix24 для учета заявок, затем AI-помощник с OpenAI-compatible API.",
+    "createdAt": "2026-05-28T00:00:00.000Z",
+    "updatedAt": "2026-05-28T00:00:00.000Z"
+  }
+]

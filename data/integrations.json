@@ -1,0 +1,21 @@
+{
+  "telegram": {
+    "enabled": true,
+    "mode": "polling",
+    "autoPublish": true,
+    "chatId": "-1003972509368",
+    "lastUpdateId": 329552518
+  },
+  "bitrix": {
+    "enabled": false,
+    "defaultAssignedById": ""
+  },
+  "ai": {
+    "enabled": false,
+    "provider": "openai-compatible",
+    "baseUrl": "http://192.168.0.148:1234/v1",
+    "model": "qwen3.5-4b-claude-4.6-opus-reasoning-distilled",
+    "temperature": 0.4,
+    "systemPrompt": "Ты AI-помощник сайта. Отвечай кратко, вежливо и только по фактам из базы знаний. Если данных не хватает, предложи оставить заявку менеджеру."
+  }
+}

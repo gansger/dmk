@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>document.documentElement.classList.add('js-enabled');</script>
+    <style>.js-enabled [data-seo-fallback] { display: none !important; }</style>
+    <title>Дагестанский медицинский колледж</title>
+    <!-- CMS_SEO_HEAD -->
+    <link rel="stylesheet" href="/site.css?v=5">
+  </head>
+  <body class="public-site">
+    <button class="mobile-nav-toggle" id="mobileNavToggle" type="button" aria-label="Открыть меню">☰</button>
+    <div class="site-body-shell" style="--side-width: 0px;">
+      <aside class="site-side-menu" id="siteSideMenu" style="display: none;"></aside>
+      <div class="site-main-column">
+        <header class="site-top-nav" id="siteHeaderNav" style="display: none;"></header>
+        <div class="site-feature-row" id="siteFeatureRow">
+        <header class="site-hero" hidden>
+          <div class="site-hero-media"></div>
+          <div class="site-hero-copy">
+            <p class="eyebrow">CMS Engine</p>
+            <h1>Публикации сайта</h1>
+            <p>Материалы появляются здесь после публикации в админке.</p>
+          </div>
+          <div class="site-slider" id="siteSlider" hidden>
+            <div class="slider-content">
+              <p class="eyebrow" id="sliderLabel">Избранное</p>
+              <h2 id="sliderTitle"></h2>
+              <p id="sliderExcerpt"></p>
+              <a id="sliderLink" href="/site.html">Открыть пост</a>
+            </div>
+            <div class="slider-controls" aria-label="Управление слайдером">
+              <button id="sliderPrev" type="button" aria-label="Предыдущий">‹</button>
+              <button id="sliderPause" type="button" hidden>Пауза</button>
+              <button id="sliderNext" type="button" aria-label="Следующий">›</button>
+            </div>
+            <div class="slider-dots" id="sliderDots"></div>
+          </div>
+        </header>
+        <aside class="site-right-panel" id="siteRightPanel" hidden></aside>
+        </div>
+        <main class="site-content" id="publicPosts"><!-- CMS_SEO_BODY --></main>
+      </div>
+    </div>
+    <footer class="site-footer" id="siteFooter"></footer>
+    <div class="chat-widget" id="siteChat">
+      <button class="chat-toggle" id="chatToggle" type="button" aria-expanded="false" aria-controls="chatPanel">AI</button>
+      <section class="chat-panel" id="chatPanel" aria-label="AI-помощник">
+        <header class="chat-header">
+          <div>
+            <strong>AI-помощник</strong>
+            <span id="chatStatus">online</span>
+          </div>
+          <button class="chat-close" id="chatClose" type="button" aria-label="Закрыть">×</button>
+        </header>
+        <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
+        <form class="chat-form" id="chatForm">
+          <input id="chatInput" autocomplete="off" placeholder="Напишите вопрос" required>
+          <button type="submit">Отправить</button>
+        </form>
+      </section>
+    </div>
+    <!-- CMS_SEO_STATE -->
+    <script src="/site.js?v=18" type="module"></script>
+  </body>
+</html>

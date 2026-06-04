@@ -1,0 +1,64 @@
+[
+  {
+    "id": "8c5fc495-bfcb-49fa-a00f-537dfdbf3695",
+    "siteId": "main-site",
+    "title": "Жил был пес",
+    "slug": "zhil-byl-pes",
+    "excerpt": "Жил был пес",
+    "content": "Жил был пес",
+    "status": "published",
+    "tags": [
+      "telegram"
+    ],
+    "source": "telegram",
+    "sourceId": "telegram:-1003972509368:31",
+    "media": [
+      {
+        "id": "5c9a18e8-c325-4744-870a-f46c3f2d1e4b",
+        "type": "video",
+        "url": "/uploads/telegram/8c5fc495-bfcb-49fa-a00f-537dfdbf3695-1.MOV",
+        "source": "telegram",
+        "sourceFileId": "BAACAgIAAyEFAATsx664AAMeah4Zzw8QP18WHaYnkjvPJKwn5SsAAgmRAAI6M_lIKKXLp5sj4yI7BA",
+        "width": 1920,
+        "height": 1124,
+        "isCover": true,
+        "createdAt": "2026-06-01T23:48:54.170Z"
+      }
+    ],
+    "coverImage": null,
+    "videoUrl": "/uploads/telegram/8c5fc495-bfcb-49fa-a00f-537dfdbf3695-1.MOV",
+    "createdAt": "2026-06-01T23:48:52.116Z",
+    "updatedAt": "2026-06-01T23:49:01.341Z",
+    "publishedAt": "2026-06-01T23:48:52.116Z",
+    "showInSlider": true,
+    "sliderOrder": 0,
+    "sliderImageFit": "",
+    "sliderImagePositionX": 50,
+    "sliderImagePositionY": 50
+  },
+  {
+    "id": "8917bec7-7756-4f44-ae64-430d7c307488",
+    "siteId": "main-site",
+    "title": "ыаыаыва",
+    "slug": "tul",
+    "excerpt": "ваывапвап",
+    "content": "ваывапвап",
+    "status": "published",
+    "tags": [
+      "telegram"
+    ],
+    "source": "manual",
+    "sourceId": null,
+    "videoUrl": "https://drive.google.com/file/d/1Otz0DGSQE3ConY5nRUhuteeam3U6-qQp/view?usp=drive_link",
+    "media": [],
+    "coverImage": null,
+    "showInSlider": false,
+    "sliderOrder": 0,
+    "sliderImageFit": "",
+    "sliderImagePositionX": 50,
+    "sliderImagePositionY": 50,
+    "createdAt": "2026-06-01T23:28:43.541Z",
+    "updatedAt": "2026-06-01T23:32:10.229Z",
+    "publishedAt": "2026-06-01T23:32:10.229Z"
+  }
+]

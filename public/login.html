@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Вход в CMS</title>
+    <link rel="stylesheet" href="/styles.css?v=3">
+  </head>
+  <body class="login-page">
+    <main class="login-card">
+      <div class="brand login-brand">
+        <span class="brand-mark">C</span>
+        <span>CMS Engine</span>
+      </div>
+      <p class="eyebrow">admin</p>
+      <h1>Вход в CMS</h1>
+      <p class="login-copy">Введите учётные данные администратора.</p>
+      <form class="login-form" id="loginForm">
+        <label>
+          Логин
+          <input id="loginUsername" name="username" autocomplete="username" required autofocus>
+        </label>
+        <label>
+          Пароль
+          <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="button" type="submit">Войти</button>
+        <p class="inline-status error" id="loginStatus" role="alert"></p>
+      </form>
+      <a class="login-site-link" href="/">Вернуться на сайт</a>
+    </main>
+    <script src="/login.js" type="module"></script>
+  </body>
+</html>

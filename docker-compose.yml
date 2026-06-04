@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  cms-engine:
+    build: .
+    env_file:
+      - .env.local
+    ports:
+      - "3003:3003"
+    volumes:
+      - cms-storage:/app/storage
+      - ./public/uploads:/app/public/uploads
+    restart: always
+
+volumes:
+  cms-storage:

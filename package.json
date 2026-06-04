@@ -1,0 +1,16 @@
+{
+  "name": "cms-engine-starter",
+  "version": "0.1.0",
+  "description": "Starter CMS engine with admin panel, Telegram publishing, Bitrix adapter, and AI knowledge memory.",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "check": "node --check src/server.js",
+    "migrate": "node scripts/migrate-to-sqlite.js"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "license": "UNLICENSED"
+}

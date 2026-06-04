@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>CMS Engine Admin</title>
+    <link rel="stylesheet" href="/styles.css?v=4">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">C</span>
+          <span>CMS Engine</span>
+        </div>
+        <nav class="nav" aria-label="Главная навигация">
+          <button class="nav-item active" data-view="dashboard">Панель</button>
+          <button class="nav-item" data-view="posts">Посты</button>
+          <button class="nav-item" data-view="slider">Слайдер</button>
+          <button class="nav-item" data-view="gallery">Фотогалерея</button>
+          <button class="nav-item" data-view="integrations">Интеграции</button>
+          <button class="nav-item" data-view="assistant">AI</button>
+          <button class="nav-item" data-view="knowledge">Знания</button>
+          <button class="nav-item" data-view="security">Безопасность</button>
+        </nav>
+        <a class="site-link" href="/" target="_blank" rel="noreferrer">Открыть сайт</a>
+        <a class="site-link secondary-site-link" href="/edit" target="_blank" rel="noreferrer">Редактировать сайт</a>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">admin</p>
+            <h1 id="viewTitle">Панель</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="button ghost" id="refreshButton">Обновить</button>
+            <button class="button ghost" id="logoutButton">Выйти</button>
+            <span class="status-pill" id="apiStatus">Проверка</span>
+          </div>
+        </header>
+
+        <section class="view active" id="dashboardView">
+          <div class="metrics" id="metrics"></div>
+          <div class="panel">
+            <div class="panel-heading">
+              <h2>Журнал</h2>
+            </div>
+            <div class="event-list" id="eventList"></div>
+          </div>
+        </section>
+
+        <section class="view" id="postsView">
+          <div class="split">
+            <form class="panel editor" id="postForm">
+              <div class="panel-heading">
+                <h2>Редактор</h2>
+                <button class="button" type="submit">Сохранить</button>
+              </div>
+              <input type="hidden" id="postId">
+              <label>
+                Заголовок
+                <input id="postTitle" required placeholder="Новый материал">
+              </label>
+              <label>
+                Slug
+                <input id="postSlug" placeholder="new-material">
+              </label>
+              <label>
+                Теги
+                <input id="postTags" placeholder="news, telegram">
+              </label>
+              <label>
+                SEO title
+                <input id="postSeoTitle" maxlength="180" placeholder="По умолчанию используется заголовок">
+              </label>
+              <label>
+                SEO description
+                <textarea id="postSeoDescription" rows="3" maxlength="500" placeholder="По умолчанию используется анонс публикации"></textarea>
+              </label>
+              <label class="checkline"><input type="checkbox" id="postNoIndex"> Не индексировать публикацию</label>
+              <div class="inline-controls">
+                <label class="checkline"><input type="checkbox" id="postShowInSlider"> Показывать в слайдере</label>
+                <label>
+                  Порядок
+                  <input id="postSliderOrder" type="number" value="0">
+                </label>
+                <label>
+                  Дата публикации
+                  <input id="postPublishedAt" type="datetime-local">
+                </label>
+              </div>
+              <label>
+                Текст
+                <textarea id="postContent" rows="14" required></textarea>
+              </label>
+              <label>
+                Ссылка на видео (mp4)
+                <input id="postVideoUrl" type="url" placeholder="https://example.com/video.mp4">
+              </label>
+            </form>
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Материалы</h2>
+                <button class="button secondary" id="telegramImportButton">Импорт Telegram</button>
+              </div>
+              <div class="post-list" id="postList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="sliderView">
+          <div class="split">
+            <form class="panel editor" id="sliderSettingsForm">
+              <div class="panel-heading">
+                <h2>Настройки</h2>
+                <button class="button" type="submit">Сохранить</button>
+              </div>
+              <label class="checkline"><input type="checkbox" id="sliderEnabled"> Включить слайдер</label>
+              <label class="checkline"><input type="checkbox" id="sliderAutoplay"> Автопрокрутка</label>
+              <label class="checkline"><input type="checkbox" id="sliderShowControls"> Кнопки управления</label>
+              <label class="checkline"><input type="checkbox" id="sliderShowDots"> Точки</label>
+              <label class="checkline"><input type="checkbox" id="sliderPauseOnHover"> Пауза при наведении</label>
+              <div class="form-grid">
+                <label>
+                  Скорость, мс
+                  <input id="sliderIntervalMs" type="number" min="1500" max="60000" step="500">
+                </label>
+                <label>
+                  Переход, мс
+                  <input id="sliderTransitionMs" type="number" min="100" max="3000" step="50">
+                </label>
+                <label>
+                  Макс. постов
+                  <input id="sliderMaxItems" type="number" min="1" max="20">
+                </label>
+                <label>
+                  Фото
+                  <select id="sliderImageFit">
+                    <option value="cover">Заполнить блок</option>
+                    <option value="contain">Показать целиком</option>
+                  </select>
+                </label>
+                <label>
+                  Фото X, %
+                  <input id="sliderImagePositionX" type="number" min="0" max="100" step="1">
+                </label>
+                <label>
+                  Фото Y, %
+                  <input id="sliderImagePositionY" type="number" min="0" max="100" step="1">
+                </label>
+              </div>
+              <span class="inline-status" id="sliderStatus"></span>
+            </form>
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Посты в слайдере</h2>
+                <button class="button ghost" id="sliderRefreshButton" type="button">Обновить</button>
+              </div>
+              <div class="slider-admin-list" id="sliderPostList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="galleryView">
+          <div class="split">
+            <form class="panel editor" id="galleryForm">
+              <div class="panel-heading">
+                <h2>Фото</h2>
+                <button class="button" type="submit">Сохранить</button>
+              </div>
+              <input type="hidden" id="galleryId">
+              <input type="hidden" id="galleryImageUrl">
+              <label>
+                Загрузить фото
+                <input id="galleryFile" type="file" accept="image/*" multiple>
+              </label>
+              <p class="muted" id="galleryCurrentImage">Для нового фото выберите один или несколько файлов.</p>
+              <label>
+                Подпись
+                <input id="galleryCaption" maxlength="220" placeholder="Например: День открытых дверей">
+              </label>
+              <label>
+                Alt-текст
+                <input id="galleryAlt" maxlength="220" placeholder="Короткое описание фото">
+              </label>
+              <div class="form-grid">
+                <label>
+                  Порядок
+                  <input id="galleryOrder" type="number" min="0" max="10000" step="1" value="0">
+                </label>
+                <label class="checkline"><input type="checkbox" id="galleryEnabled" checked> Показывать на сайте</label>
+              </div>
+              <div class="form-actions">
+                <button class="button ghost" id="galleryResetButton" type="button">Новое фото</button>
+                <span class="inline-status" id="galleryStatus"></span>
+              </div>
+            </form>
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Фотографии</h2>
+                <button class="button ghost" id="galleryRefreshButton" type="button">Обновить</button>
+              </div>
+              <div class="gallery-list" id="galleryList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="integrationsView">
+          <form class="panel stack" id="integrationsForm">
+            <div class="panel-heading">
+              <h2>Telegram</h2>
+              <button class="button ghost" type="button" data-test="telegram">Тест</button>
+            </div>
+            <div class="form-grid">
+              <label class="checkline"><input type="checkbox" id="telegramEnabled"> Включено</label>
+              <label class="checkline"><input type="checkbox" id="telegramAutoPublish"> Автопубликация</label>
+              <label>Bot token из TELEGRAM_BOT_TOKEN <input id="telegramToken" autocomplete="off" readonly></label>
+              <label>Chat ID <input id="telegramChatId"></label>
+              <label>Webhook secret из TELEGRAM_WEBHOOK_SECRET <input id="telegramSecret" autocomplete="off" readonly></label>
+            </div>
+
+            <div class="panel-heading section-heading">
+              <h2>Bitrix24</h2>
+              <button class="button ghost" type="button" data-test="bitrix">Тест</button>
+            </div>
+            <div class="form-grid">
+              <label class="checkline"><input type="checkbox" id="bitrixEnabled"> Включено</label>
+              <label>Webhook URL из BITRIX_WEBHOOK_URL <input id="bitrixWebhook" autocomplete="off" readonly></label>
+              <label>Ответственный ID <input id="bitrixAssigned"></label>
+            </div>
+
+            <div class="panel-heading section-heading">
+              <h2>AI</h2>
+              <button class="button ghost" type="button" data-test="ai">Тест</button>
+            </div>
+            <div class="form-grid">
+              <label class="checkline"><input type="checkbox" id="aiEnabled"> Включено</label>
+              <label>Base URL <input id="aiBaseUrl"></label>
+              <label>Model <input id="aiModel"></label>
+              <label>API key из OPENAI_API_KEY <input id="aiApiKey" autocomplete="off" readonly></label>
+            </div>
+            <label>
+              System prompt
+              <textarea id="aiPrompt" rows="4"></textarea>
+            </label>
+            <div class="form-actions">
+              <button class="button" type="submit">Сохранить интеграции</button>
+              <span class="inline-status" id="integrationStatus"></span>
+            </div>
+          </form>
+        </section>
+
+        <section class="view" id="assistantView">
+          <div class="split">
+            <form class="panel editor" id="assistantForm">
+              <div class="panel-heading">
+                <h2>Диалог</h2>
+                <button class="button" type="submit">Ответить</button>
+              </div>
+              <label>
+                Сообщение клиента
+                <textarea id="assistantMessage" rows="8" required>Здравствуйте, чем вы можете помочь?</textarea>
+              </label>
+              <label>
+                Visitor ID
+                <input id="visitorId" value="demo-client">
+              </label>
+            </form>
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Ответ</h2>
+              </div>
+              <pre class="assistant-answer" id="assistantAnswer"></pre>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="knowledgeView">
+          <div class="split">
+            <form class="panel editor" id="knowledgeForm">
+              <div class="panel-heading">
+                <h2>Запись</h2>
+                <button class="button" type="submit">Добавить</button>
+              </div>
+              <label>Название <input id="knowledgeTitle" required></label>
+              <label>Тип <input id="knowledgeKind" value="note"></label>
+              <label>Теги <input id="knowledgeTags" placeholder="sales, service"></label>
+              <label>Содержание <textarea id="knowledgeContent" rows="12" required></textarea></label>
+            </form>
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>База знаний</h2>
+              </div>
+              <div class="knowledge-list" id="knowledgeList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="securityView">
+          <form class="panel stack" id="passwordForm">
+            <div class="panel-heading">
+              <h2>Смена пароля администратора</h2>
+              <button class="button" type="submit">Изменить пароль</button>
+            </div>
+            <p class="muted">После смены пароля потребуется войти заново. Остальные активные сеансы также будут завершены.</p>
+            <div class="form-grid">
+              <label>
+                Текущий пароль
+                <input id="currentPassword" type="password" autocomplete="current-password" required>
+              </label>
+              <label>
+                Новый пароль
+                <input id="newPassword" type="password" autocomplete="new-password" minlength="6" required>
+              </label>
+              <label>
+                Повторите новый пароль
+                <input id="passwordConfirmation" type="password" autocomplete="new-password" minlength="6" required>
+              </label>
+            </div>
+            <span class="inline-status" id="passwordStatus"></span>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="/app.js?v=2" type="module"></script>
+  </body>
+</html>

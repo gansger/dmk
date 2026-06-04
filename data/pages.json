@@ -1,0 +1,3415 @@
+{
+  "home": {
+    "id": "home",
+    "title": "Дагестанский медицинский колледж",
+    "updatedAt": "2026-06-03T10:45:22.505Z",
+    "blocks": [
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "order": 0,
+        "fields": {
+          "eyebrowHtml": "CMS Engine",
+          "titleHtml": "Публикации сайта",
+          "textHtml": "Материалы появляются здесь после публикации в админке."
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": true,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 1330,
+            "align": "left",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": true,
+        "order": 20,
+        "fields": {
+          "emptyTitleHtml": "Пока нет публикаций",
+          "emptyTextHtml": "Опубликуйте первый материал в админке.",
+          "titleHtml": "Новости",
+          "limit": 4,
+          "cardMinWidth": 250,
+          "cardHeight": 0,
+          "coverHeight": 0,
+          "allPageId": "novosti",
+          "allLinkText": "Все новости",
+          "showAllLink": true,
+          "maxWidth": 1320,
+          "align": "left"
+        }
+      },
+      {
+        "id": "93802c51-5126-4e28-88ee-dce973e44460",
+        "type": "container",
+        "enabled": true,
+        "order": 10,
+        "fields": {
+          "html": "\n    <article class=\"builder-card-item specialty-card linked-block\" data-builder-item-id=\"specialty-sestrinskoe-delo\" data-builder-item-type=\"card\" data-page-link=\"sestrinskoe-delo\" data-link-url=\"/?page=sestrinskoe-delo\" style=\"background-color: rgb(18, 60, 98); color: rgb(255, 255, 255); font-size: 16px; padding: 28px; border-radius: 25px; max-width: 1200px; min-height: 170px;\">\n      <div class=\"specialty-card-top\">\n      <div class=\"specialty-card-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <path d=\"M18 40c0 10 6 16 14 16s14-6 14-16V24\"></path>\n      <path d=\"M18 24v16\"></path>\n      <path d=\"M14 24h8\"></path>\n      <path d=\"M42 24h8\"></path>\n      <path d=\"M32 10v16\"></path>\n      <path d=\"M24 18h16\"></path>\n      <circle cx=\"46\" cy=\"46\" r=\"6\"></circle>\n    </svg>\n  </div>\n      <span class=\"builder-card-code\">34.02.01</span>\n    </div>\n      <h3 class=\"builder-card-title\">Сестринское дело</h3>\n    </article>\n  \n\n    <article class=\"builder-card-item specialty-card linked-block\" data-builder-item-id=\"specialty-stomatologiya-profilakticheskaya\" data-builder-item-type=\"card\" data-page-link=\"stomatologiya-profilakticheskaya\" data-link-url=\"/?page=stomatologiya-profilakticheskaya\" style=\"background-color: rgb(18, 60, 98); color: rgb(255, 255, 255); font-size: 16px; padding: 28px; border-radius: 25px; max-width: 1200px; min-height: 170px;\">\n      <div class=\"specialty-card-top\">\n      <div class=\"specialty-card-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <path d=\"M22 10c-8 0-12 7-10 16 1 6 4 10 6 17 2 8 4 13 8 13 3 0 4-7 6-14 2 7 3 14 6 14 4 0 6-5 8-13 2-7 5-11 6-17 2-9-2-16-10-16-4 0-7 2-10 4-3-2-6-4-10-4z\"></path>\n      <path d=\"M48 9v8\"></path>\n      <path d=\"M44 13h8\"></path>\n      <path d=\"M52 22v6\"></path>\n      <path d=\"M49 25h6\"></path>\n    </svg>\n  </div>\n      <span class=\"builder-card-code\">31.02.06</span>\n    </div>\n      <h3 class=\"builder-card-title\">Стоматология профилактическая</h3>\n    </article>\n  \n\n    <article class=\"builder-card-item specialty-card linked-block\" data-builder-item-id=\"specialty-medicinskiy-administrator\" data-builder-item-type=\"card\" data-page-link=\"medicinskiy-administrator\" data-link-url=\"/?page=medicinskiy-administrator\" style=\"background-color: rgb(18, 60, 98); color: rgb(255, 255, 255); font-size: 16px; padding: 28px; border-radius: 25px; max-width: 1200px; min-height: 170px;\">\n      <div class=\"specialty-card-top\">\n      <div class=\"specialty-card-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <rect x=\"12\" y=\"14\" width=\"40\" height=\"38\" rx=\"6\"></rect>\n      <path d=\"M24 14c0-4 3-6 8-6s8 2 8 6\"></path>\n      <path d=\"M22 30h20\"></path>\n      <path d=\"M22 39h14\"></path>\n      <circle cx=\"44\" cy=\"41\" r=\"5\"></circle>\n      <path d=\"M48 45l5 5\"></path>\n    </svg>\n  </div>\n      <span class=\"builder-card-code\">31.01.01</span>\n    </div>\n      <h3 class=\"builder-card-title\">Медицинский администратор</h3>\n    </article>\n  \n\n    <article class=\"builder-card-item specialty-card linked-block\" data-builder-item-id=\"specialty-stomatologiya-ortopedicheskaya\" data-builder-item-type=\"card\" data-page-link=\"stomatologiya-ortopedicheskaya\" data-link-url=\"/?page=stomatologiya-ortopedicheskaya\" style=\"background-color: rgb(18, 60, 98); color: rgb(255, 255, 255); font-size: 16px; padding: 28px; border-radius: 25px; max-width: 1200px; min-height: 170px;\">\n      <div class=\"specialty-card-top\">\n      <div class=\"specialty-card-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <path d=\"M23 11c-7 0-11 6-10 14 1 6 4 10 6 17 2 8 4 13 8 13 3 0 4-7 5-13 2 6 3 13 6 13 4 0 6-5 8-13 2-7 5-11 6-17 1-8-3-14-10-14-4 0-7 2-10 4-3-2-6-4-9-4z\"></path>\n      <path d=\"M20 25h24\"></path>\n      <path d=\"M24 31h16\"></path>\n      <circle cx=\"50\" cy=\"47\" r=\"6\"></circle>\n      <path d=\"M50 43v8\"></path>\n      <path d=\"M46 47h8\"></path>\n    </svg>\n  </div>\n      <span class=\"builder-card-code\">31.02.05</span>\n    </div>\n      <h3 class=\"builder-card-title\">Стоматология ортопедическая</h3>\n    </article>\n  \n\n    <article class=\"builder-card-item specialty-card linked-block\" data-builder-item-id=\"specialty-akusherskoe-delo\" data-builder-item-type=\"card\" data-page-link=\"akusherskoe-delo\" data-link-url=\"/?page=akusherskoe-delo\" style=\"background-color: rgb(18, 60, 98); color: rgb(255, 255, 255); font-size: 16px; padding: 28px; border-radius: 25px; max-width: 1200px; min-height: 170px;\">\n      <div class=\"specialty-card-top\">\n      <div class=\"specialty-card-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <path d=\"M32 52s-18-10-22-24c-2-8 4-14 11-14 5 0 9 3 11 7 2-4 6-7 11-7 7 0 13 6 11 14-4 14-22 24-22 24z\"></path>\n      <path d=\"M26 34c2 3 4 5 6 5s4-2 6-5\"></path>\n      <path d=\"M25 27h.01\"></path>\n      <path d=\"M39 27h.01\"></path>\n    </svg>\n  </div>\n      <span class=\"builder-card-code\">31.02.02</span>\n    </div>\n      <h3 class=\"builder-card-title\">Акушерское дело</h3>\n    </article>\n  \n\n    <article class=\"builder-card-item specialty-card linked-block\" data-builder-item-id=\"specialty-lechebnoe-delo\" data-builder-item-type=\"card\" data-page-link=\"lechebnoe-delo\" data-link-url=\"/?page=lechebnoe-delo\" style=\"background-color: rgb(18, 60, 98); color: rgb(255, 255, 255); font-size: 16px; padding: 28px; border-radius: 25px; max-width: 1200px; min-height: 170px;\">\n      <div class=\"specialty-card-top\">\n      <div class=\"specialty-card-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <rect x=\"10\" y=\"20\" width=\"44\" height=\"32\" rx=\"6\"></rect>\n      <path d=\"M24 20v-6h16v6\"></path>\n      <path d=\"M32 28v16\"></path>\n      <path d=\"M24 36h16\"></path>\n      <path d=\"M10 32h44\"></path>\n    </svg>\n  </div>\n      <span class=\"builder-card-code\">31.02.01</span>\n    </div>\n      <h3 class=\"builder-card-title\">Лечебное дело</h3>\n    </article>\n  ",
+          "styles": {
+            "display": "grid",
+            "flexDirection": "row",
+            "justifyContent": "flex-start",
+            "alignItems": "stretch",
+            "position": "center",
+            "gap": 18,
+            "padding": 28,
+            "maxWidth": 1180,
+            "height": 0,
+            "backgroundColor": "#f8fafc",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "borderRadius": 0,
+            "gridColumns": 3,
+            "flexWrap": "nowrap"
+          },
+          "titleHtml": "Наши специальности"
+        }
+      },
+      {
+        "id": "site-right-panel",
+        "type": "rightPanel",
+        "enabled": true,
+        "order": 15,
+        "fields": {
+          "html": "\n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n  <article class=\"builder-widget-item\" data-builder-item-id=\"widget-c58eac11-153d-44ba-8961-3f7b0ec6302b\" data-builder-item-type=\"widget\" style=\"background-color: rgb(248, 250, 252); color: rgb(24, 32, 47); font-size: 16px; padding: 22px; border-radius: 8px; max-width: 1200px; min-height: 160px;\">\n    <h3 class=\"builder-widget-title\">&nbsp;обращение директора</h3>\n    <img class=\"builder-widget-image\" src=\"https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg\" alt=\"\" style=\"border-radius: 200px !important;\">\n    <strong class=\"builder-widget-subtitle\">Директор колледжа</strong>\n    <p class=\"builder-widget-text\">Добро пожаловать! Дорогие студенты, абитуриенты, родители, коллеги и партнёры!&nbsp;</p>\n    <a class=\"builder-widget-link\" href=\"?page=director-address\" style=\"font-size: 12px !important; justify-self: center !important; background-color: rgb(18, 60, 98) !important;\">Читать полностью</a>\n  </article>\n\n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    ",
+          "styles": {
+            "display": "grid",
+            "flexDirection": "column",
+            "justifyContent": "flex-start",
+            "alignItems": "stretch",
+            "position": "center",
+            "gap": 16,
+            "padding": 14,
+            "maxWidth": 310,
+            "height": 0,
+            "backgroundColor": "#f8fafc",
+            "textColor": "#0f172a",
+            "fontSize": 14,
+            "borderRadius": 0,
+            "gridColumns": 0,
+            "flexWrap": "nowrap"
+          }
+        }
+      },
+      {
+        "id": "cc380ec2-4c61-4953-b5a7-77c3d3fbb984",
+        "type": "container",
+        "enabled": true,
+        "order": 40,
+        "fields": {
+          "html": "\n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  \n    \n  ",
+          "styles": {
+            "display": "grid",
+            "flexDirection": "row",
+            "justifyContent": "flex-start",
+            "alignItems": "stretch",
+            "position": "center",
+            "gap": 20,
+            "padding": 0,
+            "maxWidth": 1140,
+            "height": 0,
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "borderRadius": 27,
+            "gridColumns": 0,
+            "flexWrap": "nowrap"
+          },
+          "titleHtml": "Преподаватели"
+        }
+      }
+    ]
+  },
+  "svedeniya-ob-obrazovatelnoy-organizacii": {
+    "id": "svedeniya-ob-obrazovatelnoy-organizacii",
+    "title": "Сведения об образовательной организации",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 2400,
+            "align": "center",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "cb115e59-615f-4718-a7d4-73ec4d3aaad5",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "html": "<h2>Сведения об образовательной организации</h2><p><br></p><p>ЭТО называется что то</p><p><br></p><p><br></p><p><br></p>",
+          "styles": {
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 1060,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya": {
+    "id": "vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya",
+    "title": "Внутренняя система оценки качества образования",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 2400,
+            "align": "center",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "737754ae-4143-4302-ac98-95f25eb1ed7c",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "html": "<h2>Внутренняя система оценки качества образования</h2><p>Новая страница. Здесь можно добавить текст, div-блоки, карточки и ссылки.</p>",
+          "styles": {
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 1060,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "medicinskiy-administrator": {
+    "id": "medicinskiy-administrator",
+    "title": "Медицинский администратор",
+    "updatedAt": "2026-06-03T00:18:02.351Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {}
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "specialty-detail-medicinskiy-administrator",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "titleHtml": "",
+          "html": "\n    <section class=\"specialty-detail\">\n      <div class=\"specialty-detail-hero\">\n        <div class=\"specialty-detail-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <rect x=\"12\" y=\"14\" width=\"40\" height=\"38\" rx=\"6\"></rect>\n      <path d=\"M24 14c0-4 3-6 8-6s8 2 8 6\"></path>\n      <path d=\"M22 30h20\"></path>\n      <path d=\"M22 39h14\"></path>\n      <circle cx=\"44\" cy=\"41\" r=\"5\"></circle>\n      <path d=\"M48 45l5 5\"></path>\n    </svg>\n  </div>\n        <div>\n          <span class=\"specialty-detail-code\">31.01.01</span>\n          <h2>Медицинский администратор</h2>\n          <p class=\"specialty-detail-lead\">Организация приема пациентов, документооборота и коммуникации в медицинской организации.</p>\n        </div>\n      </div>\n      <div class=\"specialty-detail-grid\">\n        \n        <article class=\"specialty-info-card\">\n          <h3>На базе 9 классов</h3>\n          <ul>\n            <li>очно — 1 год 10 месяцев (100 тыс.)</li>\n          </ul>\n        </article>\n      \n        <article class=\"specialty-info-card\">\n          <h3>На базе 11 классов</h3>\n          <ul>\n            <li>очно — 10 месяцев (100 тыс.)</li>\n          </ul>\n        </article>\n      \n      </div>\n      <div class=\"specialty-qualification\">Квалификация: Медицинский администратор</div>\n    </section>\n  ",
+          "styles": {
+            "backgroundColor": "#f8fafc",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 28,
+            "borderRadius": 0,
+            "maxWidth": 1180,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "novosti": {
+    "id": "novosti",
+    "title": "Новости",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 2400,
+            "align": "center",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": true,
+        "order": 20,
+        "fields": {
+          "titleHtml": "Новости",
+          "limit": 0,
+          "cardMinWidth": 360,
+          "cardHeight": 0,
+          "coverHeight": 0,
+          "allPageId": "novosti",
+          "allLinkText": "Все новости",
+          "showAllLink": false,
+          "emptyTitleHtml": "Пока нет публикаций",
+          "emptyTextHtml": "Опубликуйте первый материал в админке.",
+          "maxWidth": 2400,
+          "align": "center"
+        }
+      }
+    ]
+  },
+  "post-tul": {
+    "id": "post-tul",
+    "title": "ыаыаыва",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 2400,
+            "align": "center",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "post-content-8917bec7-7756-4f44-ae64-430d7c307488",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "generatedFromPostId": "8917bec7-7756-4f44-ae64-430d7c307488",
+          "html": "\n    <article class=\"post-detail\">\n      <a class=\"read-link\" href=\"/site.html?page=novosti\">Назад к новостям</a>\n      <p class=\"eyebrow\">2 июня 2026 г.</p>\n      <h2>ыаыаыва</h2>\n      \n      \n      <div style=\"position: relative; width: 100%; padding-top: 56.25%; border-radius: 8px; margin-bottom: 24px; overflow: hidden; background: #000;\">\n        <iframe src=\"https://drive.google.com/file/d/1Otz0DGSQE3ConY5nRUhuteeam3U6-qQp/preview\" style=\"position: absolute; top: -56px; left: 0; width: 100%; height: calc(100% + 56px); border: none;\" allow=\"autoplay\" allowfullscreen></iframe>\n      </div>\n    \n      <div class=\"post-body\">ваывапвап</div>\n      \n    </article>\n  ",
+          "styles": {
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 22,
+            "borderRadius": 0,
+            "maxWidth": 1060,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "post-kishmish": {
+    "id": "post-kishmish",
+    "title": "кишмиш",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 2400,
+            "align": "center",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "post-content-c2e341dd-c0a6-417a-b277-7544ab9a9585",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "generatedFromPostId": "c2e341dd-c0a6-417a-b277-7544ab9a9585",
+          "html": "\n    <article class=\"post-detail\">\n      <a class=\"read-link\" href=\"/site.html?page=novosti\">Назад к новостям</a>\n      <p class=\"eyebrow\">28 мая 2026 г.</p>\n      <h2>кишмиш</h2>\n      <img class=\"post-cover\" src=\"/uploads/telegram/c2e341dd-c0a6-417a-b277-7544ab9a9585-1.jpg\" alt=\"\">\n      <div class=\"post-body\">кишмиш</div>\n      \n    </article>\n  ",
+          "styles": {
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 22,
+            "borderRadius": 0,
+            "maxWidth": 1060,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "post-vot-takoy-dizayn-sdelal": {
+    "id": "post-vot-takoy-dizayn-sdelal",
+    "title": "Вот такой дизайн сделал.",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 2400,
+            "align": "center",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "post-content-9f1e5bf9-054b-470d-94e8-ad4afdf750a6",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "generatedFromPostId": "9f1e5bf9-054b-470d-94e8-ad4afdf750a6",
+          "html": "\n    <article class=\"post-detail\">\n      <a class=\"read-link\" href=\"/site.html?page=novosti\">Назад к новостям</a>\n      <p class=\"eyebrow\">28 мая 2026 г.</p>\n      <h2>Вот такой дизайн сделал.</h2>\n      <img class=\"post-cover\" src=\"/uploads/telegram/9f1e5bf9-054b-470d-94e8-ad4afdf750a6-1.jpg\" alt=\"\">\n      <div class=\"post-body\">Вот такой дизайн сделал. <br><br>Ежже биш миш</div>\n      \n    </article>\n  ",
+          "styles": {
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 22,
+            "borderRadius": 0,
+            "maxWidth": 1060,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "post-telegram-photo-post-4": {
+    "id": "post-telegram-photo-post-4",
+    "title": "Telegram photo post",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 2400,
+            "align": "center",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "post-content-8e47478f-fcb7-4e67-a1aa-054ebac4d83f",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "generatedFromPostId": "8e47478f-fcb7-4e67-a1aa-054ebac4d83f",
+          "html": "\n    <article class=\"post-detail\">\n      <a class=\"read-link\" href=\"/site.html?page=novosti\">Назад к новостям</a>\n      <p class=\"eyebrow\">29 мая 2026 г.</p>\n      <h2>Telegram photo post</h2>\n      <img class=\"post-cover\" src=\"/uploads/telegram/8e47478f-fcb7-4e67-a1aa-054ebac4d83f-1.jpg\" alt=\"\">\n      <div class=\"post-body\"></div>\n      \n    </article>\n  ",
+          "styles": {
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 22,
+            "borderRadius": 0,
+            "maxWidth": 1060,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "post-telegram-photo-post-3": {
+    "id": "post-telegram-photo-post-3",
+    "title": "Telegram photo post",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 2400,
+            "align": "center",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "post-content-b36f053f-3efb-48fc-a629-ff92070d8216",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "generatedFromPostId": "b36f053f-3efb-48fc-a629-ff92070d8216",
+          "html": "\n    <article class=\"post-detail\">\n      <a class=\"read-link\" href=\"/site.html?page=novosti\">Назад к новостям</a>\n      <p class=\"eyebrow\">29 мая 2026 г.</p>\n      <h2>Telegram photo post</h2>\n      <img class=\"post-cover\" src=\"/uploads/telegram/b36f053f-3efb-48fc-a629-ff92070d8216-1.jpg\" alt=\"\">\n      <div class=\"post-body\"></div>\n      \n    </article>\n  ",
+          "styles": {
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 22,
+            "borderRadius": 0,
+            "maxWidth": 1060,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "post-telegram-photo-post-2": {
+    "id": "post-telegram-photo-post-2",
+    "title": "Telegram photo post",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 2400,
+            "align": "center",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "post-content-89a34dfe-86d6-4604-ac19-9b73a4d16aa6",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "generatedFromPostId": "89a34dfe-86d6-4604-ac19-9b73a4d16aa6",
+          "html": "\n    <article class=\"post-detail\">\n      <a class=\"read-link\" href=\"/site.html?page=novosti\">Назад к новостям</a>\n      <p class=\"eyebrow\">29 мая 2026 г.</p>\n      <h2>Telegram photo post</h2>\n      <img class=\"post-cover\" src=\"/uploads/telegram/89a34dfe-86d6-4604-ac19-9b73a4d16aa6-1.jpg\" alt=\"\">\n      <div class=\"post-body\"></div>\n      \n    </article>\n  ",
+          "styles": {
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 22,
+            "borderRadius": 0,
+            "maxWidth": 1060,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "director-address": {
+    "id": "director-address",
+    "title": "Обращение Директора",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "text-1780109105474",
+        "type": "text",
+        "enabled": true,
+        "order": 10,
+        "fields": {
+          "html": "\n    <div class=\"director-address-page\" style=\"padding: 60px 20px; max-width: 800px; margin: 0 auto; text-align: center; font-family: sans-serif;\">\n      <h1 style=\"font-size: 36px; font-weight: 800; color: #0f172a; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 1px;\">Обращение Директора</h1>\n      <img src=\"https://gansgerr.ddns.net/assets/avatar.jpg\" style=\"width: 250px; height: 250px; object-fit: cover; border-radius: 50%; border: 6px solid #087789; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(8,119,137,0.2);\">\n      <h3 style=\"font-size: 26px; color: #087789; margin-bottom: 30px; font-weight: 700;\">Директор колледжа</h3>\n      <div style=\"font-size: 18px; line-height: 1.8; color: #334155; text-align: left; background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);\">\n        <p>Добро пожаловать! Дорогие студенты, абитуриенты, родители, коллеги и партнёры!&nbsp;</p>\n      </div>\n      <div style=\"margin-top: 50px;\">\n        <a href=\"?page=home\" style=\"display: inline-block; padding: 16px 32px; background: #087789; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: opacity 0.2s; box-shadow: 0 4px 12px rgba(8,119,137,0.3);\">← Вернуться на главную</a>\n      </div>\n    </div>\n  ",
+          "styles": {
+            "backgroundColor": "#f8fafc",
+            "color": "#0f172a",
+            "padding": 20
+          }
+        }
+      },
+      {
+        "id": "slider-1780109595210",
+        "type": "slider",
+        "enabled": false,
+        "order": 2
+      },
+      {
+        "id": "posts-1780109595210",
+        "type": "posts",
+        "enabled": false,
+        "order": 3
+      }
+    ]
+  },
+  "obrazovanie": {
+    "id": "obrazovanie",
+    "title": "Образование",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост"
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "999f39c6-c96b-4cf3-927c-e24d643bddfb",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "html": "<h2>Образование</h2><p>Новая страница. Здесь можно добавить текст, div-блоки, карточки и ссылки.</p>",
+          "styles": {
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 1060,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "elektronnaya-informacionno-obrazovatelnaya-sreda": {
+    "id": "elektronnaya-informacionno-obrazovatelnaya-sreda",
+    "title": "Электронная информационно-образовательная среда",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 2400,
+            "align": "center",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {
+          "titleHtml": "Новости",
+          "limit": 4,
+          "cardMinWidth": 360,
+          "cardHeight": 0,
+          "coverHeight": 0,
+          "maxWidth": 2400,
+          "align": "center",
+          "allPageId": "novosti",
+          "allLinkText": "Все новости",
+          "showAllLink": true,
+          "emptyTitleHtml": "Пока нет публикаций",
+          "emptyTextHtml": "Опубликуйте первый материал в админке."
+        }
+      },
+      {
+        "id": "f19f48fd-e7ae-4767-8633-820fa7b954ae",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "html": "<h2>Электронная информационно-образовательная среда</h2><p><br></p><p>жи есть</p>",
+          "styles": {
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 1060,
+            "height": 0
+          },
+          "titleHtml": "Заголовок блока"
+        }
+      }
+    ]
+  },
+  "post-zhil-byl-pes": {
+    "id": "post-zhil-byl-pes",
+    "title": "Жил был пес",
+    "updatedAt": "2026-06-02T23:36:19.234Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {
+          "labelHtml": "Избранное",
+          "buttonHtml": "Открыть пост",
+          "styles": {
+            "maxWidth": 2400,
+            "align": "center",
+            "borderRadius": 0,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "post-content-8c5fc495-bfcb-49fa-a00f-537dfdbf3695",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "generatedFromPostId": "8c5fc495-bfcb-49fa-a00f-537dfdbf3695",
+          "html": "\n    <article class=\"post-detail\">\n      <a class=\"read-link\" href=\"/site.html?page=novosti\">Назад к новостям</a>\n      <p class=\"eyebrow\">2 июня 2026 г.</p>\n      <h2>Жил был пес</h2>\n      \n      <video controls class=\"post-video\" src=\"/uploads/telegram/8c5fc495-bfcb-49fa-a00f-537dfdbf3695-1.MOV\" style=\"width: 100%; aspect-ratio: 16/9; border: none; border-radius: 8px; margin-bottom: 24px; display: block; background: #000;\"></video>\n      <div class=\"post-body\">Жил был пес</div>\n      \n    </article>\n  ",
+          "styles": {
+            "backgroundColor": "#ffffff",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 22,
+            "borderRadius": 0,
+            "maxWidth": 1060,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "sestrinskoe-delo": {
+    "id": "sestrinskoe-delo",
+    "title": "Сестринское дело",
+    "updatedAt": "2026-06-03T00:18:02.351Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {}
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "specialty-detail-sestrinskoe-delo",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "titleHtml": "",
+          "html": "\n    <section class=\"specialty-detail\">\n      <div class=\"specialty-detail-hero\">\n        <div class=\"specialty-detail-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <path d=\"M18 40c0 10 6 16 14 16s14-6 14-16V24\"></path>\n      <path d=\"M18 24v16\"></path>\n      <path d=\"M14 24h8\"></path>\n      <path d=\"M42 24h8\"></path>\n      <path d=\"M32 10v16\"></path>\n      <path d=\"M24 18h16\"></path>\n      <circle cx=\"46\" cy=\"46\" r=\"6\"></circle>\n    </svg>\n  </div>\n        <div>\n          <span class=\"specialty-detail-code\">34.02.01</span>\n          <h2>Сестринское дело</h2>\n          <p class=\"specialty-detail-lead\">Подготовка медицинских сестер и медицинских братьев для работы в лечебных учреждениях.</p>\n        </div>\n      </div>\n      <div class=\"specialty-detail-grid\">\n        \n        <article class=\"specialty-info-card\">\n          <h3>На базе 9 классов</h3>\n          <ul>\n            <li>очно — 2 года 10 месяцев (90 тыс.)</li>\n          </ul>\n        </article>\n      \n        <article class=\"specialty-info-card\">\n          <h3>На базе 11 классов</h3>\n          <ul>\n            <li>очно — 1 год 10 месяцев (90 тыс.)</li><li>очно-заочно — 2 года 10 месяцев (90 тыс.)</li>\n          </ul>\n        </article>\n      \n      </div>\n      <div class=\"specialty-qualification\">Квалификация: Мед. сестра / мед. брат</div>\n    </section>\n  ",
+          "styles": {
+            "backgroundColor": "#f8fafc",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 28,
+            "borderRadius": 0,
+            "maxWidth": 1180,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "stomatologiya-profilakticheskaya": {
+    "id": "stomatologiya-profilakticheskaya",
+    "title": "Стоматология профилактическая",
+    "updatedAt": "2026-06-03T00:18:02.351Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {}
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "specialty-detail-stomatologiya-profilakticheskaya",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "titleHtml": "",
+          "html": "\n    <section class=\"specialty-detail\">\n      <div class=\"specialty-detail-hero\">\n        <div class=\"specialty-detail-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <path d=\"M22 10c-8 0-12 7-10 16 1 6 4 10 6 17 2 8 4 13 8 13 3 0 4-7 6-14 2 7 3 14 6 14 4 0 6-5 8-13 2-7 5-11 6-17 2-9-2-16-10-16-4 0-7 2-10 4-3-2-6-4-10-4z\"></path>\n      <path d=\"M48 9v8\"></path>\n      <path d=\"M44 13h8\"></path>\n      <path d=\"M52 22v6\"></path>\n      <path d=\"M49 25h6\"></path>\n    </svg>\n  </div>\n        <div>\n          <span class=\"specialty-detail-code\">31.02.06</span>\n          <h2>Стоматология профилактическая</h2>\n          <p class=\"specialty-detail-lead\">Профилактика стоматологических заболеваний и профессиональная гигиена полости рта.</p>\n        </div>\n      </div>\n      <div class=\"specialty-detail-grid\">\n        \n        <article class=\"specialty-info-card\">\n          <h3>На базе 9 классов</h3>\n          <ul>\n            <li>очно — 2 года 10 месяцев (100 тыс.)</li><li>очно-заочно — 3 года 10 месяцев (100 тыс.)</li>\n          </ul>\n        </article>\n      \n        <article class=\"specialty-info-card\">\n          <h3>На базе 11 классов</h3>\n          <ul>\n            <li>очно — 1 год 10 месяцев (100 тыс.)</li><li>очно-заочно — 2 года 10 месяцев (100 тыс.)</li>\n          </ul>\n        </article>\n      \n      </div>\n      <div class=\"specialty-qualification\">Квалификация: Гигиенист стоматологический</div>\n    </section>\n  ",
+          "styles": {
+            "backgroundColor": "#f8fafc",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 28,
+            "borderRadius": 0,
+            "maxWidth": 1180,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "stomatologiya-ortopedicheskaya": {
+    "id": "stomatologiya-ortopedicheskaya",
+    "title": "Стоматология ортопедическая",
+    "updatedAt": "2026-06-03T00:18:02.351Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {}
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "specialty-detail-stomatologiya-ortopedicheskaya",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "titleHtml": "",
+          "html": "\n    <section class=\"specialty-detail\">\n      <div class=\"specialty-detail-hero\">\n        <div class=\"specialty-detail-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <path d=\"M23 11c-7 0-11 6-10 14 1 6 4 10 6 17 2 8 4 13 8 13 3 0 4-7 5-13 2 6 3 13 6 13 4 0 6-5 8-13 2-7 5-11 6-17 1-8-3-14-10-14-4 0-7 2-10 4-3-2-6-4-9-4z\"></path>\n      <path d=\"M20 25h24\"></path>\n      <path d=\"M24 31h16\"></path>\n      <circle cx=\"50\" cy=\"47\" r=\"6\"></circle>\n      <path d=\"M50 43v8\"></path>\n      <path d=\"M46 47h8\"></path>\n    </svg>\n  </div>\n        <div>\n          <span class=\"specialty-detail-code\">31.02.05</span>\n          <h2>Стоматология ортопедическая</h2>\n          <p class=\"specialty-detail-lead\">Изготовление зубных протезов и ортопедических конструкций в зуботехнической лаборатории.</p>\n        </div>\n      </div>\n      <div class=\"specialty-detail-grid\">\n        \n        <article class=\"specialty-info-card\">\n          <h3>На базе 11 классов</h3>\n          <ul>\n            <li>очно — 1 год 10 месяцев (100 тыс.)</li><li>очно-заочно — 2 года 10 месяцев (100 тыс.)</li>\n          </ul>\n        </article>\n      \n      </div>\n      <div class=\"specialty-qualification\">Квалификация: Зубной техник</div>\n    </section>\n  ",
+          "styles": {
+            "backgroundColor": "#f8fafc",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 28,
+            "borderRadius": 0,
+            "maxWidth": 1180,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "akusherskoe-delo": {
+    "id": "akusherskoe-delo",
+    "title": "Акушерское дело",
+    "updatedAt": "2026-06-03T00:18:02.351Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {}
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "specialty-detail-akusherskoe-delo",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "titleHtml": "",
+          "html": "\n    <section class=\"specialty-detail\">\n      <div class=\"specialty-detail-hero\">\n        <div class=\"specialty-detail-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <path d=\"M32 52s-18-10-22-24c-2-8 4-14 11-14 5 0 9 3 11 7 2-4 6-7 11-7 7 0 13 6 11 14-4 14-22 24-22 24z\"></path>\n      <path d=\"M26 34c2 3 4 5 6 5s4-2 6-5\"></path>\n      <path d=\"M25 27h.01\"></path>\n      <path d=\"M39 27h.01\"></path>\n    </svg>\n  </div>\n        <div>\n          <span class=\"specialty-detail-code\">31.02.02</span>\n          <h2>Акушерское дело</h2>\n          <p class=\"specialty-detail-lead\">Сопровождение беременности, родовспоможение и помощь матери и ребенку.</p>\n        </div>\n      </div>\n      <div class=\"specialty-detail-grid\">\n        \n        <article class=\"specialty-info-card\">\n          <h3>На базе 9 классов</h3>\n          <ul>\n            <li>очно — 3 года 6 месяцев (100 тыс.)</li>\n          </ul>\n        </article>\n      \n        <article class=\"specialty-info-card\">\n          <h3>На базе 11 классов</h3>\n          <ul>\n            <li>очно — 2 года 6 месяцев (100 тыс.)</li>\n          </ul>\n        </article>\n      \n      </div>\n      <div class=\"specialty-qualification\">Квалификация: Акушерка / акушер</div>\n    </section>\n  ",
+          "styles": {
+            "backgroundColor": "#f8fafc",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 28,
+            "borderRadius": 0,
+            "maxWidth": 1180,
+            "height": 0
+          }
+        }
+      }
+    ]
+  },
+  "lechebnoe-delo": {
+    "id": "lechebnoe-delo",
+    "title": "Лечебное дело",
+    "updatedAt": "2026-06-03T00:18:02.351Z",
+    "blocks": [
+      {
+        "id": "site-header-nav",
+        "type": "headerNav",
+        "enabled": true,
+        "order": -30,
+        "fields": {
+          "items": [
+            {
+              "id": "item-2",
+              "label": "Приемная комиссия",
+              "href": "#"
+            },
+            {
+              "id": "item-3",
+              "label": "+7 928 544 04 06",
+              "href": "tel:+79285440406"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 16,
+            "padding": 14,
+            "borderRadius": 0,
+            "maxWidth": 2400,
+            "height": 0
+          }
+        }
+      },
+      {
+        "id": "site-side-menu",
+        "type": "sideMenu",
+        "enabled": true,
+        "order": -20,
+        "fields": {
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Сведения об образовательной организации",
+              "href": "/site.html?page=svedeniya-ob-obrazovatelnoy-organizacii"
+            },
+            {
+              "id": "item-2",
+              "label": "Внутренняя система оценки качества образования",
+              "href": "/site.html?page=vnutrennyaya-sistema-ocenki-kachestva-obrazovaniya"
+            },
+            {
+              "id": "item-3",
+              "label": "Электронная информационно-образовательная среда",
+              "href": "/site.html?page=elektronnaya-informacionno-obrazovatelnaya-sreda"
+            },
+            {
+              "id": "item-4",
+              "label": "Комплексная безопасность",
+              "href": "#"
+            },
+            {
+              "id": "item-5",
+              "label": "Образование",
+              "href": "/site.html?page=obrazovanie"
+            },
+            {
+              "id": "item-6",
+              "label": "Жизнь колледжа",
+              "href": "#"
+            },
+            {
+              "id": "item-7",
+              "label": "Центр карьеры",
+              "href": "#"
+            },
+            {
+              "id": "item-8",
+              "label": "Отдел практик",
+              "href": "/site.html?page=otdel-praktik"
+            },
+            {
+              "id": "item-9",
+              "label": "Воспитательная работа",
+              "href": "#"
+            },
+            {
+              "id": "item-10",
+              "label": "Спортивный клуб",
+              "href": "#"
+            },
+            {
+              "id": "item-11",
+              "label": "Центр профессионального обучения",
+              "href": "#"
+            },
+            {
+              "id": "item-12",
+              "label": "Аккредитация",
+              "href": "#"
+            },
+            {
+              "id": "item-13",
+              "label": "Контакты",
+              "href": "#"
+            },
+            {
+              "id": "item-14",
+              "label": "Пресс",
+              "href": "#"
+            }
+          ],
+          "styles": {
+            "backgroundColor": "#123c62",
+            "textColor": "#ffffff",
+            "fontSize": 14,
+            "padding": 0,
+            "borderRadius": 0,
+            "maxWidth": 280,
+            "height": 0
+          },
+          "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
+          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoText": "Лого"
+        }
+      },
+      {
+        "id": "slider",
+        "type": "slider",
+        "enabled": false,
+        "order": 10,
+        "fields": {}
+      },
+      {
+        "id": "posts",
+        "type": "posts",
+        "enabled": false,
+        "order": 20,
+        "fields": {}
+      },
+      {
+        "id": "specialty-detail-lechebnoe-delo",
+        "type": "text",
+        "enabled": true,
+        "order": 30,
+        "fields": {
+          "titleHtml": "",
+          "html": "\n    <section class=\"specialty-detail\">\n      <div class=\"specialty-detail-hero\">\n        <div class=\"specialty-detail-icon\">\n    <svg viewBox=\"0 0 64 64\" aria-hidden=\"true\">\n      <rect x=\"10\" y=\"20\" width=\"44\" height=\"32\" rx=\"6\"></rect>\n      <path d=\"M24 20v-6h16v6\"></path>\n      <path d=\"M32 28v16\"></path>\n      <path d=\"M24 36h16\"></path>\n      <path d=\"M10 32h44\"></path>\n    </svg>\n  </div>\n        <div>\n          <span class=\"specialty-detail-code\">31.02.01</span>\n          <h2>Лечебное дело</h2>\n          <p class=\"specialty-detail-lead\">Подготовка фельдшеров для оказания первичной медицинской и неотложной помощи.</p>\n        </div>\n      </div>\n      <div class=\"specialty-detail-grid\">\n        \n        <article class=\"specialty-info-card\">\n          <h3>На базе 9 классов</h3>\n          <ul>\n            <li>очно — 3 года 10 месяцев (100 тыс.)</li>\n          </ul>\n        </article>\n      \n        <article class=\"specialty-info-card\">\n          <h3>На базе 11 классов</h3>\n          <ul>\n            <li>очно — 2 года 10 месяцев (100 тыс.)</li>\n          </ul>\n        </article>\n      \n      </div>\n      <div class=\"specialty-qualification\">Квалификация: Фельдшер</div>\n    </section>\n  ",
+          "styles": {
+            "backgroundColor": "#f8fafc",
+            "textColor": "#18202f",
+            "fontSize": 16,
+            "padding": 28,
+            "borderRadius": 0,
+            "maxWidth": 1180,
+            "height": 0
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+.env.local
+data/*.sqlite
+data/*.sqlite-*
+public/uploads/

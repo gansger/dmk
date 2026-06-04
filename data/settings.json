@@ -1,0 +1,15 @@
+{
+  "slider": {
+    "enabled": true,
+    "autoplay": true,
+    "intervalMs": 6500,
+    "transitionMs": 700,
+    "showControls": true,
+    "showDots": true,
+    "pauseOnHover": true,
+    "maxItems": 6,
+    "imageFit": "cover",
+    "imagePositionX": 50,
+    "imagePositionY": 50
+  }
+}
