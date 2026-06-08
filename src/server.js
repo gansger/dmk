@@ -33,6 +33,7 @@ const publicDir = path.join(rootDir, 'public');
 const port = Number(process.env.PORT || 3003);
 let publicSiteTemplate;
 const loginAttempts = new Map();
+const publicRequestLimits = new Map();
 const editorUploadMaxBytes = 8 * 1024 * 1024;
 const editorUploadBodyMaxBytes = 12 * 1024 * 1024;
 const editorUploadTypes = new Map([
@@ -121,7 +122,35 @@ function mergeIntegrations(previous, next) {
 }
 
 function loginAttemptKey(request) {
+  return clientIp(request);
+}
+
+function clientIp(request) {
+  if (process.env.CMS_TRUST_PROXY === 'true') {
+    const realIp = String(request.headers['x-real-ip'] || '').trim();
+    if (realIp) return realIp;
+  }
   return request.socket.remoteAddress || 'unknown';
+}
+
+function pruneRateLimitMap(map, cutoff) {
+  if (map.size < 5000) return;
+  for (const [key, timestamps] of map) {
+    const recent = timestamps.filter((timestamp) => timestamp > cutoff);
+    if (recent.length) map.set(key, recent);
+    else map.delete(key);
+  }
+}
+
+function consumePublicRequestLimit(request, bucket, maxRequests, windowMs) {
+  const now = Date.now();
+  const cutoff = now - windowMs;
+  const key = `${bucket}:${clientIp(request)}`;
+  const recent = (publicRequestLimits.get(key) || []).filter((timestamp) => timestamp > cutoff);
+  if (recent.length >= maxRequests) return false;
+  publicRequestLimits.set(key, [...recent, now]);
+  pruneRateLimitMap(publicRequestLimits, cutoff);
+  return true;
 }
 
 function canAttemptLogin(request) {
@@ -129,6 +158,7 @@ function canAttemptLogin(request) {
   const key = loginAttemptKey(request);
   const recent = (loginAttempts.get(key) || []).filter((timestamp) => timestamp > cutoff);
   loginAttempts.set(key, recent);
+  pruneRateLimitMap(loginAttempts, cutoff);
   return recent.length < 8;
 }
 
@@ -165,6 +195,23 @@ function editorUploadExtension(mimeType) {
   return editorUploadTypes.get(String(mimeType || '').toLowerCase()) || '';
 }
 
+function hasImageSignature(buffer, mimeType) {
+  if (mimeType === 'image/jpeg') {
+    return buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+  }
+  if (mimeType === 'image/png') {
+    return buffer.length >= 8 && buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+  }
+  if (mimeType === 'image/webp') {
+    return buffer.length >= 12 && buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP';
+  }
+  if (mimeType === 'image/gif') {
+    const signature = buffer.toString('ascii', 0, 6);
+    return signature === 'GIF87a' || signature === 'GIF89a';
+  }
+  return false;
+}
+
 async function handleEditorImageUpload(request, response) {
   const body = await readJsonBodyWithLimit(request, editorUploadBodyMaxBytes);
   const dataUrl = String(body.data || '');
@@ -189,6 +236,10 @@ async function handleEditorImageUpload(request, response) {
   }
   if (buffer.length > editorUploadMaxBytes) {
     sendJson(response, 413, { error: 'Фото слишком большое. Максимум 8 МБ.' });
+    return true;
+  }
+  if (!hasImageSignature(buffer, mimeType)) {
+    sendJson(response, 400, { error: 'Содержимое файла не соответствует формату изображения.' });
     return true;
   }
 
@@ -220,6 +271,31 @@ function isPublicApi(method, pathname) {
   if (method === 'POST' && pathname === '/api/integrations/bitrix/lead') return true;
   if (method === 'POST' && pathname === '/api/integrations/telegram/webhook') return true;
   return false;
+}
+
+function isSameOriginRequest(request) {
+  const origin = request.headers.origin;
+  if (!origin) return true;
+  try {
+    const protocol =
+      process.env.CMS_TRUST_PROXY === 'true'
+        ? String(request.headers['x-forwarded-proto'] || 'http').split(',')[0].trim()
+        : request.socket.encrypted
+          ? 'https'
+          : 'http';
+    return new URL(origin).origin === `${protocol}://${request.headers.host}`;
+  } catch {
+    return false;
+  }
+}
+
+function requiresSameOrigin(method, pathname) {
+  if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) return false;
+  return ![
+    '/api/ai/assistant',
+    '/api/integrations/bitrix/lead',
+    '/api/integrations/telegram/webhook'
+  ].includes(pathname);
 }
 
 async function handleAuthApi(request, response, pathname, method) {
@@ -504,6 +580,17 @@ function normalizeGalleryItem(input = {}, previous = {}) {
     enabled: Boolean(input.enabled ?? previous.enabled ?? true),
     createdAt: previous.createdAt || now,
     updatedAt: now
+  };
+}
+
+function normalizeLead(input = {}) {
+  const field = (value, maxLength) => (typeof value === 'string' ? value.trim().slice(0, maxLength) : '');
+  return {
+    title: field(input.title, 200) || 'Website request',
+    name: field(input.name, 120),
+    phone: field(input.phone, 80),
+    email: field(input.email, 320),
+    comments: field(input.comments, 2000)
   };
 }
 
@@ -1199,13 +1286,21 @@ async function handleApi(request, response) {
   }
 
   if (method === 'POST' && pathname === '/api/integrations/bitrix/lead') {
+    if (!consumePublicRequestLimit(request, 'bitrix-lead', 10, 15 * 60 * 1000)) {
+      sendJson(response, 429, { error: 'Слишком много заявок. Попробуйте позже.' });
+      return true;
+    }
     const integrations = withRuntimeSecrets(await read('integrations'));
     if (!integrations.bitrix?.enabled) {
       sendJson(response, 503, { error: 'Bitrix integration is disabled' });
       return true;
     }
-    const body = await readBody(request);
-    const leadId = await createBitrixLead(integrations.bitrix, body);
+    const lead = normalizeLead(await readBody(request));
+    if (!lead.name && !lead.phone && !lead.email && !lead.comments) {
+      sendJson(response, 400, { error: 'Заполните данные заявки.' });
+      return true;
+    }
+    const leadId = await createBitrixLead(integrations.bitrix, lead);
     await appendEvent('bitrix.lead_created', { leadId });
     sendJson(response, 201, { leadId });
     return true;
@@ -1213,15 +1308,25 @@ async function handleApi(request, response) {
 
   if (method === 'POST' && pathname === '/api/ai/assistant') {
     const body = await readBody(request);
+    if (!consumePublicRequestLimit(request, 'ai-assistant', 20, 15 * 60 * 1000)) {
+      sendJson(response, 429, { error: 'Слишком много сообщений. Попробуйте позже.' });
+      return true;
+    }
+    const message = String(body.message || '').trim();
+    if (!message || message.length > 2000) {
+      sendJson(response, 400, { error: 'Сообщение должно содержать от 1 до 2000 символов.' });
+      return true;
+    }
+    const visitorId = String(body.visitorId || 'anonymous').trim().slice(0, 120) || 'anonymous';
     const integrations = withRuntimeSecrets(await read('integrations'));
     const result = await askAssistant({
       config: integrations.ai,
       knowledge: await read('knowledge'),
       memory: await read('memory'),
-      message: body.message || '',
-      visitorId: body.visitorId || 'anonymous'
+      message,
+      visitorId
     });
-    await appendEvent('ai.assistant_message', { mode: result.mode, visitorId: body.visitorId || 'anonymous' });
+    await appendEvent('ai.assistant_message', { mode: result.mode, visitorId });
     sendJson(response, 200, result);
     return true;
   }
@@ -1310,6 +1415,10 @@ async function handleRequest(request, response) {
 
     if (request.url.startsWith('/api/')) {
       const method = request.method || 'GET';
+      if (requiresSameOrigin(method, url.pathname) && !isSameOriginRequest(request)) {
+        sendJson(response, 403, { error: 'Cross-origin request is not allowed.' });
+        return;
+      }
       if (await handleAuthApi(request, response, url.pathname, method)) return;
       if (!isPublicApi(method, url.pathname) && !sessionUser(request)) {
         sendJson(response, 401, { error: 'Требуется авторизация администратора.' });
@@ -1325,7 +1434,8 @@ async function handleRequest(request, response) {
     if (!served) sendJson(response, 404, { error: 'Not found' });
   } catch (error) {
     const statusCode = error.statusCode || 500;
-    sendJson(response, statusCode, { error: error.message || 'Server error' });
+    if (statusCode >= 500) console.error(error);
+    sendJson(response, statusCode, { error: statusCode >= 500 ? 'Server error' : error.message || 'Request failed' });
   }
 }
 

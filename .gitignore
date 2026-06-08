@@ -2,3 +2,5 @@
 data/*.sqlite
 data/*.sqlite-*
 public/uploads/
+deploy/certs/*
+!deploy/certs/README.md

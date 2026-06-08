@@ -48,6 +48,7 @@ export async function askAssistant({ config, knowledge, memory, message, visitor
 
   const response = await fetch(`${baseUrl}/chat/completions`, {
     method: 'POST',
+    signal: AbortSignal.timeout(30000),
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json'

@@ -1,15 +1,39 @@
-version: '3.8'
-
 services:
   cms-engine:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env.local
+    environment:
+      CMS_TRUST_PROXY: "true"
     ports:
-      - "3003:3003"
+      - "127.0.0.1:3003:3003"
     volumes:
       - cms-storage:/app/storage
       - ./public/uploads:/app/public/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3003/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      cms-engine:
+        condition: service_healthy
+    environment:
+      CMS_DOMAIN: ${CMS_DOMAIN:-localhost}
+      NGINX_ENVSUBST_FILTER: ^CMS_DOMAIN$
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./deploy/certs:/etc/nginx/certs:ro
     restart: always
 
 volumes:

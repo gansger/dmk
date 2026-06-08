@@ -107,10 +107,10 @@ export async function serveFile(response, publicDir, fileName, options = {}) {
 export async function serveStatic(request, response, publicDir) {
   const url = new URL(request.url, `http://${request.headers.host}`);
   const cleanPath = decodeURIComponent(url.pathname).replace(/^\/+/, '');
-  const extension = path.extname(cleanPath);
-  const cacheControl = extension && extension !== '.html'
-    ? 'public, max-age=31536000, immutable'
-    : 'no-store';
+  const cacheControl =
+    cleanPath.startsWith('uploads/') || (url.searchParams.has('v') && /\.(?:css|js)$/i.test(cleanPath))
+      ? 'public, max-age=31536000, immutable'
+      : 'no-store';
   return serveFile(response, publicDir, cleanPath || 'site.html', { cacheControl });
 }
 

@@ -280,6 +280,7 @@ function renderSeoHead({ page, post, pages, baseUrl, canonicalUrl, statusCode })
     title,
     noIndex,
     head: `
+    <meta name="cms-page-id" content="${escapeHtml(page?.id || 'home')}">
     <meta name="description" content="${escapeHtml(description)}">
     <meta name="robots" content="${robots}">
     <link rel="canonical" href="${escapeHtml(canonicalUrl)}">
@@ -373,14 +374,12 @@ export function renderPublicSiteHtml({ template, request, page, pages, posts, po
   const path = canonicalPath || (post ? postPublicPath(post) : pagePublicPath(page?.id));
   const canonicalUrl = absoluteUrl(path, baseUrl);
   const metadata = renderSeoHead({ page, post, pages, baseUrl, canonicalUrl, statusCode });
-  const state = `<script>window.__CMS_PAGE_ID__=${jsonForScript(page?.id || 'home')};</script>`;
-
   return {
     html: template
       .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(metadata.title)}</title>`)
       .replace('<!-- CMS_SEO_HEAD -->', metadata.head)
       .replace('<!-- CMS_SEO_BODY -->', renderFallback({ page, post, pages, posts }))
-      .replace('<!-- CMS_SEO_STATE -->', state),
+      .replace('<!-- CMS_SEO_STATE -->', ''),
     noIndex: metadata.noIndex
   };
 }

@@ -68,6 +68,17 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+function safeUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  try {
+    const url = new URL(raw, window.location.origin);
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch {
+    return '';
+  }
+}
+
 function fileToDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -108,7 +119,7 @@ function renderDashboard() {
         .map(
           (event) => `
             <div class="event">
-              <span>${event.type}</span>
+              <span>${escapeHtml(event.type)}</span>
               <span class="muted">${formatDate(event.createdAt)}</span>
             </div>
           `
@@ -124,23 +135,23 @@ function renderPosts() {
         .map(
           (post) => {
             const imageCount = post.media?.filter((item) => item.type === 'image').length || 0;
-            const cover = post.coverImage || post.media?.find((item) => item.url)?.url;
+            const cover = safeUrl(post.coverImage || post.media?.find((item) => item.url)?.url);
             return `
             <article class="post-item">
               <div class="item-row">
                 <div class="post-summary">
-                  ${cover ? `<img class="post-thumb" src="${cover}" alt="">` : ''}
+                  ${cover ? `<img class="post-thumb" src="${escapeHtml(cover)}" alt="">` : ''}
                   <div>
-                    <strong>${post.title}</strong>
+                    <strong>${escapeHtml(post.title)}</strong>
                     <div class="muted">${formatDate(post.publishedAt || post.createdAt)}${imageCount ? ` · ${imageCount} фото` : ''}${post.videoUrl ? ' · Видео' : ''}</div>
                   </div>
                 </div>
                 <div class="badge-row">
                   ${post.showInSlider ? '<span class="badge slider">slider</span>' : ''}
-                  <span class="badge ${post.status === 'draft' ? 'draft' : ''}">${post.status}</span>
+                  <span class="badge ${post.status === 'draft' ? 'draft' : ''}">${escapeHtml(post.status)}</span>
                 </div>
               </div>
-              <p class="muted">${post.excerpt || ''}</p>
+              <p class="muted">${escapeHtml(post.excerpt || '')}</p>
               <div class="item-actions">
                 <button class="button ghost" data-edit-post="${post.id}">Редактировать</button>
                 <button class="button secondary" data-publish-post="${post.id}">Опубликовать</button>
@@ -178,17 +189,17 @@ function renderSliderAdmin() {
     ? publishedPosts
         .sort((a, b) => Number(a.sliderOrder || 0) - Number(b.sliderOrder || 0) || String(b.publishedAt).localeCompare(String(a.publishedAt)))
         .map((post) => {
-          const cover = post.coverImage || post.media?.find((item) => item.url)?.url;
+          const cover = safeUrl(post.coverImage || post.media?.find((item) => item.url)?.url);
           const imageFit = post.sliderImageFit || '';
           const imagePositionX = post.sliderImagePositionX ?? 50;
           const imagePositionY = post.sliderImagePositionY ?? 50;
           return `
             <article class="slider-admin-item">
               <div class="post-summary">
-                ${cover ? `<img class="post-thumb" src="${cover}" alt="">` : ''}
+                ${cover ? `<img class="post-thumb" src="${escapeHtml(cover)}" alt="">` : ''}
                 <div>
-                  <strong>${post.title}</strong>
-                  <div class="muted">${post.slug}</div>
+                  <strong>${escapeHtml(post.title)}</strong>
+                  <div class="muted">${escapeHtml(post.slug)}</div>
                 </div>
               </div>
               <div class="slider-admin-controls">
@@ -235,7 +246,7 @@ function renderGalleryAdmin() {
             <article class="gallery-admin-item">
               <div class="item-row">
                 <div class="post-summary">
-                  <img class="gallery-admin-thumb" src="${escapeHtml(item.url)}" alt="">
+                  <img class="gallery-admin-thumb" src="${escapeHtml(safeUrl(item.url))}" alt="">
                   <div>
                     <strong>${escapeHtml(item.caption || 'Фото без подписи')}</strong>
                     <div class="muted">Порядок: ${Number(item.order || 0)} · ${formatDate(item.createdAt)}</div>
@@ -276,10 +287,10 @@ function renderKnowledge() {
           (item) => `
             <article class="knowledge-item">
               <div class="item-row">
-                <strong>${item.title}</strong>
-                <span class="badge">${item.kind}</span>
+                <strong>${escapeHtml(item.title)}</strong>
+                <span class="badge">${escapeHtml(item.kind)}</span>
               </div>
-              <p class="muted">${item.content}</p>
+              <p class="muted">${escapeHtml(item.content)}</p>
             </article>
           `
         )
@@ -573,7 +584,7 @@ selectors.galleryList.addEventListener('click', async (event) => {
     document.querySelector('#galleryOrder').value = item.order || 0;
     document.querySelector('#galleryEnabled').checked = Boolean(item.enabled);
     document.querySelector('#galleryFile').value = '';
-    document.querySelector('#galleryCurrentImage').innerHTML = `Текущее фото: <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener">открыть</a>. Можно выбрать новый файл для замены.`;
+    document.querySelector('#galleryCurrentImage').innerHTML = `Текущее фото: <a href="${escapeHtml(safeUrl(item.url))}" target="_blank" rel="noopener">открыть</a>. Можно выбрать новый файл для замены.`;
     selectors.galleryStatus.textContent = 'Редактирование фото';
     selectors.galleryStatus.className = 'inline-status';
   }

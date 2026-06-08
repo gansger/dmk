@@ -3,6 +3,9 @@ import path from 'node:path';
 import { excerptFrom, firstSentenceFrom, slugify } from '../core/format.js';
 import { getRootDir } from '../core/config.js';
 
+const telegramMediaMaxBytes = 25 * 1024 * 1024;
+const telegramRequestTimeoutMs = 30000;
+
 function messageText(message) {
   return message?.text || message?.caption || '';
 }
@@ -81,7 +84,9 @@ function mediaRefsFromMessage(message) {
 
 async function telegramFilePath(config, fileId) {
   const baseUrl = process.env.TELEGRAM_API_URL || 'https://api.telegram.org';
-  const response = await fetch(`${baseUrl}/bot${config.botToken}/getFile?file_id=${encodeURIComponent(fileId)}`);
+  const response = await fetch(`${baseUrl}/bot${config.botToken}/getFile?file_id=${encodeURIComponent(fileId)}`, {
+    signal: AbortSignal.timeout(telegramRequestTimeoutMs)
+  });
   const payload = await response.json();
   if (!response.ok || !payload.ok) {
     throw new Error(payload.description || 'Telegram file lookup failed');
@@ -97,12 +102,17 @@ async function downloadTelegramMedia(config, ref, postId, index) {
   const outputPath = path.join(uploadDir, safeName);
   const baseUrl = process.env.TELEGRAM_API_URL || 'https://api.telegram.org';
   const url = `${baseUrl}/file/bot${config.botToken}/${filePath}`;
-  const response = await fetch(url);
+  const response = await fetch(url, { signal: AbortSignal.timeout(telegramRequestTimeoutMs) });
 
   if (!response.ok) throw new Error('Telegram media download failed');
+  const declaredSize = Number(response.headers.get('content-length') || 0);
+  if (declaredSize > telegramMediaMaxBytes) throw new Error('Telegram media file is too large');
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  if (buffer.length > telegramMediaMaxBytes) throw new Error('Telegram media file is too large');
 
   await mkdir(uploadDir, { recursive: true });
-  await writeFile(outputPath, Buffer.from(await response.arrayBuffer()));
+  await writeFile(outputPath, buffer);
 
   return {
     id: crypto.randomUUID(),
@@ -169,7 +179,9 @@ export async function testTelegram(config) {
   }
 
   const baseUrl = process.env.TELEGRAM_API_URL || 'https://api.telegram.org';
-  const response = await fetch(`${baseUrl}/bot${config.botToken}/getMe`);
+  const response = await fetch(`${baseUrl}/bot${config.botToken}/getMe`, {
+    signal: AbortSignal.timeout(telegramRequestTimeoutMs)
+  });
   const payload = await response.json();
 
   if (!response.ok || !payload.ok) {
@@ -195,7 +207,7 @@ export async function importTelegramUpdates(config, existingPosts = []) {
   url.searchParams.set('allowed_updates', JSON.stringify(['message', 'channel_post', 'edited_channel_post', 'edited_message']));
   url.searchParams.set('timeout', '0');
 
-  const response = await fetch(url);
+  const response = await fetch(url, { signal: AbortSignal.timeout(telegramRequestTimeoutMs) });
   const payload = await response.json();
   if (!response.ok || !payload.ok) {
     throw new Error(payload.description || 'Telegram import failed');

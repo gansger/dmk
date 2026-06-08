@@ -21,6 +21,50 @@ npm start
 
 Редактор `/edit` и приватные API доступны только после авторизации через `/admin`.
 
+### Docker Compose
+
+После изменения исходников контейнер нужно пересобрать и пересоздать. Обычный `docker compose up -d` может продолжить запускать старый image.
+
+В `.env.local` задайте публичный домен:
+
+```bash
+CMS_DOMAIN="example.com"
+CMS_SITE_URL="https://example.com"
+```
+
+Перед запуском Nginx положите TLS-сертификаты в `deploy/certs`:
+
+```text
+deploy/certs/fullchain.pem
+deploy/certs/privkey.pem
+```
+
+Nginx принимает запросы на `80` и перенаправляет их на `443`. HTTPS-запросы проксируются в контейнер CMS на порт `3003`. Порт `3003` опубликован только на `127.0.0.1`.
+
+```bash
+docker compose build --pull --no-cache cms-engine
+docker compose up -d --force-recreate
+docker compose ps
+```
+
+Проверка файлов редактора внутри запущенного контейнера:
+
+```bash
+docker compose exec cms-engine sh -lc "grep -n 'editor.css' public/site.js && grep -n 'site.js' public/site.html"
+curl -I http://127.0.0.1:3003/site.js
+curl -I http://127.0.0.1:3003/editor.css
+```
+
+Проверка Nginx и HTTPS:
+
+```bash
+docker compose exec nginx nginx -t
+curl -I https://example.com
+curl -I https://example.com/edit
+```
+
+JS/CSS с параметром версии `?v=` и загруженные изображения получают долгий immutable-кэш. После изменения frontend-файла увеличивайте его `?v=`, чтобы браузеры сразу получили новую версию. HTML и ресурсы без версии сервер отдает с `Cache-Control: no-store`.
+
 ## Хранилище
 
 Рабочие данные находятся в SQLite-базе `data/cms.sqlite`. При первом запуске существующие данные из `data/*.json` импортируются автоматически. JSON-файлы сохранены только как legacy-источник для миграции.

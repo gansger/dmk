@@ -40,7 +40,9 @@ const slider = {
   paused: false
 };
 const isEditMode = window.location.pathname === '/edit' || window.location.pathname === '/edit/';
-const currentPageId = normalizePageParam(window.__CMS_PAGE_ID__ || urlParams.get('page') || pageIdFromPath());
+const currentPageId = normalizePageParam(
+  document.querySelector('meta[name="cms-page-id"]')?.content || urlParams.get('page') || pageIdFromPath()
+);
 let pageState = null;
 let pagesIndex = [];
 let selectedBuilderBlockId = null;
@@ -277,10 +279,12 @@ function pageUrl(pageId, edit = false) {
 
 function normalizePublicHref(href) {
   const value = String(href || '').trim();
-  if (!value || value.startsWith('#') || /^(?:mailto:|tel:|javascript:)/i.test(value)) return value;
+  if (!value || value.startsWith('#') || /^(?:mailto:|tel:)/i.test(value)) return value;
+  if (/^(?:javascript:|data:|vbscript:)/i.test(value)) return '#';
 
   try {
     const url = new URL(value, `${window.location.origin}/`);
+    if (!['http:', 'https:'].includes(url.protocol)) return '#';
     if (url.origin !== window.location.origin) return value;
     const pageId = url.searchParams.get('page');
     const postSlug = url.searchParams.get('post');
@@ -288,7 +292,7 @@ function normalizePublicHref(href) {
     if (postSlug && ['/', '/site.html'].includes(url.pathname)) return `/news/${encodeURIComponent(postSlug)}`;
     if (url.pathname === '/site.html') return '/';
   } catch {
-    return value;
+    return '#';
   }
 
   return value;
@@ -1478,12 +1482,12 @@ function renderPostCard(post) {
 
   return `
     <article class="site-post-card">
-      ${post.videoUrl ? generateVideoPlayer(post.videoUrl, true) : (cover ? `<a href="${href}"><img class="post-card-cover" src="${cover}" alt=""></a>` : '')}
+      ${post.videoUrl ? generateVideoPlayer(post.videoUrl, true) : (cover ? `<a href="${escapeHtml(href)}"><img class="post-card-cover" src="${escapeHtml(cover)}" alt="" loading="lazy" decoding="async"></a>` : '')}
       <div class="post-card-body">
         <p class="eyebrow">${escapeHtml(publishedAt)}</p>
-        <h2><a href="${href}">${escapeHtml(post.title)}</a></h2>
+        <h2><a href="${escapeHtml(href)}">${escapeHtml(post.title)}</a></h2>
         <p>${escapeHtml(post.excerpt || '')}</p>
-        <a class="read-link" href="${href}">Читать полностью</a>
+        <a class="read-link" href="${escapeHtml(href)}">Читать полностью</a>
       </div>
     </article>
   `;
@@ -1578,7 +1582,7 @@ function renderGalleryItems(items, settings) {
           .map(
             (item) => `
               <figure class="site-gallery-item">
-                <img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.alt || item.caption || 'Фото галереи')}" loading="lazy">
+                <img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.alt || item.caption || 'Фото галереи')}" loading="lazy" decoding="async">
                 ${item.caption ? `<figcaption>${escapeHtml(item.caption)}</figcaption>` : ''}
               </figure>
             `
