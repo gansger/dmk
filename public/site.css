@@ -298,7 +298,7 @@ textarea {
 
 .slider-content h2 {
   margin: 0;
-  font-size: 34px;
+  font-size: 28px;
   line-height: 1.12;
 }
 
@@ -1079,6 +1079,69 @@ textarea {
   text-decoration: none;
 }
 
+.builder-accordion-item {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border-top: 1px solid #dbe2e8;
+  background: #ffffff;
+  color: #18202f;
+}
+
+.builder-accordion-section {
+  position: relative;
+  border-bottom: 1px solid #dbe2e8;
+}
+
+.builder-accordion-summary {
+  position: relative;
+  display: block;
+  padding: 22px 46px 22px 22px;
+  color: inherit;
+  font-size: 17px;
+  font-weight: inherit;
+  line-height: 1.35;
+  cursor: pointer;
+  list-style: none;
+}
+
+.builder-accordion-summary::-webkit-details-marker {
+  display: none;
+}
+
+.builder-accordion-summary::after {
+  content: '⌄';
+  position: absolute;
+  top: 50%;
+  right: 22px;
+  color: #94a3b8;
+  transform: translateY(-55%);
+  transition: transform 0.18s ease;
+}
+
+.builder-accordion-section[open] > .builder-accordion-summary::after {
+  transform: translateY(-45%) rotate(180deg);
+}
+
+.builder-accordion-content {
+  display: grid;
+  gap: 12px;
+  padding: 8px 22px 24px;
+  color: inherit;
+  line-height: 1.55;
+}
+
+.builder-accordion-content > *,
+.builder-accordion-content .builder-card-item,
+.builder-accordion-content .builder-section-item,
+.builder-accordion-content .builder-widget-item,
+.builder-accordion-content .builder-image-item {
+  width: 100%;
+  max-width: 100%;
+}
+
 .site-footer {
   margin-top: 48px;
   background: #075f70;
@@ -1277,7 +1340,7 @@ textarea {
   }
 
   .slider-content h2 {
-    font-size: 26px;
+    font-size: 21px;
   }
 
   .slider-controls {

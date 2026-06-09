@@ -304,6 +304,38 @@
   color: #164194;
 }
 
+.builder-accordion-form {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.builder-accordion-form[hidden] {
+  display: none;
+}
+
+.builder-accordion-form button {
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  padding: 10px 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.builder-accordion-form button:last-child {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.builder-accordion-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 
 .custom-page-block.dragging {
   opacity: 0.55;
@@ -337,7 +369,9 @@
 .builder-card-remove,
 .builder-section-remove,
 .builder-widget-remove,
-.builder-image-remove {
+.builder-image-remove,
+.builder-accordion-remove,
+.builder-accordion-section-remove {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -359,11 +393,33 @@
 .builder-section-item:hover .builder-section-remove,
 .builder-widget-item:hover .builder-widget-remove,
 .builder-image-item:hover .builder-image-remove,
+.builder-accordion-item:hover > .builder-accordion-remove,
+.builder-accordion-section:hover > .builder-accordion-section-remove,
 .builder-card-remove:focus,
 .builder-section-remove:focus,
 .builder-widget-remove:focus,
-.builder-image-remove:focus {
+.builder-image-remove:focus,
+.builder-accordion-remove:focus,
+.builder-accordion-section-remove:focus {
   opacity: 1;
+}
+
+.builder-accordion-section-remove {
+  top: 14px;
+  right: 52px;
+  z-index: 3;
+  width: 26px;
+  height: 26px;
+  font-size: 17px;
+}
+
+.builder-accordion-section.accordion-section-selected {
+  box-shadow: inset 0 0 0 2px rgba(36, 107, 254, 0.72);
+}
+
+.builder-mode .builder-accordion-summary,
+.builder-mode .builder-accordion-content {
+  cursor: text;
 }
 
 .builder-drag-handle {
