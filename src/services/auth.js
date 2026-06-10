@@ -5,7 +5,10 @@ const sessionCookieName = 'cms_session';
 const sessionTtlMs = Number(process.env.CMS_SESSION_TTL_MS || 12 * 60 * 60 * 1000);
 const passwordMinLength = 10;
 const passwordMaxLength = 256;
+const loginAttemptWindowMs = 15 * 60 * 1000;
+const loginAttemptLimit = 8;
 let lastSessionCleanupAt = 0;
+let lastLoginAttemptCleanupAt = 0;
 
 function hash(value) {
   return createHash('sha256').update(String(value)).digest('hex');
@@ -86,6 +89,45 @@ function clearExpiredSessions() {
   if (now - lastSessionCleanupAt < 60 * 1000) return;
   lastSessionCleanupAt = now;
   getDatabase().prepare('DELETE FROM admin_sessions WHERE expires_at <= ?').run(new Date().toISOString());
+}
+
+function loginAttemptKey(value) {
+  return hash(`admin-login:${String(value || 'unknown')}`);
+}
+
+function clearExpiredLoginAttempts(now = Date.now()) {
+  if (now - lastLoginAttemptCleanupAt < 60 * 1000) return;
+  lastLoginAttemptCleanupAt = now;
+  getDatabase()
+    .prepare('DELETE FROM admin_login_attempts WHERE attempted_at <= ?')
+    .run(now - loginAttemptWindowMs);
+}
+
+export function canAttemptAdminLogin(value) {
+  const now = Date.now();
+  clearExpiredLoginAttempts(now);
+  const row = getDatabase()
+    .prepare(`
+      SELECT COUNT(*) AS attempts
+      FROM admin_login_attempts
+      WHERE attempt_key = ? AND attempted_at > ?
+    `)
+    .get(loginAttemptKey(value), now - loginAttemptWindowMs);
+  return Number(row?.attempts || 0) < loginAttemptLimit;
+}
+
+export function recordFailedAdminLogin(value) {
+  const now = Date.now();
+  clearExpiredLoginAttempts(now);
+  getDatabase()
+    .prepare('INSERT INTO admin_login_attempts (attempt_key, attempted_at) VALUES (?, ?)')
+    .run(loginAttemptKey(value), now);
+}
+
+export function clearFailedAdminLogins(value) {
+  getDatabase()
+    .prepare('DELETE FROM admin_login_attempts WHERE attempt_key = ?')
+    .run(loginAttemptKey(value));
 }
 
 export function adminCredentialsConfigured() {

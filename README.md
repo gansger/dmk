@@ -59,9 +59,13 @@ curl -I http://127.0.0.1:3003/editor.css
 
 ```bash
 docker compose exec nginx nginx -t
+curl -I http://example.com
 curl -I https://example.com
 curl -I https://example.com/edit
 ```
+
+HTTP-ответ `301` и HTTPS-страницы содержат защитные заголовки. Внешние сканеры
+следует запускать отдельно для `http://example.com` и `https://example.com`.
 
 JS/CSS с параметром версии `?v=` и загруженные изображения получают долгий immutable-кэш. После изменения frontend-файла увеличивайте его `?v=`, чтобы браузеры сразу получили новую версию. HTML и ресурсы без версии сервер отдает с `Cache-Control: no-store`.
 
@@ -115,7 +119,7 @@ SEO title, description, изображение для соцсетей и зап
 
 ## Что уже есть
 
-- Cookie-сессии и хеш пароля администратора в SQLite.
+- Cookie-сессии, хеш пароля администратора и rate limiting входа в SQLite.
 - Приватные CMS API для постов, страниц, настроек, интеграций, знаний и памяти.
 - Публичные API для чтения сайта, AI-чата, Telegram webhook и Bitrix-формы.
 - Серверный SEO-рендеринг публичных страниц и публикаций.

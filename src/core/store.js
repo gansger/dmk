@@ -191,6 +191,18 @@ function openDatabase() {
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS admin_login_attempts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      attempt_key TEXT NOT NULL,
+      attempted_at INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS admin_login_attempts_key_time
+      ON admin_login_attempts (attempt_key, attempted_at);
+
+    CREATE INDEX IF NOT EXISTS admin_login_attempts_time
+      ON admin_login_attempts (attempted_at);
   `);
   return database;
 }

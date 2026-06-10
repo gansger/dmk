@@ -56,7 +56,7 @@ const builderPanelPositionKey = 'cms-builder-panel-position';
 if (isEditMode) {
   const editorStyles = document.createElement('link');
   editorStyles.rel = 'stylesheet';
-  editorStyles.href = '/editor.css?v=4';
+  editorStyles.href = '/editor.css?v=5';
   document.head.appendChild(editorStyles);
 }
 
@@ -154,6 +154,16 @@ const sectionObjectDefaults = {
   height: 160
 };
 
+const accordionObjectDefaults = {
+  ...objectStyleDefaults,
+  backgroundColor: '#ffffff',
+  textColor: '#18202f',
+  padding: 0,
+  borderRadius: 0,
+  maxWidth: 1200,
+  height: 0
+};
+
 const imageObjectDefaults = {
   ...objectStyleDefaults,
   backgroundColor: '#f8fafc',
@@ -233,6 +243,16 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
+}
+
+function googleDriveFileId(value) {
+  try {
+    const url = new URL(String(value || ''));
+    if (url.protocol !== 'https:' || url.hostname !== 'drive.google.com') return '';
+    return url.pathname.match(/^\/file\/d\/([a-zA-Z0-9_-]+)(?:\/|$)/)?.[1] || '';
+  } catch {
+    return '';
+  }
 }
 
 function sanitizePageId(value) {
@@ -781,7 +801,8 @@ function objectDefaultsForSelectedTarget() {
   if (selectedDesignTarget?.type === 'footer') return footerObjectDefaults;
   if (selectedDesignTarget?.type === 'card') return cardObjectDefaults;
   if (selectedDesignTarget?.type === 'image') return imageObjectDefaults;
-  if (['section', 'widget', 'accordion'].includes(selectedDesignTarget?.type)) return sectionObjectDefaults;
+  if (selectedDesignTarget?.type === 'accordion') return accordionObjectDefaults;
+  if (['section', 'widget'].includes(selectedDesignTarget?.type)) return sectionObjectDefaults;
   return objectStyleDefaults;
 }
 
@@ -906,12 +927,12 @@ function widgetTemplate() {
   `;
 }
 
-function accordionSectionTemplate(title = 'Новый раздел', text = 'Добавьте текст или блоки в этот пункт.') {
+function accordionSectionTemplate(title = 'Новый пункт', text = '') {
   return `
     <details class="builder-accordion-section" data-accordion-section-id="accordion-section-${crypto.randomUUID()}" open>
       <summary class="builder-accordion-summary">${escapeHtml(title)}</summary>
       <div class="builder-accordion-content">
-        <p>${escapeHtml(text)}</p>
+        ${text ? `<p>${escapeHtml(text)}</p>` : ''}
       </div>
     </details>
   `;
@@ -920,8 +941,7 @@ function accordionSectionTemplate(title = 'Новый раздел', text = 'Д�
 function accordionTemplate() {
   return `
     <div class="builder-accordion-item">
-      ${accordionSectionTemplate('Основные сведения', 'Нажмите на текст и отредактируйте содержимое.')}
-      ${accordionSectionTemplate('Документы', 'Добавьте документы, карточки, разделы, фото или обычный текст.')}
+      ${accordionSectionTemplate()}
     </div>
   `;
 }
@@ -1190,6 +1210,15 @@ function prepareAccordionItems(container) {
   if (!container) return;
   container.querySelectorAll('.builder-accordion-item').forEach((accordion) => {
     ensureBuilderItemId(accordion, 'accordion');
+    if (
+      accordion.style.padding === '22px' &&
+      accordion.style.borderRadius === '8px' &&
+      accordion.style.minHeight === '160px'
+    ) {
+      accordion.style.padding = '0px';
+      accordion.style.borderRadius = '0px';
+      accordion.style.minHeight = '';
+    }
     accordion.querySelector('.builder-accordion-remove')?.remove();
     accordion.querySelectorAll('.builder-accordion-section-remove').forEach((button) => button.remove());
 
@@ -1199,7 +1228,17 @@ function prepareAccordionItems(container) {
       }
       const summary = section.querySelector('.builder-accordion-summary');
       const content = section.querySelector('.builder-accordion-content');
-      if (summary) summary.contentEditable = isEditMode ? 'true' : 'false';
+      if (summary) {
+        summary.contentEditable = isEditMode ? 'true' : 'false';
+        summary.onkeydown = isEditMode
+          ? (event) => {
+              if (event.key !== ' ' || event.ctrlKey || event.altKey || event.metaKey) return;
+              event.preventDefault();
+              event.stopPropagation();
+              document.execCommand('insertText', false, ' ');
+            }
+          : null;
+      }
       if (content) content.contentEditable = isEditMode ? 'true' : 'false';
 
       if (!isEditMode) return;
@@ -1590,14 +1629,13 @@ async function loadPage() {
 
 function generateVideoPlayer(url, isCard = false) {
   if (!url) return '';
-  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  const fileId = googleDriveFileId(url);
   const radius = isCard ? '8px 8px 0 0' : '8px';
   const margin = isCard ? '0' : '0 0 24px 0';
-  if (driveMatch) {
-    const fileId = driveMatch[1];
+  if (fileId) {
     return `
       <div style="position: relative; width: 100%; padding-top: 56.25%; border-radius: ${radius}; margin: ${margin}; overflow: hidden; background: #000;">
-        <iframe src="https://drive.google.com/file/d/${fileId}/preview" style="position: absolute; top: -56px; left: 0; width: 100%; height: calc(100% + 56px); border: none;" allow="autoplay" allowfullscreen></iframe>
+        <iframe src="https://drive.google.com/file/d/${escapeHtml(fileId)}/preview" style="position: absolute; top: -56px; left: 0; width: 100%; height: calc(100% + 56px); border: none;" allow="autoplay" allowfullscreen></iframe>
       </div>
     `;
   }

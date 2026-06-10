@@ -19,9 +19,12 @@ import {
 import {
   adminCredentialsConfigured,
   authenticateAdmin,
+  canAttemptAdminLogin,
   changeAdminPassword,
+  clearFailedAdminLogins,
   createAdminSession,
   expiredSessionCookie,
+  recordFailedAdminLogin,
   revokeAdminSession,
   sessionCookie,
   sessionUser
@@ -32,7 +35,6 @@ const rootDir = getRootDir();
 const publicDir = path.join(rootDir, 'public');
 const port = Number(process.env.PORT || 3003);
 let publicSiteTemplate;
-const loginAttempts = new Map();
 const publicRequestLimits = new Map();
 const editorUploadMaxBytes = 8 * 1024 * 1024;
 const editorUploadBodyMaxBytes = 12 * 1024 * 1024;
@@ -121,10 +123,6 @@ function mergeIntegrations(previous, next) {
   return merged;
 }
 
-function loginAttemptKey(request) {
-  return clientIp(request);
-}
-
 function clientIp(request) {
   if (process.env.CMS_TRUST_PROXY === 'true') {
     const realIp = String(request.headers['x-real-ip'] || '').trim();
@@ -151,20 +149,6 @@ function consumePublicRequestLimit(request, bucket, maxRequests, windowMs) {
   publicRequestLimits.set(key, [...recent, now]);
   pruneRateLimitMap(publicRequestLimits, cutoff);
   return true;
-}
-
-function canAttemptLogin(request) {
-  const cutoff = Date.now() - 15 * 60 * 1000;
-  const key = loginAttemptKey(request);
-  const recent = (loginAttempts.get(key) || []).filter((timestamp) => timestamp > cutoff);
-  loginAttempts.set(key, recent);
-  pruneRateLimitMap(loginAttempts, cutoff);
-  return recent.length < 8;
-}
-
-function recordFailedLogin(request) {
-  const key = loginAttemptKey(request);
-  loginAttempts.set(key, [...(loginAttempts.get(key) || []), Date.now()]);
 }
 
 async function readJsonBodyWithLimit(request, maxBytes) {
@@ -259,10 +243,6 @@ async function handleEditorImageUpload(request, response) {
   return true;
 }
 
-function clearFailedLogins(request) {
-  loginAttempts.delete(loginAttemptKey(request));
-}
-
 function isPublicApi(method, pathname) {
   if (pathname.startsWith('/api/auth/')) return true;
   if (method === 'GET' && pathname === '/api/health') return true;
@@ -310,19 +290,20 @@ async function handleAuthApi(request, response, pathname, method) {
       sendJson(response, 503, { error: 'CMS admin credentials are not configured.' });
       return true;
     }
-    if (!canAttemptLogin(request)) {
+    const loginKey = clientIp(request);
+    if (!canAttemptAdminLogin(loginKey)) {
       sendJson(response, 429, { error: 'Too many login attempts. Try again later.' });
       return true;
     }
 
     const body = await readBody(request);
     if (!authenticateAdmin(body.username || '', body.password || '')) {
-      recordFailedLogin(request);
+      recordFailedAdminLogin(loginKey);
       sendJson(response, 401, { error: 'Неверный логин или пароль.' });
       return true;
     }
 
-    clearFailedLogins(request);
+    clearFailedAdminLogins(loginKey);
     const token = createAdminSession(body.username);
     await appendEvent('auth.login', { username: body.username });
     sendJson(response, 200, { authenticated: true }, { 'Set-Cookie': sessionCookie(token, request) });
@@ -630,6 +611,16 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+function googleDriveFileId(value) {
+  try {
+    const url = new URL(String(value || ''));
+    if (url.protocol !== 'https:' || url.hostname !== 'drive.google.com') return '';
+    return url.pathname.match(/^\/file\/d\/([a-zA-Z0-9_-]+)(?:\/|$)/)?.[1] || '';
+  } catch {
+    return '';
+  }
+}
+
 function postPageId(post) {
   return `post-${slugify(post.slug || post.title || post.id)}`;
 }
@@ -701,12 +692,11 @@ function syncSharedLayoutBlocks(pages) {
 
 function generateVideoPlayer(url) {
   if (!url) return '';
-  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (driveMatch) {
-    const fileId = driveMatch[1];
+  const fileId = googleDriveFileId(url);
+  if (fileId) {
     return `
       <div style="position: relative; width: 100%; padding-top: 56.25%; border-radius: 8px; margin-bottom: 24px; overflow: hidden; background: #000;">
-        <iframe src="https://drive.google.com/file/d/${fileId}/preview" style="position: absolute; top: -56px; left: 0; width: 100%; height: calc(100% + 56px); border: none;" allow="autoplay" allowfullscreen></iframe>
+        <iframe src="https://drive.google.com/file/d/${escapeHtml(fileId)}/preview" style="position: absolute; top: -56px; left: 0; width: 100%; height: calc(100% + 56px); border: none;" allow="autoplay" allowfullscreen></iframe>
       </div>
     `;
   }

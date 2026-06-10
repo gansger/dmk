@@ -1084,7 +1084,7 @@ textarea {
   display: grid;
   width: 100%;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
   border-top: 1px solid #dbe2e8;
   background: #ffffff;
   color: #18202f;
@@ -1098,7 +1098,7 @@ textarea {
 .builder-accordion-summary {
   position: relative;
   display: block;
-  padding: 22px 46px 22px 22px;
+  padding: 22px 22px 22px 34px;
   color: inherit;
   font-size: 17px;
   font-weight: inherit;
@@ -1115,7 +1115,7 @@ textarea {
   content: '⌄';
   position: absolute;
   top: 50%;
-  right: 22px;
+  left: 5px;
   color: #94a3b8;
   transform: translateY(-55%);
   transition: transform 0.18s ease;
@@ -1128,7 +1128,7 @@ textarea {
 .builder-accordion-content {
   display: grid;
   gap: 12px;
-  padding: 8px 22px 24px;
+  padding: 8px 22px 24px 34px;
   color: inherit;
   line-height: 1.55;
 }
