@@ -16,6 +16,34 @@ const mimeTypes = {
   '.ico': 'image/x-icon'
 };
 
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "script-src 'self'",
+  // Page builder blocks rely on style attributes.
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' blob: https:",
+  "font-src 'self' data:",
+  "connect-src 'self'",
+  'frame-src https://drive.google.com',
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'"
+].join('; ');
+
+export function applySecurityHeaders(request, response) {
+  response.setHeader('Content-Security-Policy', contentSecurityPolicy);
+  response.setHeader('X-Content-Type-Options', 'nosniff');
+  response.setHeader('X-Frame-Options', 'DENY');
+  response.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+  response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  if (request.socket.encrypted || request.headers['x-forwarded-proto'] === 'https') {
+    response.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+}
+
 export function sendJson(response, statusCode, payload, headers = {}) {
   response.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',

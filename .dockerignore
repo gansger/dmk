@@ -1,0 +1,21 @@
+# Секреты: передаются в контейнер через env_file, а не в образе.
+.env
+.env.*
+!.env.example
+
+# Рабочие данные: SQLite живёт в volume cms-storage, загрузки — в bind mount.
+data/*.sqlite
+data/*.sqlite-*
+storage/
+public/uploads/
+
+# Служебное.
+.git
+.gitignore
+.claude
+.codex-remote-attachments
+node_modules
+npm-debug.log*
+Dockerfile
+docker-compose.yml
+.dockerignore

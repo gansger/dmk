@@ -4,7 +4,8 @@ import path from 'node:path';
 import { appendEvent, ensureDataFiles, read, write } from './core/store.js';
 import { getRootDir, withRuntimeSecrets } from './core/config.js';
 import { excerptFrom, maskSecret, slugify } from './core/format.js';
-import { readBody, routeParams, sendHtml, sendJson, sendNoContent, sendRedirect, sendText, serveFile, serveStatic } from './core/http.js';
+import { applySecurityHeaders, readBody, routeParams, sendHtml, sendJson, sendNoContent, sendRedirect, sendText, serveFile, serveStatic } from './core/http.js';
+import { clientIp, createRateLimiter, envLimit } from './core/rate-limit.js';
 import { createBitrixLead, testBitrix } from './integrations/bitrix.js';
 import { importTelegramUpdates, telegramUpdateToPost, testTelegram } from './integrations/telegram.js';
 import { askAssistant } from './services/assistant.js';
@@ -33,6 +34,21 @@ const publicDir = path.join(rootDir, 'public');
 const port = Number(process.env.PORT || 3003);
 let publicSiteTemplate;
 const loginAttempts = new Map();
+const minuteMs = 60 * 1000;
+const hourMs = 60 * minuteMs;
+// Public endpoints cost money (AI tokens) or create CRM records, so cap them per IP and in total.
+const publicApiLimits = {
+  '/api/ai/assistant': [
+    { scope: 'ip', limiter: createRateLimiter({ windowMs: 10 * minuteMs, max: envLimit('CMS_AI_LIMIT_PER_IP', 20) }) },
+    { scope: 'global', limiter: createRateLimiter({ windowMs: hourMs, max: envLimit('CMS_AI_LIMIT_PER_HOUR', 300) }) }
+  ],
+  '/api/integrations/bitrix/lead': [
+    { scope: 'ip', limiter: createRateLimiter({ windowMs: hourMs, max: envLimit('CMS_LEAD_LIMIT_PER_IP', 5) }) },
+    { scope: 'global', limiter: createRateLimiter({ windowMs: hourMs, max: envLimit('CMS_LEAD_LIMIT_PER_HOUR', 100) }) }
+  ]
+};
+const assistantMessageMaxLength = 2000;
+const leadCommentsMaxLength = 2000;
 const editorUploadMaxBytes = 8 * 1024 * 1024;
 const editorUploadBodyMaxBytes = 12 * 1024 * 1024;
 const editorUploadTypes = new Map([
@@ -121,7 +137,31 @@ function mergeIntegrations(previous, next) {
 }
 
 function loginAttemptKey(request) {
-  return request.socket.remoteAddress || 'unknown';
+  return clientIp(request);
+}
+
+function allowPublicApiRequest(request, response, pathname) {
+  const limits = publicApiLimits[pathname];
+  if (!limits) return true;
+
+  const ip = clientIp(request);
+  for (const { scope, limiter } of limits) {
+    const result = limiter.hit(scope === 'ip' ? ip : 'global');
+    if (!result.allowed) {
+      sendJson(
+        response,
+        429,
+        { error: 'Слишком много запросов. Попробуйте позже.' },
+        { 'Retry-After': String(result.retryAfterSeconds) }
+      );
+      return false;
+    }
+  }
+  return true;
+}
+
+function limitedString(value, maxLength) {
+  return String(value ?? '').trim().slice(0, maxLength);
 }
 
 function canAttemptLogin(request) {
@@ -1205,7 +1245,18 @@ async function handleApi(request, response) {
       return true;
     }
     const body = await readBody(request);
-    const leadId = await createBitrixLead(integrations.bitrix, body);
+    const lead = {
+      title: limitedString(body.title, 200),
+      name: limitedString(body.name, 200),
+      phone: limitedString(body.phone, 50),
+      email: limitedString(body.email, 200),
+      comments: limitedString(body.comments, leadCommentsMaxLength)
+    };
+    if (!lead.phone && !lead.email) {
+      sendJson(response, 400, { error: 'Укажите телефон или email.' });
+      return true;
+    }
+    const leadId = await createBitrixLead(integrations.bitrix, lead);
     await appendEvent('bitrix.lead_created', { leadId });
     sendJson(response, 201, { leadId });
     return true;
@@ -1213,15 +1264,26 @@ async function handleApi(request, response) {
 
   if (method === 'POST' && pathname === '/api/ai/assistant') {
     const body = await readBody(request);
+    const message = String(body.message ?? '').trim();
+    if (!message) {
+      sendJson(response, 400, { error: 'Введите вопрос.' });
+      return true;
+    }
+    if (message.length > assistantMessageMaxLength) {
+      sendJson(response, 400, { error: `Вопрос не должен превышать ${assistantMessageMaxLength} символов.` });
+      return true;
+    }
+    // "engine" is the shared memory scope; a visitor must not be able to claim it.
+    const visitorId = limitedString(body.visitorId, 100).replace(/[^\w-]/g, '') || 'anonymous';
     const integrations = withRuntimeSecrets(await read('integrations'));
     const result = await askAssistant({
       config: integrations.ai,
       knowledge: await read('knowledge'),
       memory: await read('memory'),
-      message: body.message || '',
-      visitorId: body.visitorId || 'anonymous'
+      message,
+      visitorId: visitorId === 'engine' ? 'anonymous' : visitorId
     });
-    await appendEvent('ai.assistant_message', { mode: result.mode, visitorId: body.visitorId || 'anonymous' });
+    await appendEvent('ai.assistant_message', { mode: result.mode, visitorId });
     sendJson(response, 200, result);
     return true;
   }
@@ -1305,16 +1367,19 @@ async function handleApi(request, response) {
 }
 
 async function handleRequest(request, response) {
+  applySecurityHeaders(request, response);
   try {
     const url = new URL(request.url, `http://${request.headers.host}`);
 
     if (request.url.startsWith('/api/')) {
       const method = request.method || 'GET';
       if (await handleAuthApi(request, response, url.pathname, method)) return;
-      if (!isPublicApi(method, url.pathname) && !sessionUser(request)) {
+      const user = sessionUser(request);
+      if (!isPublicApi(method, url.pathname) && !user) {
         sendJson(response, 401, { error: 'Требуется авторизация администратора.' });
         return;
       }
+      if (!user && method === 'POST' && !allowPublicApiRequest(request, response, url.pathname)) return;
       const handled = await handleApi(request, response);
       if (!handled) sendJson(response, 404, { error: 'API route not found' });
       return;

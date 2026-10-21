@@ -373,7 +373,8 @@ export function renderPublicSiteHtml({ template, request, page, pages, posts, po
   const path = canonicalPath || (post ? postPublicPath(post) : pagePublicPath(page?.id));
   const canonicalUrl = absoluteUrl(path, baseUrl);
   const metadata = renderSeoHead({ page, post, pages, baseUrl, canonicalUrl, statusCode });
-  const state = `<script>window.__CMS_PAGE_ID__=${jsonForScript(page?.id || 'home')};</script>`;
+  // Data block, not executable script: it is allowed by the CSP without 'unsafe-inline'.
+  const state = `<script id="cmsPageState" type="application/json">${jsonForScript({ pageId: page?.id || 'home' })}</script>`;
 
   return {
     html: template

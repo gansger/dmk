@@ -40,7 +40,7 @@ const slider = {
   paused: false
 };
 const isEditMode = window.location.pathname === '/edit' || window.location.pathname === '/edit/';
-const currentPageId = normalizePageParam(window.__CMS_PAGE_ID__ || urlParams.get('page') || pageIdFromPath());
+const currentPageId = normalizePageParam(serverPageId() || urlParams.get('page') || pageIdFromPath());
 let pageState = null;
 let pagesIndex = [];
 let selectedBuilderBlockId = null;
@@ -251,6 +251,14 @@ function normalizePageParam(value) {
     .toLowerCase()
     .replace(/[^a-z0-9_-]+/g, '-')
     .replace(/^-+|-+$/g, '') || 'home';
+}
+
+function serverPageId() {
+  try {
+    return JSON.parse(document.querySelector('#cmsPageState')?.textContent || '{}').pageId || '';
+  } catch {
+    return '';
+  }
 }
 
 function pageIdFromPath() {
