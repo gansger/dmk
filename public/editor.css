@@ -29,6 +29,7 @@
   padding: 9px 12px;
   text-decoration: none;
   font-weight: 800;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -134,6 +135,102 @@
   cursor: pointer;
 }
 
+/* Sections and labels use display: grid, which would otherwise override [hidden]. */
+.builder-panel [hidden] {
+  display: none !important;
+}
+
+.builder-panel-head-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.builder-panel-head-actions button {
+  min-width: 32px;
+}
+
+#builderPanelTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.builder-panel.is-collapsed {
+  width: min(260px, calc(100vw - 36px));
+  overflow: hidden;
+}
+
+.builder-panel.is-collapsed > :not(.builder-panel-head) {
+  display: none !important;
+}
+
+.builder-panel.is-collapsed .builder-panel-head {
+  margin-bottom: -14px;
+  border-bottom: 0;
+}
+
+.builder-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  border-radius: 8px;
+  background: var(--surface-strong, #eef2f7);
+  padding: 4px;
+}
+
+.builder-tabs button {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 6px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.builder-tabs button[aria-selected='true'] {
+  background: white;
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+}
+
+.builder-tab-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.builder-empty {
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  line-height: 1.45;
+}
+
+.builder-panel-section.is-compact #builderLayoutForm {
+  display: none !important;
+}
+
+.builder-subform {
+  margin-top: 4px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.builder-button-row {
+  display: flex;
+  gap: 8px;
+}
+
+.builder-button-row button:first-child {
+  flex: 1;
+}
+
+.builder-panel .builder-danger {
+  background: #e11d48;
+  color: white;
+}
+
 .builder-panel h2,
 .builder-panel p {
   margin: 0;
@@ -233,11 +330,6 @@
   gap: 8px;
 }
 
-.builder-pages-form {
-  display: grid;
-  gap: 8px;
-}
-
 .builder-seo-form {
   display: grid;
   gap: 8px;
@@ -254,7 +346,8 @@
   display: none;
 }
 
-.builder-pages-form button,
+.builder-panel-section > button,
+.builder-button-row button,
 .builder-side-menu-actions button,
 .builder-footer-actions button {
   border: 0;
@@ -266,16 +359,11 @@
   cursor: pointer;
 }
 
-.builder-pages-form button:disabled,
+.builder-panel-section > button:disabled,
 .builder-side-menu-actions button:disabled,
 .builder-footer-actions button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.builder-pages-form button:nth-of-type(3) {
-  background: #e0ecff;
-  color: #164194;
 }
 
 .builder-side-menu-actions button:nth-of-type(2),
@@ -403,7 +491,7 @@
 
 .builder-drag-handle {
   position: absolute;
-  top: -12px;
+  top: -14px;
   left: 12px;
   z-index: 5;
   width: fit-content;
@@ -411,9 +499,20 @@
   border-radius: 8px;
   background: var(--surface-strong);
   color: var(--text);
-  padding: 8px 10px;
+  padding: 4px 9px;
+  font-size: 16px;
   font-weight: 800;
+  line-height: 1.2;
   cursor: grab;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+/* Shown only where it is needed, so it never covers headings. */
+.custom-page-block:hover > .builder-drag-handle,
+.custom-page-block.selected > .builder-drag-handle,
+.builder-drag-handle:focus-visible {
+  opacity: 1;
 }
 
 @media (max-width: 640px) {

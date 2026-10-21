@@ -1023,6 +1023,7 @@ function selectInlineItem(element, type) {
   const rightPanelBlock = element.closest('.site-right-panel') ? pageBlock('rightPanel') : null;
   selectedBuilderBlockId = parentBlock?.dataset.blockId || rightPanelBlock?.id || selectedBuilderBlockId;
   selectedDesignTarget = { type, id };
+  showBuilderTab('element');
   syncLayoutControls();
   syncObjectControls();
   syncPageControls();
@@ -1414,7 +1415,7 @@ function renderCustomBlocks() {
     section.dataset.blockType = block.type;
     section.draggable = isEditMode;
     section.innerHTML = `
-      ${isEditMode ? '<button class="builder-drag-handle" type="button">Перетащить</button>' : ''}
+      ${isEditMode ? '<button class="builder-drag-handle" type="button" title="Потяните, чтобы переместить блок" aria-label="Переместить блок">⠿</button>' : ''}
       ${block.fields?.titleHtml || isEditMode ? `<h2 class="custom-block-title" style="margin: 32px 0 16px 22px; font-size: 30px; line-height: 1.1; ${isEditMode ? 'min-height: 1em; min-width: 50px; outline: none;' : ''}" ${isEditMode ? 'contenteditable="true"' : ''}>${block.fields?.titleHtml !== undefined ? block.fields.titleHtml : 'Заголовок блока'}</h2>` : ''}
       <div class="custom-block-content" data-edit-block="${block.id}" data-edit-field="html">${block.fields?.html || '<p>Новый текстовый блок</p>'}</div>
     `;
@@ -1699,6 +1700,7 @@ function updateTextBlockOrderFromDom() {
 }
 
 function syncLayoutControls() {
+  schedulePanelContext();
   const form = document.querySelector('#builderLayoutForm');
   const hint = document.querySelector('#builderBlockHint');
   const cardActions = document.querySelector('#builderCardActions');
@@ -1718,8 +1720,8 @@ function syncLayoutControls() {
   if (duplicateButton) duplicateButton.disabled = !canDuplicate;
   
   hint.textContent = isContainer
-    ? 'Настройки применяются к выбранному div-блоку сразу. Карточки внутри можно редактировать и удалять.'
-    : 'Выберите div-блок на странице или добавьте новый через кнопку сверху.';
+    ? 'Текст карточек меняйте прямо на странице, лишние удаляйте крестиком.'
+    : '';
 
   document.querySelectorAll('.custom-page-block').forEach((element) => {
     element.classList.toggle('selected', element.dataset.blockId === selectedBuilderBlockId);
@@ -1888,12 +1890,17 @@ function syncPageControls() {
   const hint = document.querySelector('#builderPageHint');
   if (!current || !target || !attach || !hint) return;
 
-  current.textContent = `Текущая: ${pageState?.title || currentPageId}`;
-  const selectedValue = target.value || currentPageId;
-  target.innerHTML = pagesIndex
+  schedulePanelContext();
+  current.textContent = pageState?.title || currentPageId;
+  const options = pagesIndex
     .map((page) => `<option value="${escapeHtml(page.id)}">${escapeHtml(page.title || page.id)}</option>`)
     .join('');
-  target.value = pagesIndex.some((page) => page.id === selectedValue) ? selectedValue : currentPageId;
+  for (const select of [target, document.querySelector('#builderPagesList')]) {
+    if (!select) continue;
+    const selectedValue = select.value || currentPageId;
+    select.innerHTML = options;
+    select.value = pagesIndex.some((page) => page.id === selectedValue) ? selectedValue : currentPageId;
+  }
 
   const canAttach =
     selectedSideMenuIndex !== null ||
@@ -1902,8 +1909,8 @@ function syncPageControls() {
     ['card', 'section', 'block'].includes(selectedDesignTarget?.type);
   attach.disabled = !canAttach;
   hint.textContent = canAttach
-    ? 'Можно привязать выбранную страницу к выделенному пункту или блоку.'
-    : 'Выберите пункт меню, карточку, раздел, div или текстовый блок.';
+    ? 'Выберите страницу и нажмите кнопку — по клику на элемент посетитель попадёт на неё.'
+    : '';
 }
 
 function syncSeoControls() {
@@ -1994,8 +2001,8 @@ async function createPageFromEditor() {
   if (input) input.value = '';
   syncPageControls();
   syncPostsControls();
-  const target = document.querySelector('#builderPageTarget');
-  if (target) target.value = page.id;
+  // Ready to open it or to link a menu item to it right away.
+  for (const select of document.querySelectorAll('#builderPageTarget, #builderPagesList')) select.value = page.id;
   const status = document.querySelector('#builderStatus');
   if (status) status.textContent = 'Страница создана';
 }
@@ -2047,12 +2054,12 @@ async function attachPageToSelected() {
 }
 
 function openSelectedPage() {
-  const pageId = document.querySelector('#builderPageTarget')?.value || currentPageId;
+  const pageId = document.querySelector('#builderPagesList')?.value || currentPageId;
   window.location.href = pageUrl(pageId, true);
 }
 
 async function deleteSelectedPage() {
-  const pageId = document.querySelector('#builderPageTarget')?.value;
+  const pageId = document.querySelector('#builderPagesList')?.value;
   if (!pageId || pageId === 'home') {
     alert('Нельзя удалить главную страницу (home).');
     return;
@@ -2073,6 +2080,7 @@ async function deleteSelectedPage() {
 }
 
 function syncObjectControls() {
+  schedulePanelContext();
   const form = document.querySelector('#builderObjectForm');
   const hint = document.querySelector('#builderObjectHint');
   if (!form || !hint) return;
@@ -2088,13 +2096,13 @@ function syncObjectControls() {
   } else if (selectedDesignTarget?.type === 'image') {
     hint.textContent = 'Кликните по фото-зоне, чтобы загрузить или заменить изображение.';
   } else if (selectedDesignTarget?.type === 'section') {
-    hint.textContent = 'Настройки применяются только к выбранному разделу внутри div.';
+    hint.textContent = 'Настройки применяются только к выбранному разделу.';
   } else if (selectedDesignTarget?.type === 'footer') {
-    hint.textContent = 'Фон и текст меняют цвет футера. Пункты навигации редактируются прямо в футере.';
+    hint.textContent = 'Текст и ссылки подвала меняйте прямо на странице.';
   } else {
     hint.textContent = hasTarget
-      ? 'Цвет, размер и высота применяются к выбранному объекту сразу.'
-      : 'Кликните по хидеру, боковому меню, футеру, карточке, разделу или блоку на странице.';
+      ? 'Изменения видны на странице сразу.'
+      : '';
   }
 
   document.querySelectorAll('.design-selected').forEach((item) => item.classList.remove('design-selected'));
@@ -2143,6 +2151,7 @@ function syncObjectControls() {
 
 function selectDesignTarget(target) {
   selectedDesignTarget = target;
+  showBuilderTab('element');
   if (target?.type !== 'sideMenu') selectedSideMenuIndex = null;
   if (target?.type !== 'headerNav') selectedHeaderNavIndex = null;
   if (target?.type !== 'footer') selectedFooterIndex = null;
@@ -2419,6 +2428,7 @@ function setupObjectControls() {
 }
 
 function syncPostsControls() {
+  schedulePanelContext();
   const form = document.querySelector('#builderPostsForm');
   const hint = document.querySelector('#builderPostsHint');
   const block = pageBlock('posts');
@@ -2904,6 +2914,127 @@ function setupFloatingBuilderPanel() {
   });
 }
 
+// Settings panel: tabs, only the settings of the selected element, collapsing.
+const builderPanelCollapsedKey = 'cms-builder-panel-collapsed';
+const builderTargetNames = {
+  card: 'Карточка',
+  section: 'Раздел',
+  widget: 'Карточка с фото и кнопкой',
+  image: 'Фото',
+  headerNav: 'Верхнее меню',
+  sideMenu: 'Боковое меню',
+  footer: 'Подвал сайта',
+  posts: 'Лента новостей',
+  slider: 'Слайдер',
+  rightPanel: 'Колонка справа'
+};
+let panelContextQueued = false;
+
+function selectedTargetName() {
+  const type = selectedDesignTarget?.type;
+  if (type === 'block') return selectedBuilderBlock()?.type === 'container' ? 'Секция' : 'Текстовый блок';
+  return builderTargetNames[type] || '';
+}
+
+function showBuilderTab(name) {
+  document.querySelectorAll('[data-builder-tab]').forEach((tab) => {
+    tab.setAttribute('aria-selected', String(tab.dataset.builderTab === name));
+  });
+  document.querySelectorAll('[data-builder-tab-panel]').forEach((panel) => {
+    panel.hidden = panel.dataset.builderTabPanel !== name;
+  });
+}
+
+// The sync* functions decide which forms apply to the selection (by toggling
+// their hidden flags); this then shows only the sections that have something.
+function updatePanelContext() {
+  const panel = document.querySelector('#builderPanel');
+  if (!panel) return;
+  const type = selectedDesignTarget?.type;
+  const isShown = (selector) => {
+    const element = panel.querySelector(selector);
+    return Boolean(element && !element.hidden);
+  };
+  const visible = {
+    design: !['slider', 'posts'].includes(type) && ['#builderObjectForm', '#builderSideMenuActions', '#builderFooterActions'].some(isShown),
+    link: panel.querySelector('#builderAttachPage')?.disabled === false,
+    posts: isShown('#builderPostsForm'),
+    // The last selected section is remembered; show it only while it (or
+    // something inside it) is the current selection.
+    layout: isShown('#builderLayoutForm') && ['block', 'rightPanel', 'card', 'section', 'widget', 'image'].includes(type),
+    slider: type === 'slider'
+  };
+  panel.querySelectorAll('[data-builder-context]').forEach((section) => {
+    section.hidden = !visible[section.dataset.builderContext];
+  });
+
+  // With a card (or photo, section...) selected, its parent section offers only
+  // the "add next to it" buttons, not its whole layout form.
+  const layoutSection = panel.querySelector('[data-builder-context="layout"]');
+  const isInlineItem = ['card', 'section', 'widget', 'image'].includes(type);
+  layoutSection.classList.toggle('is-compact', isInlineItem);
+  layoutSection.querySelector('h2').textContent = isInlineItem ? 'Добавить в эту секцию' : 'Секция';
+  panel.querySelector('#builderElementEmpty').hidden = Object.values(visible).some(Boolean);
+
+  const name = selectedTargetName();
+  panel.querySelector('#builderPanelTitle').textContent = name ? `Настройки: ${name}` : 'Настройки';
+
+  // Flex-only and grid-only options are noise for other layouts.
+  const display = panel.querySelector('[data-style-field="display"]')?.value || 'block';
+  panel.querySelectorAll('[data-layout-when]').forEach((label) => {
+    label.hidden = !label.dataset.layoutWhen.split(' ').includes(display);
+  });
+}
+
+function schedulePanelContext() {
+  if (panelContextQueued) return;
+  panelContextQueued = true;
+  queueMicrotask(() => {
+    panelContextQueued = false;
+    updatePanelContext();
+  });
+}
+
+function setBuilderPanelCollapsed(collapsed) {
+  const panel = document.querySelector('#builderPanel');
+  const button = document.querySelector('#builderPanelCollapse');
+  if (!panel || !button) return;
+  panel.classList.toggle('is-collapsed', collapsed);
+  button.textContent = collapsed ? '+' : '—';
+  button.title = collapsed ? 'Развернуть панель' : 'Свернуть панель';
+  button.setAttribute('aria-expanded', String(!collapsed));
+  try {
+    localStorage.setItem(builderPanelCollapsedKey, collapsed ? '1' : '0');
+  } catch {
+    // Private mode: the panel just will not remember its state.
+  }
+}
+
+function setupBuilderPanelUi() {
+  document.querySelectorAll('[data-builder-tab]').forEach((tab) => {
+    tab.addEventListener('click', () => showBuilderTab(tab.dataset.builderTab));
+  });
+
+  let collapsed = false;
+  try {
+    collapsed = localStorage.getItem(builderPanelCollapsedKey) === '1';
+  } catch {}
+  setBuilderPanelCollapsed(collapsed);
+  document.querySelector('#builderPanelCollapse')?.addEventListener('click', () => {
+    setBuilderPanelCollapsed(!document.querySelector('#builderPanel').classList.contains('is-collapsed'));
+  });
+
+  document.querySelector('[data-style-field="display"]')?.addEventListener('change', updatePanelContext);
+
+  // The slider had settings but no way to select it.
+  slider.root?.addEventListener('click', (event) => {
+    if (event.target.closest('.slider-controls, .slider-dots')) return;
+    selectDesignTarget({ type: 'slider' });
+  });
+
+  updatePanelContext();
+}
+
 // Editor safety net: unsaved-changes tracking, undo/redo and clean paste.
 // Every change is recorded as a snapshot of the whole page (collectPageFromDom),
 // so text edits, added/removed blocks, styles and drag-and-drop are all covered
@@ -3137,322 +3268,354 @@ function setupEditor() {
         <button id="builderRedo" type="button" title="Вернуть (Ctrl+Shift+Z)" aria-label="Вернуть" disabled>↷</button>
         <span id="builderSaveState" class="builder-save-state" aria-live="polite"></span>
         <span id="builderStatus"></span>
-        <button id="builderAddText" type="button">+ Текст</button>
-        <button id="builderAddDiv" type="button">+ Div</button>
-        <button id="builderAddImage" type="button">+ Фото</button>
-        <button id="builderAddRightPanel" type="button">+ Справа</button>
+        <button id="builderAddText" type="button" title="Добавить блок текста в конец страницы">+ Текст</button>
+        <button id="builderAddDiv" type="button" title="Добавить секцию для карточек, разделов и фото">+ Секция</button>
+        <button id="builderAddImage" type="button" title="Добавить фото в выбранный блок">+ Фото</button>
+        <button id="builderAddRightPanel" type="button" title="Добавить колонку справа от слайдера">+ Колонка</button>
         <button id="builderAddSections" type="button" style="display: none;">+ Разделы</button>
-        <button id="builderDuplicateItem" type="button" disabled>Копировать</button>
-        <button id="builderDeleteBlock" type="button" disabled>Удалить</button>
-        <button id="builderLink" type="button">Ссылка</button>
-        <a href="/">Выйти из редактора</a>
-        <a href="/admin">CMS</a>
+        <button id="builderDuplicateItem" type="button" title="Сделать копию выбранного элемента" disabled>Дублировать</button>
+        <button id="builderDeleteBlock" type="button" title="Удалить выбранный элемент" disabled>Удалить</button>
+        <button id="builderLink" type="button" title="Выделите слово в тексте и нажмите, чтобы сделать его ссылкой">Ссылка</button>
+        <a href="/" title="Выйти из редактора и открыть сайт">Выйти</a>
+        <a href="/admin" title="Новости, галерея, интеграции, база знаний">Админка</a>
       </div>
       <aside class="builder-panel" id="builderPanel">
-        <div class="builder-panel-head" id="builderPanelHandle">
-          <strong>Панель</strong>
-          <button id="builderPanelReset" type="button">Справа</button>
+        <div class="builder-panel-head" id="builderPanelHandle" title="Перетащите, чтобы передвинуть панель">
+          <strong id="builderPanelTitle">Настройки</strong>
+          <div class="builder-panel-head-actions">
+            <button id="builderPanelReset" type="button" title="Вернуть панель к правому краю">⇥</button>
+            <button id="builderPanelCollapse" type="button" title="Свернуть панель" aria-expanded="true">—</button>
+          </div>
         </div>
-        <section class="builder-panel-section">
-          <h2>Страницы</h2>
-          <p id="builderCurrentPage">Текущая: ${escapeHtml(pageState?.title || currentPageId)}</p>
-          <div class="builder-pages-form">
+        <div class="builder-tabs" role="tablist">
+          <button type="button" role="tab" data-builder-tab="element" aria-selected="true">Элемент</button>
+          <button type="button" role="tab" data-builder-tab="page" aria-selected="false">Страница</button>
+          <button type="button" role="tab" data-builder-tab="seo" aria-selected="false">SEO</button>
+        </div>
+
+        <div class="builder-tab-panel" data-builder-tab-panel="element">
+          <p id="builderElementEmpty" class="builder-empty">Кликните по любому элементу на странице: меню, карточке, тексту, слайдеру или ленте новостей — здесь появятся его настройки.</p>
+
+          <section class="builder-panel-section" data-builder-context="design">
+            <h2>Оформление</h2>
+            <p id="builderObjectHint"></p>
+            <div id="builderObjectForm" class="builder-object-form" hidden>
+              <label>
+                Цвет фона
+                <input data-object-style-field="backgroundColor" type="color">
+              </label>
+              <label>
+                Цвет текста
+                <input data-object-style-field="textColor" type="color">
+              </label>
+              <label>
+                Размер текста
+                <input data-object-style-field="fontSize" type="number" min="10" max="72" step="1">
+              </label>
+              <label>
+                Внутренний отступ
+                <input data-object-style-field="padding" type="number" min="0" max="120" step="1">
+              </label>
+              <label>
+                Скругление углов
+                <input data-object-style-field="borderRadius" type="number" min="0" max="96" step="1">
+              </label>
+              <label>
+                Макс. ширина
+                <input data-object-style-field="maxWidth" type="number" min="180" max="2400" step="10">
+              </label>
+              <label>
+                Высота (0 — авто)
+                <input data-object-style-field="height" type="number" min="0" max="2000" step="10">
+              </label>
+            </div>
+            <div id="builderWidgetForm" class="builder-object-form builder-subform" hidden>
+              <label>
+                Скругление фото
+                <input data-widget-style-field="imgRadius" type="number" min="0" max="200" step="1">
+              </label>
+              <label>
+                Текст кнопки
+                <input data-widget-style-field="btnText" type="text">
+              </label>
+              <label>
+                Ссылка кнопки
+                <input data-widget-style-field="btnLink" type="text">
+              </label>
+              <label>
+                Положение кнопки
+                <select data-widget-style-field="btnAlign">
+                  <option value="start">Слева</option>
+                  <option value="center">По центру</option>
+                  <option value="end">Справа</option>
+                </select>
+              </label>
+              <label>
+                Размер кнопки
+                <input data-widget-style-field="btnSize" type="number" min="10" max="40" step="1">
+              </label>
+              <label>
+                Цвет кнопки
+                <input data-widget-style-field="btnBg" type="color">
+              </label>
+              <label>
+                Цвет текста кнопки
+                <input data-widget-style-field="btnColor" type="color">
+              </label>
+            </div>
+            <div id="builderSideMenuActions" class="builder-side-menu-actions" hidden>
+              <label>
+                Название организации
+                <input id="builderSideTitle" type="text" placeholder="Название организации">
+              </label>
+              <label>
+                Логотип (ссылка на картинку)
+                <input id="builderSideLogoUrl" type="url" placeholder="https://...">
+              </label>
+              <p id="builderSideMenuHint">Кликните по пункту меню слева.</p>
+              <button id="builderAddSideItem" type="button">+ Пункт меню</button>
+              <button id="builderDeleteSideItem" type="button" disabled>Удалить пункт</button>
+            </div>
+            <div id="builderFooterActions" class="builder-footer-actions" hidden>
+              <p id="builderFooterHint">Кликните по ссылке в подвале.</p>
+              <button id="builderAddFooterItem" type="button">+ Ссылка в подвале</button>
+              <button id="builderDeleteFooterItem" type="button" disabled>Удалить ссылку</button>
+            </div>
+          </section>
+
+          <section class="builder-panel-section" data-builder-context="link">
+            <h2>Ссылка</h2>
             <label>
-              Новая страница
-              <input id="builderNewPageTitle" type="text" placeholder="Например: О колледже">
-            </label>
-            <button id="builderCreatePage" type="button">+ Страница</button>
-            <label>
-              Ссылка на страницу
+              При клике открывать страницу
               <select id="builderPageTarget"></select>
             </label>
-            <button id="builderAttachPage" type="button" disabled>Привязать к выбранному</button>
-            <div style="display: flex; gap: 8px;">
-              <button id="builderOpenPage" type="button" style="flex: 1;">Открыть страницу</button>
-              <button id="builderDeletePage" type="button" style="background: #e11d48; color: white;">Удалить</button>
+            <button id="builderAttachPage" type="button" disabled>Сделать ссылкой на эту страницу</button>
+            <p id="builderPageHint"></p>
+          </section>
+
+          <section class="builder-panel-section" data-builder-context="posts">
+            <h2>Лента новостей</h2>
+            <p id="builderPostsHint" hidden></p>
+            <div id="builderPostsForm" class="builder-posts-form" hidden>
+              <label>
+                Заголовок ленты
+                <input data-posts-field="titleHtml" type="text">
+              </label>
+              <label>
+                Сколько новостей показывать (0 — все)
+                <input data-posts-field="limit" type="number" min="0" max="100" step="1">
+              </label>
+              <label>
+                Ширина ленты
+                <input data-posts-field="maxWidth" type="number" min="320" max="2400" step="10">
+              </label>
+              <label>
+                Положение
+                <select data-posts-field="align">
+                  <option value="left">Слева</option>
+                  <option value="center">По центру</option>
+                  <option value="right">Справа</option>
+                </select>
+              </label>
+              <label>
+                Ширина карточки
+                <input data-posts-field="cardMinWidth" type="number" min="180" max="900" step="10">
+              </label>
+              <label>
+                Высота карточки (0 — авто)
+                <input data-posts-field="cardHeight" type="number" min="0" max="1400" step="10">
+              </label>
+              <label>
+                Высота фото (0 — авто)
+                <input data-posts-field="coverHeight" type="number" min="0" max="800" step="10">
+              </label>
+              <label>
+                Страница со всеми новостями
+                <select data-posts-field="allPageId"></select>
+              </label>
+              <label>
+                Текст ссылки «Все новости»
+                <input data-posts-field="allLinkText" type="text">
+              </label>
+              <label class="checkline">
+                <input data-posts-field="showAllLink" type="checkbox">
+                Показывать ссылку «Все новости»
+              </label>
             </div>
-            <p id="builderPageHint">Выберите пункт меню, карточку, раздел, div или текстовый блок.</p>
-          </div>
-        </section>
-        <section class="builder-panel-section">
-          <h2>SEO</h2>
-          <div class="builder-seo-form">
+          </section>
+
+          <section class="builder-panel-section" data-builder-context="layout">
+            <h2>Секция</h2>
+            <p id="builderBlockHint" hidden></p>
+            <div id="builderCardActions" class="builder-card-actions" hidden>
+              <button id="builderAddCard" type="button">+ Карточка</button>
+              <button id="builderAddSection" type="button">+ Раздел</button>
+              <button id="builderAddImageInside" type="button">+ Фото</button>
+              <button id="builderAddWidget" type="button">+ Карточка с фото и кнопкой</button>
+            </div>
+            <div id="builderLayoutForm" class="builder-layout-form" hidden>
+              <label>
+                Как расположить содержимое
+                <select data-style-field="display">
+                  <option value="block">Друг под другом</option>
+                  <option value="flex">В ряд</option>
+                  <option value="grid">Сеткой</option>
+                </select>
+              </label>
+              <label data-layout-when="flex">
+                Направление ряда
+                <select data-style-field="flexDirection">
+                  <option value="row">Слева направо</option>
+                  <option value="row-reverse">Справа налево</option>
+                  <option value="column">Сверху вниз</option>
+                  <option value="column-reverse">Снизу вверх</option>
+                </select>
+              </label>
+              <label data-layout-when="flex">
+                Если не помещается
+                <select data-style-field="flexWrap">
+                  <option value="nowrap">Не переносить</option>
+                  <option value="wrap">Переносить на новую строку</option>
+                </select>
+              </label>
+              <label data-layout-when="grid">
+                Колонок в сетке (0 — авто)
+                <input data-style-field="gridColumns" type="number" min="0" max="12" step="1">
+              </label>
+              <label data-layout-when="flex grid">
+                Выравнивание по горизонтали
+                <select data-style-field="justifyContent">
+                  <option value="flex-start">К началу</option>
+                  <option value="center">По центру</option>
+                  <option value="flex-end">К концу</option>
+                  <option value="space-between">Равномерно, края прижаты</option>
+                  <option value="space-around">Равномерно с отступами</option>
+                </select>
+              </label>
+              <label data-layout-when="flex grid">
+                Выравнивание по вертикали
+                <select data-style-field="alignItems">
+                  <option value="stretch">Растянуть по высоте</option>
+                  <option value="flex-start">Сверху</option>
+                  <option value="center">По центру</option>
+                  <option value="flex-end">Снизу</option>
+                </select>
+              </label>
+              <label>
+                Положение секции
+                <select data-style-field="position">
+                  <option value="left">Слева</option>
+                  <option value="center">По центру</option>
+                  <option value="right">Справа</option>
+                </select>
+              </label>
+              <label data-layout-when="flex grid">
+                Промежуток между элементами
+                <input data-style-field="gap" type="number" min="0" max="96" step="1">
+              </label>
+              <label>
+                Внутренний отступ
+                <input data-style-field="padding" type="number" min="0" max="120" step="1">
+              </label>
+              <label>
+                Макс. ширина
+                <input data-style-field="maxWidth" type="number" min="320" max="1600" step="10">
+              </label>
+              <label>
+                Высота (0 — авто)
+                <input data-style-field="height" type="number" min="0" max="2000" step="10">
+              </label>
+              <label>
+                Скругление углов
+                <input data-style-field="borderRadius" type="number" min="0" max="48" step="1">
+              </label>
+              <label>
+                Цвет фона
+                <input data-style-field="backgroundColor" type="color">
+              </label>
+              <label>
+                Цвет текста
+                <input data-style-field="textColor" type="color">
+              </label>
+            </div>
+          </section>
+
+          <section class="builder-panel-section" data-builder-context="slider">
+            <h2>Слайдер</h2>
+            <p>Размер и положение слайдера на странице.</p>
+            <div id="builderSliderForm" class="builder-slider-form">
+              <label>
+                Макс. ширина
+                <input data-slider-style-field="maxWidth" type="number" min="360" max="2400" step="10">
+              </label>
+              <label>
+                Положение
+                <select data-slider-style-field="align">
+                  <option value="left">Слева</option>
+                  <option value="center">По центру</option>
+                  <option value="right">Справа</option>
+                </select>
+              </label>
+              <label>
+                Скругление углов
+                <input data-slider-style-field="borderRadius" type="number" min="0" max="96" step="1">
+              </label>
+              <label>
+                Высота (0 — авто)
+                <input data-slider-style-field="height" type="number" min="0" max="2000" step="10">
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <div class="builder-tab-panel" data-builder-tab-panel="page" hidden>
+          <section class="builder-panel-section">
+            <h2>Эта страница</h2>
+            <p id="builderCurrentPage">${escapeHtml(pageState?.title || currentPageId)}</p>
+          </section>
+          <section class="builder-panel-section">
+            <h2>Новая страница</h2>
             <label>
-              SEO title
-              <input id="builderSeoTitle" type="text" maxlength="180" placeholder="По умолчанию используется название страницы">
+              Название
+              <input id="builderNewPageTitle" type="text" placeholder="Например: О колледже">
+            </label>
+            <button id="builderCreatePage" type="button">+ Создать страницу</button>
+          </section>
+          <section class="builder-panel-section">
+            <h2>Все страницы</h2>
+            <label>
+              Страница
+              <select id="builderPagesList"></select>
+            </label>
+            <div class="builder-button-row">
+              <button id="builderOpenPage" type="button">Открыть для редактирования</button>
+              <button id="builderDeletePage" type="button" class="builder-danger">Удалить</button>
+            </div>
+          </section>
+        </div>
+
+        <div class="builder-tab-panel" data-builder-tab-panel="seo" hidden>
+          <section class="builder-panel-section builder-seo-form">
+            <p>Как страница выглядит в Яндексе, Google и при отправке ссылки в мессенджеры.</p>
+            <label>
+              Заголовок в поиске
+              <input id="builderSeoTitle" type="text" maxlength="180" placeholder="По умолчанию — название страницы">
             </label>
             <label>
-              Description
-              <textarea id="builderSeoDescription" rows="4" maxlength="500" placeholder="Краткое описание страницы для поисковой выдачи"></textarea>
+              Описание в поиске
+              <textarea id="builderSeoDescription" rows="4" maxlength="500" placeholder="1–2 предложения о том, что есть на странице"></textarea>
             </label>
             <label>
-              Изображение для соцсетей
+              Картинка для соцсетей (ссылка)
               <input id="builderSeoImage" type="url" maxlength="2000" placeholder="https://...">
             </label>
             <label class="checkline">
               <input id="builderSeoNoIndex" type="checkbox">
-              Не индексировать страницу
+              Скрыть страницу из поиска
             </label>
-            <p>Публичный URL: <a id="builderSeoPublicUrl" href="/" target="_blank" rel="noopener"></a></p>
-          </div>
-        </section>
-        <section class="builder-panel-section">
-          <h2>Объект</h2>
-          <p id="builderObjectHint">Кликните по хидеру, боковому меню, слайдеру или блоку на странице.</p>
-          <div id="builderObjectForm" class="builder-object-form" hidden>
-            <label>
-              Фон
-              <input data-object-style-field="backgroundColor" type="color">
-            </label>
-            <label>
-              Текст
-              <input data-object-style-field="textColor" type="color">
-            </label>
-            <label>
-              Размер
-              <input data-object-style-field="fontSize" type="number" min="10" max="72" step="1">
-            </label>
-            <label>
-              Padding
-              <input data-object-style-field="padding" type="number" min="0" max="120" step="1">
-            </label>
-            <label>
-              Radius
-              <input data-object-style-field="borderRadius" type="number" min="0" max="96" step="1">
-            </label>
-            <label>
-              Max width
-              <input data-object-style-field="maxWidth" type="number" min="180" max="2400" step="10">
-            </label>
-            <label>
-              Height
-              <input data-object-style-field="height" type="number" min="0" max="2000" step="10">
-            </label>
-          </div>
-          <div id="builderWidgetForm" class="builder-object-form" hidden style="margin-top: 14px; border-top: 1px solid var(--line); padding-top: 14px;">
-            <label>
-              Радиус фото
-              <input data-widget-style-field="imgRadius" type="number" min="0" max="200" step="1">
-            </label>
-            <label>
-              Текст кнопки
-              <input data-widget-style-field="btnText" type="text">
-            </label>
-            <label>
-              Ссылка кнопки
-              <input data-widget-style-field="btnLink" type="text">
-            </label>
-            <label>
-              Позиция кнопки
-              <select data-widget-style-field="btnAlign">
-                <option value="start">Слева</option>
-                <option value="center">По центру</option>
-                <option value="end">Справа</option>
-              </select>
-            </label>
-            <label>
-              Размер кнопки
-              <input data-widget-style-field="btnSize" type="number" min="10" max="40" step="1">
-            </label>
-            <label>
-              Цвет кнопки
-              <input data-widget-style-field="btnBg" type="color">
-            </label>
-            <label>
-              Текст на кнопке
-              <input data-widget-style-field="btnColor" type="color">
-            </label>
-          </div>
-          <div id="builderSideMenuActions" class="builder-side-menu-actions" hidden>
-            <label>
-              Название
-              <input id="builderSideTitle" type="text" placeholder="Название организации">
-            </label>
-            <label>
-              Лого URL
-              <input id="builderSideLogoUrl" type="url" placeholder="https://...">
-            </label>
-            <p id="builderSideMenuHint">Кликните по пункту слева.</p>
-            <button id="builderAddSideItem" type="button">+ Пункт меню</button>
-            <button id="builderDeleteSideItem" type="button" disabled>Удалить пункт</button>
-          </div>
-          <div id="builderFooterActions" class="builder-footer-actions" hidden>
-            <p id="builderFooterHint">Кликните по пункту навигации в футере.</p>
-            <button id="builderAddFooterItem" type="button">+ Пункт навигации</button>
-            <button id="builderDeleteFooterItem" type="button" disabled>Удалить пункт</button>
-          </div>
-        </section>
-        <section class="builder-panel-section">
-          <h2>Публикации</h2>
-          <p id="builderPostsHint">Кликните по блоку новостей на странице, чтобы менять его.</p>
-          <div id="builderPostsForm" class="builder-posts-form" hidden>
-            <label>
-              Заглавный текст
-              <input data-posts-field="titleHtml" type="text">
-            </label>
-            <label>
-              Количество
-              <input data-posts-field="limit" type="number" min="0" max="100" step="1">
-            </label>
-            <label>
-              Ширина раздела
-              <input data-posts-field="maxWidth" type="number" min="320" max="2400" step="10">
-            </label>
-            <label>
-              Положение
-              <select data-posts-field="align">
-                <option value="left">left</option>
-                <option value="center">center</option>
-                <option value="right">right</option>
-              </select>
-            </label>
-            <label>
-              Ширина карточки
-              <input data-posts-field="cardMinWidth" type="number" min="180" max="900" step="10">
-            </label>
-            <label>
-              Высота карточки
-              <input data-posts-field="cardHeight" type="number" min="0" max="1400" step="10">
-            </label>
-            <label>
-              Высота фото
-              <input data-posts-field="coverHeight" type="number" min="0" max="800" step="10">
-            </label>
-            <label>
-              Страница всех
-              <select data-posts-field="allPageId"></select>
-            </label>
-            <label>
-              Текст ссылки
-              <input data-posts-field="allLinkText" type="text">
-            </label>
-            <label class="checkline">
-              <input data-posts-field="showAllLink" type="checkbox">
-              Показывать ссылку
-            </label>
-          </div>
-        </section>
-        <section class="builder-panel-section">
-          <h2>Div блок</h2>
-          <p id="builderBlockHint">Выберите div-блок на странице или добавьте новый через кнопку сверху.</p>
-          <div id="builderLayoutForm" class="builder-layout-form" hidden>
-            <label>
-              Display
-              <select data-style-field="display">
-                <option value="block">block</option>
-                <option value="flex">flex</option>
-                <option value="grid">grid</option>
-              </select>
-            </label>
-            <label>
-              Direction
-              <select data-style-field="flexDirection">
-                <option value="row">row</option>
-                <option value="row-reverse">row-reverse</option>
-                <option value="column">column</option>
-                <option value="column-reverse">column-reverse</option>
-              </select>
-            </label>
-            <label>
-              Wrap (Flex)
-              <select data-style-field="flexWrap">
-                <option value="nowrap">nowrap</option>
-                <option value="wrap">wrap</option>
-              </select>
-            </label>
-            <label>
-              Cols (Grid)
-              <input data-style-field="gridColumns" type="number" min="0" max="12" step="1">
-            </label>
-            <label>
-              Justify
-              <select data-style-field="justifyContent">
-                <option value="flex-start">flex-start</option>
-                <option value="center">center</option>
-                <option value="flex-end">flex-end</option>
-                <option value="space-between">space-between</option>
-                <option value="space-around">space-around</option>
-              </select>
-            </label>
-            <label>
-              Align
-              <select data-style-field="alignItems">
-                <option value="stretch">stretch</option>
-                <option value="flex-start">flex-start</option>
-                <option value="center">center</option>
-                <option value="flex-end">flex-end</option>
-              </select>
-            </label>
-            <label>
-              Position
-              <select data-style-field="position">
-                <option value="left">left</option>
-                <option value="center">center</option>
-                <option value="right">right</option>
-              </select>
-            </label>
-            <label>
-              Gap
-              <input data-style-field="gap" type="number" min="0" max="96" step="1">
-            </label>
-            <label>
-              Padding
-              <input data-style-field="padding" type="number" min="0" max="120" step="1">
-            </label>
-            <label>
-              Max width
-              <input data-style-field="maxWidth" type="number" min="320" max="1600" step="10">
-            </label>
-            <label>
-              Height
-              <input data-style-field="height" type="number" min="0" max="2000" step="10">
-            </label>
-            <label>
-              Radius
-              <input data-style-field="borderRadius" type="number" min="0" max="48" step="1">
-            </label>
-            <label>
-              Фон
-              <input data-style-field="backgroundColor" type="color">
-            </label>
-            <label>
-              Текст
-              <input data-style-field="textColor" type="color">
-            </label>
-          </div>
-          <div id="builderCardActions" class="builder-card-actions" hidden>
-            <button id="builderAddCard" type="button">+ Карточка</button>
-            <button id="builderAddSection" type="button">+ Раздел</button>
-            <button id="builderAddImageInside" type="button">+ Фото</button>
-            <button id="builderAddWidget" type="button">+ Объект</button>
-          </div>
-        </section>
-        <section class="builder-panel-section">
-          <h2>Слайдер</h2>
-          <p>Настрой внешний размер и положение слайдера на странице.</p>
-          <div id="builderSliderForm" class="builder-slider-form">
-            <label>
-              Max width
-              <input data-slider-style-field="maxWidth" type="number" min="360" max="2400" step="10">
-            </label>
-            <label>
-              Position
-              <select data-slider-style-field="align">
-                <option value="left">left</option>
-                <option value="center">center</option>
-                <option value="right">right</option>
-              </select>
-            </label>
-            <label>
-              Radius
-              <input data-slider-style-field="borderRadius" type="number" min="0" max="96" step="1">
-            </label>
-            <label>
-              Height
-              <input data-slider-style-field="height" type="number" min="0" max="2000" step="10">
-            </label>
-          </div>
-        </section>
+            <p>Адрес страницы: <a id="builderSeoPublicUrl" href="/" target="_blank" rel="noopener"></a></p>
+          </section>
+        </div>
       </aside>
     `
   );
@@ -3493,6 +3656,7 @@ function setupEditor() {
   setupPostsControls();
   setupSliderControls();
   setupFloatingBuilderPanel();
+  setupBuilderPanelUi();
   syncLayoutControls();
   syncObjectControls();
   syncPostsControls();
