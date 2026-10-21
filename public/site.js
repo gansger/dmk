@@ -1114,12 +1114,6 @@ function prepareContainerItems(container) {
       widget.remove();
       recordDeletion();
     });
-    widget.querySelector('.builder-widget-image')?.addEventListener('dblclick', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      const nextUrl = window.prompt('Ссылка на фото', event.currentTarget.getAttribute('src') || '');
-      if (nextUrl !== null) event.currentTarget.setAttribute('src', nextUrl.trim());
-    });
     widget.onclick = (event) => {
       if (event.target.closest('.builder-widget-remove')) return;
       if (event.target.closest('a')) event.preventDefault();
@@ -1768,6 +1762,7 @@ function syncSideMenuControls() {
   const block = pageBlock('sideMenu');
   if (titleInput) titleInput.value = siteSideMenu.querySelector('[data-side-title]')?.textContent.trim() || block?.fields?.titleHtml || '';
   if (logoInput) logoInput.value = block?.fields?.logoUrl || '';
+  updateLogoControls();
   const items = sideMenuItemsFromDom();
   const selected = selectedSideMenuIndex !== null ? items[selectedSideMenuIndex] : null;
   deleteButton.disabled = !selected;
@@ -2828,9 +2823,7 @@ function addSectionRowBlock() {
 }
 
 function addLinkToSelection() {
-  const url = window.prompt('URL ссылки');
-  if (!url) return;
-  document.execCommand('createLink', false, url);
+  openLinkDialog();
 }
 
 function clampPanelPosition(panel, left, top) {
@@ -2914,6 +2907,346 @@ function setupFloatingBuilderPanel() {
   });
 }
 
+// Rich text tools: floating formatting bar, link dialog, replacing photos by file.
+const richTextSelector = '.custom-block-content, .right-panel-content';
+let savedLinkRange = null;
+let editedLink = null;
+
+function richEditableFromNode(node) {
+  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+  const editable = element?.closest('[contenteditable="true"]');
+  return editable?.closest(richTextSelector) ? editable : null;
+}
+
+function currentRichRange() {
+  const selection = window.getSelection();
+  if (!selection?.rangeCount) return null;
+  const range = selection.getRangeAt(0);
+  return richEditableFromNode(range.commonAncestorContainer) ? range : null;
+}
+
+function restoreRange(range) {
+  if (!range) return;
+  richEditableFromNode(range.commonAncestorContainer)?.focus({ preventScroll: true });
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
+function updateFormatBar() {
+  const bar = document.querySelector('#builderFormatBar');
+  if (!bar) return;
+  const range = currentRichRange();
+  if (!range || range.collapsed || document.querySelector('#builderLinkDialog')?.open) {
+    bar.hidden = true;
+    return;
+  }
+
+  const block = String(document.queryCommandValue('formatBlock') || '').toLowerCase();
+  const active = {
+    bold: document.queryCommandState('bold'),
+    italic: document.queryCommandState('italic'),
+    h2: block === 'h2',
+    h3: block === 'h3',
+    ul: document.queryCommandState('insertUnorderedList'),
+    ol: document.queryCommandState('insertOrderedList'),
+    link: Boolean(range.commonAncestorContainer.parentElement?.closest('a') || range.cloneContents().querySelector?.('a'))
+  };
+  bar.querySelectorAll('[data-format]').forEach((button) => {
+    button.classList.toggle('is-active', Boolean(active[button.dataset.format]));
+  });
+
+  bar.hidden = false;
+  const rect = range.getBoundingClientRect();
+  const barRect = bar.getBoundingClientRect();
+  const topLimit = (document.querySelector('.builder-bar')?.getBoundingClientRect().bottom || 0) + 8;
+  let top = rect.top - barRect.height - 10;
+  if (top < topLimit) top = rect.bottom + 10;
+  const left = Math.min(Math.max(8, rect.left + rect.width / 2 - barRect.width / 2), window.innerWidth - barRect.width - 8);
+  bar.style.top = `${Math.round(top)}px`;
+  bar.style.left = `${Math.round(left)}px`;
+}
+
+function applyFormat(format) {
+  const range = currentRichRange();
+  if (!range) return;
+  const block = String(document.queryCommandValue('formatBlock') || '').toLowerCase();
+  if (format === 'bold' || format === 'italic') document.execCommand(format);
+  // Pressing the active heading again turns it back into a paragraph.
+  if (format === 'h2' || format === 'h3') document.execCommand('formatBlock', false, block === format ? '<p>' : `<${format}>`);
+  if (format === 'ul') document.execCommand('insertUnorderedList');
+  if (format === 'ol') document.execCommand('insertOrderedList');
+  if (format === 'clear') {
+    document.execCommand('removeFormat');
+    if (['h2', 'h3', 'h4'].includes(block)) document.execCommand('formatBlock', false, '<p>');
+  }
+  if (format === 'link') {
+    openLinkDialog();
+    return;
+  }
+  updateFormatBar();
+}
+
+function linkTargetFromValue(value) {
+  const text = String(value || '').trim();
+  if (!text) return { error: 'Укажите адрес.' };
+  if (/^(https?:|mailto:|tel:)/i.test(text) || text.startsWith('/') || text.startsWith('#')) return { href: text };
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) return { href: `mailto:${text}` };
+  if (/^\+?[\d\s()-]{6,}$/.test(text)) return { href: `tel:${text.replace(/[^\d+]/g, '')}` };
+  if (/^[\p{L}\d-]+(\.[\p{L}\d-]+)+(\/\S*)?$/u.test(text)) return { href: `https://${text}` };
+  return { error: 'Не похоже на адрес сайта, почту или телефон.' };
+}
+
+function setLinkDialogKind(kind) {
+  const dialog = document.querySelector('#builderLinkDialog');
+  dialog.querySelectorAll('[data-link-kind]').forEach((field) => {
+    field.hidden = field.dataset.linkKind !== kind;
+  });
+  dialog.querySelector(`input[name="linkKind"][value="${kind}"]`).checked = true;
+  // External sites usually open in a new tab, own pages in the same one.
+  dialog.querySelector('#builderLinkNewTab').checked = kind === 'url';
+}
+
+function openLinkDialog() {
+  const range = currentRichRange();
+  if (!range) {
+    setBuilderStatus('Выделите слово в текстовом блоке. Пункт меню или карточку сделайте ссылкой через раздел «Ссылка» в панели.');
+    return;
+  }
+  savedLinkRange = range.cloneRange();
+  const startElement = range.startContainer.nodeType === Node.ELEMENT_NODE ? range.startContainer : range.startContainer.parentElement;
+  editedLink = startElement?.closest('a') || null;
+
+  const dialog = document.querySelector('#builderLinkDialog');
+  const pageSelect = dialog.querySelector('#builderLinkPage');
+  pageSelect.innerHTML = pagesIndex
+    .filter((page) => !String(page.id).startsWith('post-'))
+    .map((page) => `<option value="${escapeHtml(page.id)}">${escapeHtml(page.title || page.id)}</option>`)
+    .join('');
+
+  const selectedText = (editedLink?.textContent || range.toString()).trim();
+  dialog.querySelector('#builderLinkText').textContent = selectedText ? `Текст ссылки: «${selectedText.slice(0, 80)}»` : 'Текст ссылки будет таким же, как название страницы или адрес.';
+  dialog.querySelector('#builderLinkError').hidden = true;
+  dialog.querySelector('#builderLinkRemove').hidden = !editedLink;
+
+  const href = editedLink?.getAttribute('href') || '';
+  const linkedPage = pagesIndex.find((page) => href && pageUrl(page.id, false) === href);
+  if (linkedPage || !href) {
+    setLinkDialogKind('page');
+    if (linkedPage) pageSelect.value = linkedPage.id;
+    dialog.querySelector('#builderLinkUrl').value = '';
+  } else {
+    setLinkDialogKind('url');
+    dialog.querySelector('#builderLinkUrl').value = href.replace(/^mailto:|^tel:/, '');
+  }
+  if (editedLink) dialog.querySelector('#builderLinkNewTab').checked = editedLink.target === '_blank';
+
+  document.querySelector('#builderFormatBar').hidden = true;
+  dialog.showModal();
+}
+
+function applyLinkDialog() {
+  const dialog = document.querySelector('#builderLinkDialog');
+  const kind = dialog.querySelector('input[name="linkKind"]:checked').value;
+  const pageSelect = dialog.querySelector('#builderLinkPage');
+  const target = kind === 'page'
+    ? { href: pageUrl(pageSelect.value, false), label: pageSelect.selectedOptions[0]?.textContent || '' }
+    : linkTargetFromValue(dialog.querySelector('#builderLinkUrl').value);
+  if (target.error || !target.href) {
+    const error = dialog.querySelector('#builderLinkError');
+    error.textContent = target.error || 'Выберите страницу.';
+    error.hidden = false;
+    return;
+  }
+  // A mail or phone link opens an app, not a page: a new tab would stay empty.
+  const newTab = dialog.querySelector('#builderLinkNewTab').checked && !/^(mailto|tel):/i.test(target.href);
+  dialog.close();
+  restoreRange(savedLinkRange);
+
+  let links = [];
+  if (editedLink) {
+    editedLink.setAttribute('href', target.href);
+    links = [editedLink];
+  } else if (savedLinkRange?.collapsed) {
+    const marker = `link-${crypto.randomUUID()}`;
+    const label = target.label || dialog.querySelector('#builderLinkUrl').value.trim() || target.href;
+    document.execCommand('insertHTML', false, `<a href="${escapeHtml(target.href)}" data-new-link="${marker}">${escapeHtml(label)}</a>`);
+    links = [...document.querySelectorAll(`[data-new-link="${marker}"]`)];
+  } else {
+    // createLink gives no handle on the new anchors; mark them through a unique href first.
+    const marker = `#cms-new-link-${crypto.randomUUID()}`;
+    document.execCommand('createLink', false, marker);
+    links = [...document.querySelectorAll(`a[href="${marker}"]`)];
+    links.forEach((link) => link.setAttribute('href', target.href));
+  }
+  for (const link of links) {
+    link.removeAttribute('data-new-link');
+    if (newTab) {
+      link.target = '_blank';
+      link.rel = 'noopener';
+    } else {
+      link.removeAttribute('target');
+      link.removeAttribute('rel');
+    }
+  }
+  savedLinkRange = null;
+  editedLink = null;
+  scheduleEditorCapture();
+}
+
+function removeLinkFromDialog() {
+  const dialog = document.querySelector('#builderLinkDialog');
+  dialog.close();
+  if (editedLink) editedLink.replaceWith(...editedLink.childNodes);
+  savedLinkRange = null;
+  editedLink = null;
+  scheduleEditorCapture();
+}
+
+async function replaceImageFromFile(applyUrl, doneText = 'Фото заменено') {
+  try {
+    const file = await chooseImageFile();
+    if (!file) return;
+    setBuilderStatus('Загружаю фото...');
+    const uploaded = await uploadEditorImageFile(file);
+    if (!uploaded?.url) return;
+    applyUrl(uploaded.url);
+    setBuilderStatus(doneText);
+  } catch (error) {
+    setBuilderStatus('');
+    alert(error.message || 'Не удалось загрузить фото');
+  }
+}
+
+function replaceSelectedImage() {
+  const element = selectedDesignElement();
+  if (!element) return;
+  if (selectedDesignTarget?.type === 'image') {
+    void uploadImageForItem(element);
+  } else if (selectedDesignTarget?.type === 'widget') {
+    const image = element.querySelector('.builder-widget-image');
+    if (image) void replaceImageFromFile((url) => image.setAttribute('src', url));
+  }
+}
+
+function updateLogoControls() {
+  const url = pageBlock('sideMenu')?.fields?.logoUrl || '';
+  const preview = document.querySelector('#builderLogoPreview');
+  if (preview) preview.innerHTML = url ? `<img src="${escapeHtml(url)}" alt="Логотип">` : '<span>Нет логотипа</span>';
+  const remove = document.querySelector('#builderRemoveLogo');
+  if (remove) remove.hidden = !url;
+}
+
+function setLogoUrl(url) {
+  const input = document.querySelector('#builderSideLogoUrl');
+  if (input) input.value = url;
+  updateSideMenuBrandFromControls();
+  updateLogoControls();
+}
+
+function uploadLogo() {
+  void replaceImageFromFile(setLogoUrl, 'Логотип загружен');
+}
+
+function setupRichTextTools() {
+  document.body.insertAdjacentHTML(
+    'beforeend',
+    `
+      <div class="builder-format-bar" id="builderFormatBar" role="toolbar" aria-label="Оформление текста" hidden>
+        <button type="button" data-format="bold" title="Жирный (Ctrl+B)"><strong>Ж</strong></button>
+        <button type="button" data-format="italic" title="Курсив (Ctrl+I)"><em>К</em></button>
+        <button type="button" data-format="h2" title="Заголовок">Заголовок</button>
+        <button type="button" data-format="h3" title="Подзаголовок">Подзаголовок</button>
+        <button type="button" data-format="ul" title="Маркированный список">• Список</button>
+        <button type="button" data-format="ol" title="Нумерованный список">1. Список</button>
+        <button type="button" data-format="link" title="Ссылка (Ctrl+K)">Ссылка</button>
+        <button type="button" data-format="clear" title="Убрать оформление">Очистить</button>
+      </div>
+      <dialog class="builder-dialog" id="builderLinkDialog" aria-labelledby="builderLinkTitle">
+        <form id="builderLinkForm" method="dialog">
+          <h2 id="builderLinkTitle">Ссылка</h2>
+          <p id="builderLinkText"></p>
+          <div class="builder-link-kinds">
+            <label><input type="radio" name="linkKind" value="page" checked> Страница этого сайта</label>
+            <label><input type="radio" name="linkKind" value="url"> Другой сайт, почта или телефон</label>
+          </div>
+          <label data-link-kind="page">
+            Страница
+            <select id="builderLinkPage"></select>
+          </label>
+          <label data-link-kind="url" hidden>
+            Адрес
+            <input id="builderLinkUrl" type="text" placeholder="example.ru, info@example.ru или +7 900 000-00-00">
+          </label>
+          <label class="checkline">
+            <input id="builderLinkNewTab" type="checkbox">
+            Открывать в новой вкладке
+          </label>
+          <p class="builder-dialog-error" id="builderLinkError" hidden></p>
+          <div class="builder-dialog-actions">
+            <button type="button" id="builderLinkRemove" class="builder-danger" hidden>Убрать ссылку</button>
+            <button type="button" id="builderLinkCancel" class="builder-secondary">Отмена</button>
+            <button type="submit" id="builderLinkApply">Готово</button>
+          </div>
+        </form>
+      </dialog>
+    `
+  );
+
+  const bar = document.querySelector('#builderFormatBar');
+  // mousedown would move focus away from the text and drop the selection.
+  bar.addEventListener('mousedown', (event) => event.preventDefault());
+  bar.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-format]');
+    if (button) applyFormat(button.dataset.format);
+  });
+  document.addEventListener('selectionchange', updateFormatBar);
+  window.addEventListener('scroll', updateFormatBar, true);
+  window.addEventListener('resize', updateFormatBar);
+
+  const dialog = document.querySelector('#builderLinkDialog');
+  dialog.querySelectorAll('input[name="linkKind"]').forEach((radio) => {
+    radio.addEventListener('change', () => setLinkDialogKind(radio.value));
+  });
+  dialog.querySelector('#builderLinkForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    applyLinkDialog();
+  });
+  dialog.querySelector('#builderLinkCancel').addEventListener('click', () => dialog.close());
+  dialog.querySelector('#builderLinkRemove').addEventListener('click', removeLinkFromDialog);
+  dialog.addEventListener('close', () => {
+    if (savedLinkRange) restoreRange(savedLinkRange);
+    savedLinkRange = null;
+    editedLink = null;
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.code === 'KeyK' && currentRichRange()) {
+      event.preventDefault();
+      openLinkDialog();
+    }
+  });
+
+  // Double-click on a picture replaces it with a file from the computer.
+  document.addEventListener('dblclick', (event) => {
+    const image = event.target.closest?.('img');
+    if (!image || isEditorChromeNode(image)) return;
+    if (image.closest('.builder-widget-item') || richEditableFromNode(image)) {
+      event.preventDefault();
+      event.stopPropagation();
+      void replaceImageFromFile((url) => image.setAttribute('src', url));
+    } else if (image.closest('.side-brand-logo')) {
+      event.preventDefault();
+      uploadLogo();
+    }
+  }, true);
+
+  document.querySelector('#builderReplaceImage')?.addEventListener('click', replaceSelectedImage);
+  document.querySelector('#builderUploadLogo')?.addEventListener('click', uploadLogo);
+  document.querySelector('#builderRemoveLogo')?.addEventListener('click', () => setLogoUrl(''));
+  updateLogoControls();
+}
+
 // Settings panel: tabs, only the settings of the selected element, collapsing.
 const builderPanelCollapsedKey = 'cms-builder-panel-collapsed';
 const builderTargetNames = {
@@ -2975,6 +3308,9 @@ function updatePanelContext() {
   layoutSection.classList.toggle('is-compact', isInlineItem);
   layoutSection.querySelector('h2').textContent = isInlineItem ? 'Добавить в эту секцию' : 'Секция';
   panel.querySelector('#builderElementEmpty').hidden = Object.values(visible).some(Boolean);
+
+  panel.querySelector('#builderReplaceImage').hidden = !['image', 'widget'].includes(type);
+  panel.querySelector('#builderSharedLayoutNote').hidden = currentPageId === 'home' || !['headerNav', 'sideMenu', 'footer'].includes(type);
 
   const name = selectedTargetName();
   panel.querySelector('#builderPanelTitle').textContent = name ? `Настройки: ${name}` : 'Настройки';
@@ -3173,7 +3509,7 @@ function recordDeletion(text = 'Удалено') {
 
 function isEditorChromeNode(node) {
   const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
-  return Boolean(element?.closest('.builder-bar, .builder-panel, .chat-widget'));
+  return Boolean(element?.closest('.builder-bar, .builder-panel, .builder-format-bar, .builder-dialog, .chat-widget'));
 }
 
 // Rich text areas take formatted paste; titles, menu items and card labels take plain text.
@@ -3211,7 +3547,7 @@ async function setupEditorSafetyNet() {
         return;
       }
       // Panel fields (SEO, colors...) keep the browser's own undo.
-      if (event.target.closest?.('.builder-panel input, .builder-panel textarea, .builder-panel select')) return;
+      if (event.target.closest?.('.builder-panel input, .builder-panel textarea, .builder-panel select, .builder-dialog')) return;
       if (event.code === 'KeyZ' && !event.shiftKey) {
         event.preventDefault();
         undoEditorChange();
@@ -3299,6 +3635,8 @@ function setupEditor() {
           <section class="builder-panel-section" data-builder-context="design">
             <h2>Оформление</h2>
             <p id="builderObjectHint"></p>
+            <p id="builderSharedLayoutNote" class="builder-note" hidden>Меню, логотип и подвал общие для всех страниц и берутся с главной. Чтобы изменения сохранились, правьте их <a href="/edit">на главной странице</a>.</p>
+            <button id="builderReplaceImage" type="button" hidden>Заменить фото с компьютера</button>
             <div id="builderObjectForm" class="builder-object-form" hidden>
               <label>
                 Цвет фона
@@ -3368,10 +3706,20 @@ function setupEditor() {
                 Название организации
                 <input id="builderSideTitle" type="text" placeholder="Название организации">
               </label>
-              <label>
-                Логотип (ссылка на картинку)
-                <input id="builderSideLogoUrl" type="url" placeholder="https://...">
-              </label>
+              <div class="builder-logo-field">
+                <span class="builder-field-title">Логотип</span>
+                <div class="builder-logo-row">
+                  <div class="builder-logo-preview" id="builderLogoPreview"></div>
+                  <div class="builder-logo-buttons">
+                    <button id="builderUploadLogo" type="button">Загрузить с компьютера</button>
+                    <button id="builderRemoveLogo" type="button" class="builder-secondary" hidden>Убрать</button>
+                  </div>
+                </div>
+                <details>
+                  <summary>или вставить ссылку на картинку</summary>
+                  <input id="builderSideLogoUrl" type="url" placeholder="https://...">
+                </details>
+              </div>
               <p id="builderSideMenuHint">Кликните по пункту меню слева.</p>
               <button id="builderAddSideItem" type="button">+ Пункт меню</button>
               <button id="builderDeleteSideItem" type="button" disabled>Удалить пункт</button>
@@ -3657,6 +4005,7 @@ function setupEditor() {
   setupSliderControls();
   setupFloatingBuilderPanel();
   setupBuilderPanelUi();
+  setupRichTextTools();
   syncLayoutControls();
   syncObjectControls();
   syncPostsControls();

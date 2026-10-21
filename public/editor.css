@@ -520,3 +520,221 @@
 
 }
 
+
+/* Floating formatting bar over selected text. */
+.builder-format-bar {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  gap: 2px;
+  border-radius: 10px;
+  background: #0f172a;
+  padding: 4px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3);
+}
+
+.builder-format-bar[hidden] {
+  display: none;
+}
+
+.builder-format-bar button {
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: white;
+  padding: 7px 9px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.builder-format-bar button:hover {
+  background: #1e293b;
+}
+
+.builder-format-bar button.is-active {
+  background: #e0ecff;
+  color: #0f172a;
+}
+
+/* Link dialog. */
+.builder-dialog {
+  width: min(440px, calc(100vw - 32px));
+  border: 0;
+  border-radius: 12px;
+  padding: 22px;
+  color: var(--text, #0f172a);
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.35);
+}
+
+.builder-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.builder-dialog form {
+  display: grid;
+  gap: 14px;
+}
+
+.builder-dialog h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.builder-dialog p {
+  margin: 0;
+  color: var(--muted, #64748b);
+  font-size: 14px;
+}
+
+.builder-dialog label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted, #64748b);
+}
+
+.builder-dialog label[hidden] {
+  display: none;
+}
+
+.builder-dialog .checkline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.builder-dialog input[type='text'],
+.builder-dialog select {
+  width: 100%;
+  border: 1px solid var(--line, #dbe3ee);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text, #0f172a);
+}
+
+.builder-link-kinds {
+  display: grid;
+  gap: 8px;
+}
+
+.builder-link-kinds label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text, #0f172a);
+  font-size: 14px;
+}
+
+.builder-dialog-error {
+  color: #b91c1c !important;
+  font-weight: 700;
+}
+
+.builder-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.builder-dialog-actions button {
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent, #246bfe);
+  color: white;
+  padding: 10px 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.builder-dialog-actions .builder-danger {
+  margin-right: auto;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.builder-dialog-actions .builder-secondary,
+.builder-panel .builder-secondary {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Logo upload in the side menu settings. */
+.builder-logo-field {
+  display: grid;
+  gap: 8px;
+}
+
+.builder-field-title {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.builder-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.builder-logo-preview {
+  display: grid;
+  flex: 0 0 64px;
+  height: 64px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px dashed var(--line);
+  border-radius: 50%;
+  background: #f8fafc;
+  font-size: 10px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.builder-logo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.builder-logo-buttons {
+  display: grid;
+  flex: 1;
+  gap: 6px;
+}
+
+.builder-logo-buttons button {
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  padding: 9px 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.builder-logo-field summary {
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.builder-logo-field details input {
+  margin-top: 6px;
+}
+
+.builder-panel .builder-note {
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #92400e;
+  padding: 10px 12px;
+  line-height: 1.45;
+}
+
+.builder-panel .builder-note a {
+  color: inherit;
+  font-weight: 800;
+}
