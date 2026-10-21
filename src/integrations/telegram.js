@@ -55,10 +55,28 @@ function largestPhoto(message) {
   return [...message.photo].sort((a, b) => (b.file_size || 0) - (a.file_size || 0))[0];
 }
 
+// Telegram keeps every photo in several sizes; the smallest one that is still
+// at least ~320px is a ready-made preview for gallery grids.
+function thumbnailPhoto(message, largest) {
+  if (!Array.isArray(message?.photo)) return null;
+  const candidate = [...message.photo]
+    .sort((a, b) => (a.width || 0) - (b.width || 0))
+    .find((size) => Math.max(size.width || 0, size.height || 0) >= 320);
+  return candidate && candidate.file_id !== largest?.file_id ? candidate : null;
+}
+
 function mediaRefsFromMessage(message) {
   const refs = [];
   const photo = largestPhoto(message);
-  if (photo) refs.push({ fileId: photo.file_id, width: photo.width, height: photo.height, type: 'image' });
+  if (photo) {
+    refs.push({
+      fileId: photo.file_id,
+      thumbFileId: thumbnailPhoto(message, photo)?.file_id || null,
+      width: photo.width,
+      height: photo.height,
+      type: 'image'
+    });
+  }
 
   if (message?.document?.mime_type?.startsWith('image/') && message.document.file_id) {
     refs.push({
@@ -94,10 +112,10 @@ async function telegramFilePath(config, fileId) {
   return payload.result.file_path;
 }
 
-async function downloadTelegramMedia(config, ref, postId, index) {
-  const filePath = await telegramFilePath(config, ref.fileId);
-  const extension = path.extname(filePath) || (ref.type === 'video' ? '.mp4' : '.jpg');
-  const safeName = `${postId}-${index + 1}${extension}`;
+async function downloadTelegramFile(config, fileId, baseName, fallbackExtension) {
+  const filePath = await telegramFilePath(config, fileId);
+  const extension = path.extname(filePath) || fallbackExtension;
+  const safeName = `${baseName}${extension}`;
   const uploadDir = path.join(getRootDir(), 'public', 'uploads', 'telegram');
   const outputPath = path.join(uploadDir, safeName);
   const baseUrl = process.env.TELEGRAM_API_URL || 'https://api.telegram.org';
@@ -113,11 +131,22 @@ async function downloadTelegramMedia(config, ref, postId, index) {
 
   await mkdir(uploadDir, { recursive: true });
   await writeFile(outputPath, buffer);
+  return `/uploads/telegram/${safeName}`;
+}
+
+async function downloadTelegramMedia(config, ref, postId, index) {
+  const baseName = `${postId}-${index + 1}`;
+  const url = await downloadTelegramFile(config, ref.fileId, baseName, ref.type === 'video' ? '.mp4' : '.jpg');
+  // A missing preview is not worth losing the photo: the gallery falls back to the full image.
+  const thumbUrl = ref.thumbFileId
+    ? await downloadTelegramFile(config, ref.thumbFileId, `${baseName}-thumb`, '.jpg').catch(() => '')
+    : '';
 
   return {
     id: crypto.randomUUID(),
     type: ref.type,
-    url: `/uploads/telegram/${safeName}`,
+    url,
+    thumbUrl,
     source: 'telegram',
     sourceFileId: ref.fileId,
     width: ref.width || null,

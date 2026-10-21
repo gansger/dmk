@@ -1,6 +1,7 @@
 import { appendEvent, read, write } from '../core/store.js';
 import { withRuntimeSecrets } from '../core/config.js';
 import { importTelegramUpdates } from '../integrations/telegram.js';
+import { syncPublishedPostPages } from '../domain/posts.js';
 
 export function startTelegramScheduler() {
   const intervalMs = Number(process.env.CMS_TELEGRAM_POLL_MS || 120000);
@@ -14,6 +15,7 @@ export function startTelegramScheduler() {
       const result = await importTelegramUpdates(telegram, posts);
       if (result.imported.length > 0) {
         await write('posts', [...result.imported, ...posts]);
+        await syncPublishedPostPages([...result.imported, ...posts]);
         await appendEvent('telegram.auto_import', { count: result.imported.length });
       }
 

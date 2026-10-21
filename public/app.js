@@ -89,6 +89,38 @@ function fileToDataUrl(file) {
   });
 }
 
+// A small JPEG copy for gallery grids, made in the browser so the server needs
+// no image library. The full photo is still uploaded and opens in the viewer.
+async function imagePreview(file, maxSize = 480) {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    return { dataUrl: canvas.toDataURL('image/jpeg', 0.82), width: bitmap.width, height: bitmap.height };
+  } catch {
+    return null;
+  }
+}
+
+async function uploadPhotoWithPreview(file) {
+  const url = await uploadImageFile(file);
+  const preview = await imagePreview(file);
+  if (!preview) return { url, thumbUrl: '' };
+  const thumb = await api('/api/uploads/images', {
+    method: 'POST',
+    body: JSON.stringify({ data: preview.dataUrl, name: `preview-${file.name}` })
+  });
+  return { url, thumbUrl: thumb.url, width: preview.width, height: preview.height };
+}
+
+function dateInputValue(value) {
+  const date = value ? new Date(value) : null;
+  return date && !Number.isNaN(date.getTime()) ? date.toISOString().slice(0, 10) : '';
+}
+
 async function uploadImageFile(file) {
   const uploaded = await api('/api/uploads/images', {
     method: 'POST',
@@ -239,47 +271,46 @@ function renderSliderAdmin() {
     : '<p class="muted">Опубликованных постов пока нет.</p>';
 }
 
+function galleryItemSource(item) {
+  if (item.source !== 'post') return '<span class="badge">загружено</span>';
+  const hidden = item.postStatus === 'published' ? '' : ' — новость не опубликована, на сайте не видно';
+  return `<span class="badge slider">из новости</span><span class="muted media-post-title">${escapeHtml(item.postTitle || 'новость удалена')}${hidden}</span>`;
+}
+
+// The library list comes sorted newest first from the server.
 function renderGalleryAdmin() {
-  const items = [...state.gallery].sort(
-    (a, b) =>
-      Number(a.order || 0) - Number(b.order || 0) ||
-      String(b.createdAt || '').localeCompare(String(a.createdAt || ''))
-  );
+  const items = state.gallery;
   selectors.galleryList.innerHTML = items.length
     ? items
         .map(
           (item) => `
-            <article class="gallery-admin-item">
-              <div class="item-row">
-                <div class="post-summary">
-                  <img class="gallery-admin-thumb" src="${escapeHtml(safeUrl(item.url))}" alt="">
-                  <div>
-                    <strong>${escapeHtml(item.caption || 'Фото без подписи')}</strong>
-                    <div class="muted">Порядок: ${Number(item.order || 0)} · ${formatDate(item.createdAt)}</div>
-                  </div>
-                </div>
+            <article class="gallery-admin-item ${item.enabled ? '' : 'is-hidden'}">
+              <img class="gallery-admin-thumb" src="${escapeHtml(safeUrl(item.thumbUrl || item.url))}" alt="" loading="lazy">
+              <div class="gallery-admin-info">
+                <strong>${escapeHtml(item.caption || 'Фото без подписи')}</strong>
+                <div class="muted">${formatDate(item.takenAt || item.createdAt)}</div>
                 <div class="badge-row">
-                  <span class="badge ${item.enabled ? '' : 'draft'}">${item.enabled ? 'на сайте' : 'скрыто'}</span>
+                  ${galleryItemSource(item)}
+                  ${item.enabled ? '' : '<span class="badge draft">скрыто из галереи</span>'}
                 </div>
               </div>
-              ${item.alt ? `<p class="muted">${escapeHtml(item.alt)}</p>` : ''}
               <div class="item-actions">
-                <button class="button ghost" data-edit-gallery="${item.id}">Редактировать</button>
+                <button class="button ghost" data-edit-gallery="${item.id}">Изменить</button>
                 <button class="button secondary" data-toggle-gallery="${item.id}">${item.enabled ? 'Скрыть' : 'Показать'}</button>
-                <button class="button ghost" data-delete-gallery="${item.id}">Удалить</button>
+                ${item.source === 'post' ? '' : `<button class="button ghost" data-delete-gallery="${item.id}">Удалить</button>`}
               </div>
             </article>
           `
         )
         .join('')
-    : '<p class="muted">Фотографий пока нет. Загрузите первое фото слева.</p>';
+    : '<p class="muted">Фото пока нет. Загрузите первые слева или опубликуйте новость с фото.</p>';
 }
 
 function resetGalleryForm() {
   document.querySelector('#galleryForm').reset();
   document.querySelector('#galleryId').value = '';
   document.querySelector('#galleryImageUrl').value = '';
-  document.querySelector('#galleryOrder').value = '0';
+  document.querySelector('#galleryTakenAt').value = '';
   document.querySelector('#galleryEnabled').checked = true;
   document.querySelector('#galleryCurrentImage').textContent = 'Для нового фото выберите один или несколько файлов.';
   selectors.galleryStatus.textContent = '';
@@ -522,19 +553,21 @@ document.querySelector('#galleryForm').addEventListener('submit', async (event) 
     let url = document.querySelector('#galleryImageUrl').value;
     const caption = document.querySelector('#galleryCaption').value;
     const alt = document.querySelector('#galleryAlt').value;
-    const order = Number(document.querySelector('#galleryOrder').value || 0);
+    const takenAtValue = document.querySelector('#galleryTakenAt').value;
+    const takenAt = takenAtValue ? new Date(`${takenAtValue}T12:00:00`).toISOString() : undefined;
     const enabled = document.querySelector('#galleryEnabled').checked;
 
     if (!id && files.length > 1) {
       for (const [index, file] of files.entries()) {
-        const uploadedUrl = await uploadImageFile(file);
+        selectors.galleryStatus.textContent = `Загружаю ${index + 1} из ${files.length}...`;
+        const photo = await uploadPhotoWithPreview(file);
         await api('/api/gallery', {
           method: 'POST',
           body: JSON.stringify({
-            url: uploadedUrl,
+            ...photo,
             caption: caption || file.name.replace(/\.[^.]+$/, ''),
             alt: alt || caption || file.name.replace(/\.[^.]+$/, ''),
-            order: order + index,
+            takenAt,
             enabled
           })
         });
@@ -545,16 +578,17 @@ document.querySelector('#galleryForm').addEventListener('submit', async (event) 
       return;
     }
 
-    if (files[0]) url = await uploadImageFile(files[0]);
-    if (!url) throw new Error('Выберите фото для загрузки.');
+    let photo = { url };
+    if (files[0]) photo = await uploadPhotoWithPreview(files[0]);
+    if (!photo.url) throw new Error('Выберите фото для загрузки.');
 
     await api(id ? `/api/gallery/${id}` : '/api/gallery', {
       method: id ? 'PUT' : 'POST',
       body: JSON.stringify({
-        url,
+        ...photo,
         caption,
         alt,
-        order,
+        takenAt,
         enabled
       })
     });
@@ -572,7 +606,7 @@ document.querySelector('#galleryResetButton').addEventListener('click', resetGal
 
 document.querySelector('#galleryRefreshButton').addEventListener('click', async () => {
   await refreshAll();
-  toast('Фотогалерея обновлена');
+  toast('Медиатека обновлена');
 });
 
 selectors.galleryList.addEventListener('click', async (event) => {
@@ -587,10 +621,12 @@ selectors.galleryList.addEventListener('click', async (event) => {
     document.querySelector('#galleryImageUrl').value = item.url || '';
     document.querySelector('#galleryCaption').value = item.caption || '';
     document.querySelector('#galleryAlt').value = item.alt || '';
-    document.querySelector('#galleryOrder').value = item.order || 0;
+    document.querySelector('#galleryTakenAt').value = dateInputValue(item.takenAt || item.createdAt);
     document.querySelector('#galleryEnabled').checked = Boolean(item.enabled);
     document.querySelector('#galleryFile').value = '';
-    document.querySelector('#galleryCurrentImage').innerHTML = `Текущее фото: <a href="${escapeHtml(safeUrl(item.url))}" target="_blank" rel="noopener">открыть</a>. Можно выбрать новый файл для замены.`;
+    document.querySelector('#galleryCurrentImage').innerHTML = item.source === 'post'
+      ? `Фото из новости «${escapeHtml(item.postTitle || '')}». Здесь меняются подпись, дата и показ в галерее; само фото меняется в новости.`
+      : `Текущее фото: <a href="${escapeHtml(safeUrl(item.url))}" target="_blank" rel="noopener">открыть</a>. Можно выбрать новый файл для замены.`;
     selectors.galleryStatus.textContent = 'Редактирование фото';
     selectors.galleryStatus.className = 'inline-status';
   }

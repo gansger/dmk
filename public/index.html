@@ -20,7 +20,7 @@
           <button class="nav-item active" data-view="dashboard">Панель</button>
           <button class="nav-item" data-view="posts">Посты</button>
           <button class="nav-item" data-view="slider">Слайдер</button>
-          <button class="nav-item" data-view="gallery">Фотогалерея</button>
+          <button class="nav-item" data-view="gallery">Медиатека</button>
           <button class="nav-item" data-view="integrations">Интеграции</button>
           <button class="nav-item" data-view="assistant">AI</button>
           <button class="nav-item" data-view="knowledge">Знания</button>
@@ -179,7 +179,7 @@
                 Загрузить фото
                 <input id="galleryFile" type="file" accept="image/*" multiple>
               </label>
-              <p class="muted" id="galleryCurrentImage">Для нового фото выберите один или несколько файлов.</p>
+              <p class="muted" id="galleryCurrentImage">Можно выбрать сразу несколько фото. Фото из новостей попадают сюда сами.</p>
               <label>
                 Подпись
                 <input id="galleryCaption" maxlength="220" placeholder="Например: День открытых дверей">
@@ -190,10 +190,10 @@
               </label>
               <div class="form-grid">
                 <label>
-                  Порядок
-                  <input id="galleryOrder" type="number" min="0" max="10000" step="1" value="0">
+                  Дата (для группировки по месяцам)
+                  <input id="galleryTakenAt" type="date">
                 </label>
-                <label class="checkline"><input type="checkbox" id="galleryEnabled" checked> Показывать на сайте</label>
+                <label class="checkline"><input type="checkbox" id="galleryEnabled" checked> Показывать в фотогалерее</label>
               </div>
               <div class="form-actions">
                 <button class="button ghost" id="galleryResetButton" type="button">Новое фото</button>
@@ -202,7 +202,7 @@
             </form>
             <div class="panel">
               <div class="panel-heading">
-                <h2>Фотографии</h2>
+                <h2>Все фото</h2>
                 <button class="button ghost" id="galleryRefreshButton" type="button">Обновить</button>
               </div>
               <div class="gallery-list" id="galleryList"></div>

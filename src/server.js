@@ -1,6 +1,7 @@
 import http from 'node:http';
 import { getPublicDir } from './core/config.js';
 import { ensureDataFiles } from './core/store.js';
+import { prepareContent } from './domain/startup.js';
 import { applySecurityHeaders, sendJson, serveStatic } from './core/http.js';
 import { allowPublicApiRequest, isPublicApi, isSameOriginRequest, requiresSameOrigin } from './routes/access.js';
 import { handleAiApi } from './routes/ai.js';
@@ -73,6 +74,7 @@ async function handleRequest(request, response) {
 }
 
 await ensureDataFiles();
+await prepareContent();
 startTelegramScheduler();
 
 http.createServer(handleRequest).listen(port, () => {

@@ -1,6 +1,7 @@
 import { read, write } from '../core/store.js';
 import { excerptFrom, slugify } from '../core/format.js';
 import { pagePublicPath, postPublicPath } from '../services/seo.js';
+import { syncPostPhotos } from './gallery.js';
 import { sharedPageBlocks } from './pages.js';
 import { clampNumber, normalizeImageFit } from './slider.js';
 
@@ -194,7 +195,11 @@ export function ensurePublishedPostPages(posts, pages) {
   return changed;
 }
 
+// Called after every change to the posts: keeps the generated post pages and
+// the media library (post photos in the gallery) in step with them.
 export async function syncPublishedPostPages(posts) {
   const pages = await read('pages');
   if (ensurePublishedPostPages(posts, pages)) await write('pages', pages);
+  const library = syncPostPhotos(posts, await read('gallery'));
+  if (library.changed) await write('gallery', library.items);
 }

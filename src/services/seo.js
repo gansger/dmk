@@ -455,12 +455,31 @@ function renderPageNavigation(pages, currentPageId) {
 // The same content a visitor sees, as plain server-rendered HTML. Browsers with
 // JavaScript replace it with the interactive page; search engines and visitors
 // without JavaScript read it as is.
-function renderServerContent({ page, pages, posts }) {
-  const context = { pageTitle: page?.title || '', posts };
-  const content = visibleContentBlocks(page)
-    .map((block) => renderContentBlock(block, context))
-    .filter(Boolean)
+// Photos for image search: the same photos the gallery block shows.
+function renderGallery(page, gallery) {
+  const block = blockOf(page, 'gallery');
+  const shown = block ? block.enabled !== false : page?.id === 'home';
+  if (!shown || !gallery?.length) return '';
+  const limit = Number(block?.fields?.limit ?? 12);
+  const items = (limit > 0 ? gallery.slice(0, limit) : gallery.slice(0, 200))
+    .map((item) => {
+      const image = `<img src="${escapeHtml(item.thumbUrl || item.url)}" alt="${escapeHtml(item.alt)}" loading="lazy">`;
+      const caption = item.caption ? `<figcaption>${escapeHtml(item.caption)}</figcaption>` : '';
+      return `<figure><a href="${escapeHtml(item.postUrl || item.url)}">${image}</a>${caption}</figure>`;
+    })
     .join('');
+  const title = htmlToText(block?.fields?.titleHtml) || 'Фотогалерея';
+  const more = limit > 0 && page?.id !== 'fotogalereya' ? '<a href="/fotogalereya">Все фото</a>' : '';
+  return `<section><h2>${escapeHtml(title)}</h2>${items}${more}</section>`;
+}
+
+function renderServerContent({ page, pages, posts, gallery }) {
+  const context = { pageTitle: page?.title || '', posts };
+  const content =
+    visibleContentBlocks(page)
+      .map((block) => renderContentBlock(block, context))
+      .filter(Boolean)
+      .join('') + renderGallery(page, gallery);
   return `
     <div class="seo-fallback" data-seo-fallback>
       ${renderLayoutStart(page)}
@@ -474,7 +493,7 @@ export function pageHeading({ page, post }) {
   return String(post?.title || page?.seo?.h1 || page?.title || 'Страница').trim();
 }
 
-export function renderPublicSiteHtml({ template, request, page, pages, posts, post = null, statusCode = 200, canonicalPath }) {
+export function renderPublicSiteHtml({ template, request, page, pages, posts, gallery = [], post = null, statusCode = 200, canonicalPath }) {
   const baseUrl = siteBaseUrl(request);
   const path = canonicalPath || (post ? postPublicPath(post) : pagePublicPath(page?.id));
   const canonicalUrl = absoluteUrl(path, baseUrl);
@@ -490,7 +509,7 @@ export function renderPublicSiteHtml({ template, request, page, pages, posts, po
       .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(metadata.title)}</title>`)
       .replace('<!-- CMS_SEO_HEAD -->', metadata.head)
       .replace('<!-- CMS_PAGE_H1 -->', h1)
-      .replace('<!-- CMS_SEO_BODY -->', renderServerContent({ page, pages, posts }))
+      .replace('<!-- CMS_SEO_BODY -->', renderServerContent({ page, pages, posts, gallery }))
       .replace('<!-- CMS_SEO_STATE -->', state),
     noIndex: metadata.noIndex
   };

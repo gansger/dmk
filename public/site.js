@@ -1847,24 +1847,50 @@ function removeGalleryBlock() {
   root.querySelector('.site-gallery')?.remove();
 }
 
-function renderGalleryItems(items, settings) {
+// Photo gallery, laid out like the photo app on a phone: a tight grid of square
+// previews (grouped by month on the full gallery page); a tap opens the photo
+// full screen with swiping. Photos come from the media library, which also
+// holds every news photo.
+const galleryPagePath = '/fotogalereya';
+let galleryItems = [];
+
+function galleryMonthLabel(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Без даты';
+  const label = new Intl.DateTimeFormat('ru-RU', { month: 'long', year: 'numeric' }).format(date).replace(/\s*г\.$/, '');
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+function galleryTile(item, index) {
+  return `
+    <button class="gallery-tile" type="button" data-gallery-index="${index}" aria-label="${escapeHtml(item.alt || 'Открыть фото')}">
+      <img src="${escapeHtml(item.thumbUrl || item.url)}" alt="${escapeHtml(item.alt || '')}" loading="lazy" decoding="async">
+    </button>
+  `;
+}
+
+function renderGalleryItems(items, settings, { byMonth = false, moreLink = false } = {}) {
+  let grid = '';
+  if (byMonth) {
+    const months = [];
+    items.forEach((item, index) => {
+      const label = galleryMonthLabel(item.takenAt);
+      if (months.at(-1)?.label !== label) months.push({ label, tiles: [] });
+      months.at(-1).tiles.push(galleryTile(item, index));
+    });
+    grid = months
+      .map((month) => `<h3 class="gallery-month">${escapeHtml(month.label)}</h3><div class="gallery-grid">${month.tiles.join('')}</div>`)
+      .join('');
+  } else {
+    grid = `<div class="gallery-grid">${items.map(galleryTile).join('')}</div>`;
+  }
   return `
     <section class="site-gallery" aria-label="Фотогалерея">
       <div class="site-gallery-head">
         <h2 class="gallery-block-title">${settings.titleHtml}</h2>
+        ${moreLink ? `<a class="gallery-all-link" href="${galleryPagePath}">Все фото</a>` : ''}
       </div>
-      <div class="site-gallery-grid">
-        ${items
-          .map(
-            (item) => `
-              <figure class="site-gallery-item">
-                <img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.alt || item.caption || 'Фото галереи')}" loading="lazy" decoding="async">
-                ${item.caption ? `<figcaption>${escapeHtml(item.caption)}</figcaption>` : ''}
-              </figure>
-            `
-          )
-          .join('')}
-      </div>
+      ${grid}
     </section>
   `;
 }
@@ -1872,16 +1898,147 @@ function renderGalleryItems(items, settings) {
 async function loadGallery() {
   removeGalleryBlock();
   const block = pageBlock('gallery');
-  if (currentPageId !== 'home' || block?.enabled === false) return;
+  // Pages show the gallery when they have a gallery block; the home page also
+  // shows it by default, under the news.
+  if (block ? block.enabled === false : currentPageId !== 'home') return;
 
   const settings = normalizeGalleryFields(block?.fields);
-  const response = await fetch('/api/public/gallery');
+  const response = await fetch(`/api/public/gallery${settings.limit > 0 ? `?limit=${settings.limit + 1}` : ''}`);
   if (!response.ok) return;
   const items = await response.json();
-  const visibleItems = settings.limit > 0 ? items.slice(0, settings.limit) : items;
-  if (!visibleItems.length) return;
+  galleryItems = settings.limit > 0 ? items.slice(0, settings.limit) : items;
+  if (!galleryItems.length && !isEditMode) return;
 
-  root.insertAdjacentHTML('beforeend', renderGalleryItems(visibleItems, settings));
+  root.insertAdjacentHTML(
+    'beforeend',
+    renderGalleryItems(galleryItems, settings, {
+      byMonth: settings.limit === 0,
+      moreLink: settings.limit > 0 && currentPageId !== 'fotogalereya'
+    })
+  );
+  if (!isEditMode) {
+    root.querySelector('.site-gallery').addEventListener('click', (event) => {
+      const tile = event.target.closest('[data-gallery-index]');
+      if (tile) openPhotoViewer(Number(tile.dataset.galleryIndex));
+    });
+  }
+}
+
+const photoViewer = { element: null, index: 0, pointer: null, historyEntry: false };
+
+function preloadPhoto(index) {
+  const item = galleryItems[index];
+  if (item) new Image().src = item.url;
+}
+
+function showViewerPhoto(index) {
+  const total = galleryItems.length;
+  photoViewer.index = (index + total) % total;
+  const item = galleryItems[photoViewer.index];
+  const viewer = photoViewer.element;
+  const image = viewer.querySelector('.photo-viewer-image');
+  // The preview is already in the browser cache: show it at once, then swap in the full photo.
+  image.src = item.thumbUrl || item.url;
+  image.alt = item.alt || '';
+  const full = new Image();
+  full.onload = () => {
+    if (galleryItems[photoViewer.index] === item) image.src = item.url;
+  };
+  full.src = item.url;
+  image.style.transform = '';
+
+  viewer.querySelector('.photo-viewer-counter').textContent = `${photoViewer.index + 1} из ${total}`;
+  viewer.querySelector('.photo-viewer-caption').textContent = item.caption || '';
+  const postLink = viewer.querySelector('.photo-viewer-post');
+  postLink.hidden = !item.postUrl;
+  if (item.postUrl) postLink.href = item.postUrl;
+  viewer.querySelectorAll('.photo-viewer-prev, .photo-viewer-next').forEach((button) => {
+    button.hidden = total < 2;
+  });
+  preloadPhoto(photoViewer.index + 1);
+  preloadPhoto(photoViewer.index - 1);
+}
+
+function closePhotoViewer({ fromHistory = false } = {}) {
+  if (!photoViewer.element?.classList.contains('open')) return;
+  photoViewer.element.classList.remove('open');
+  document.documentElement.classList.remove('photo-viewer-open');
+  // The viewer added a history entry so the phone's Back button closes it.
+  if (photoViewer.historyEntry && !fromHistory) history.back();
+  photoViewer.historyEntry = false;
+  root.querySelector(`[data-gallery-index="${photoViewer.index}"]`)?.focus();
+}
+
+function createPhotoViewer() {
+  const viewer = document.createElement('div');
+  viewer.className = 'photo-viewer';
+  viewer.setAttribute('role', 'dialog');
+  viewer.setAttribute('aria-modal', 'true');
+  viewer.setAttribute('aria-label', 'Просмотр фото');
+  viewer.innerHTML = `
+    <button class="photo-viewer-close" type="button" aria-label="Закрыть">×</button>
+    <button class="photo-viewer-prev" type="button" aria-label="Предыдущее фото">‹</button>
+    <div class="photo-viewer-stage"><img class="photo-viewer-image" alt="" draggable="false"></div>
+    <button class="photo-viewer-next" type="button" aria-label="Следующее фото">›</button>
+    <div class="photo-viewer-info">
+      <span class="photo-viewer-counter"></span>
+      <span class="photo-viewer-caption"></span>
+      <a class="photo-viewer-post" href="/" hidden>Открыть новость</a>
+    </div>
+  `;
+  document.body.append(viewer);
+
+  viewer.querySelector('.photo-viewer-close').addEventListener('click', () => closePhotoViewer());
+  viewer.querySelector('.photo-viewer-prev').addEventListener('click', () => showViewerPhoto(photoViewer.index - 1));
+  viewer.querySelector('.photo-viewer-next').addEventListener('click', () => showViewerPhoto(photoViewer.index + 1));
+  viewer.addEventListener('click', (event) => {
+    if (event.target === viewer || event.target.classList.contains('photo-viewer-stage')) closePhotoViewer();
+  });
+
+  // Swipe left/right for the next photo, down to close; the photo follows the finger.
+  const stage = viewer.querySelector('.photo-viewer-stage');
+  const image = viewer.querySelector('.photo-viewer-image');
+  stage.addEventListener('pointerdown', (event) => {
+    photoViewer.pointer = { x: event.clientX, y: event.clientY, id: event.pointerId };
+    stage.setPointerCapture(event.pointerId);
+  });
+  stage.addEventListener('pointermove', (event) => {
+    if (!photoViewer.pointer) return;
+    const dx = event.clientX - photoViewer.pointer.x;
+    const dy = event.clientY - photoViewer.pointer.y;
+    image.style.transform = Math.abs(dx) > Math.abs(dy) ? `translateX(${dx}px)` : `translateY(${Math.max(0, dy)}px)`;
+  });
+  const endSwipe = (event) => {
+    if (!photoViewer.pointer) return;
+    const dx = event.clientX - photoViewer.pointer.x;
+    const dy = event.clientY - photoViewer.pointer.y;
+    photoViewer.pointer = null;
+    image.style.transform = '';
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) showViewerPhoto(photoViewer.index + (dx < 0 ? 1 : -1));
+    else if (dy > 90) closePhotoViewer();
+  };
+  stage.addEventListener('pointerup', endSwipe);
+  stage.addEventListener('pointercancel', endSwipe);
+
+  document.addEventListener('keydown', (event) => {
+    if (!viewer.classList.contains('open')) return;
+    if (event.key === 'Escape') closePhotoViewer();
+    if (event.key === 'ArrowRight') showViewerPhoto(photoViewer.index + 1);
+    if (event.key === 'ArrowLeft') showViewerPhoto(photoViewer.index - 1);
+  });
+  window.addEventListener('popstate', () => closePhotoViewer({ fromHistory: true }));
+  return viewer;
+}
+
+function openPhotoViewer(index) {
+  if (!galleryItems.length) return;
+  photoViewer.element ||= createPhotoViewer();
+  showViewerPhoto(index);
+  photoViewer.element.classList.add('open');
+  document.documentElement.classList.add('photo-viewer-open');
+  history.pushState({ photoViewer: true }, '');
+  photoViewer.historyEntry = true;
+  photoViewer.element.querySelector('.photo-viewer-close').focus();
 }
 
 function renderSlider(index) {

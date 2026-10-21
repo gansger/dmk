@@ -56,6 +56,7 @@ export async function handlePostsApi({ request, response, method, pathname }) {
       return true;
     }
     await write('posts', nextPosts);
+    await syncPublishedPostPages(nextPosts);
     if (deletedPost) {
       const pages = await read('pages');
       delete pages[postPageId(deletedPost)];
