@@ -3,12 +3,15 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..', '..');
-const envFile = path.join(rootDir, '.env.local');
+// CMS_ENV_FILE="" disables the env file (tests must not pick up real secrets).
+const envFile = process.env.CMS_ENV_FILE ?? path.join(rootDir, '.env.local');
 
-try {
-  process.loadEnvFile(envFile);
-} catch (error) {
-  if (error.code !== 'ENOENT') throw error;
+if (envFile) {
+  try {
+    process.loadEnvFile(path.resolve(rootDir, envFile));
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
 }
 
 const secretFields = {
