@@ -81,14 +81,23 @@ function formatPublishedDate(value) {
   return new Intl.DateTimeFormat('ru-RU', { dateStyle: 'long' }).format(date);
 }
 
+function googleDriveFileId(value) {
+  try {
+    const url = new URL(String(value || ''));
+    if (url.protocol !== 'https:' || url.hostname !== 'drive.google.com') return '';
+    return url.pathname.match(/^\/file\/d\/([a-zA-Z0-9_-]+)(?:\/|$)/)?.[1] || '';
+  } catch {
+    return '';
+  }
+}
+
 function generateVideoPlayer(url) {
   if (!url) return '';
-  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if (driveMatch) {
-    const fileId = driveMatch[1];
+  const fileId = googleDriveFileId(url);
+  if (fileId) {
     return `
       <div style="position: relative; width: 100%; padding-top: 56.25%; border-radius: 8px; margin-bottom: 24px; overflow: hidden; background: #000;">
-        <iframe src="https://drive.google.com/file/d/${fileId}/preview" style="position: absolute; top: -56px; left: 0; width: 100%; height: calc(100% + 56px); border: none;" allow="autoplay" allowfullscreen></iframe>
+        <iframe src="https://drive.google.com/file/d/${escapeHtml(fileId)}/preview" style="position: absolute; top: -56px; left: 0; width: 100%; height: calc(100% + 56px); border: none;" allow="autoplay" allowfullscreen></iframe>
       </div>
     `;
   }

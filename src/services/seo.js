@@ -279,6 +279,7 @@ function renderSeoHead({ page, post, pages, posts, baseUrl, canonicalUrl, status
     title,
     noIndex,
     head: `
+    <meta name="cms-page-id" content="${escapeHtml(page?.id || 'home')}">
     <meta name="description" content="${escapeHtml(description)}">
     <meta name="robots" content="${robots}">
     <link rel="canonical" href="${escapeHtml(canonicalUrl)}">

@@ -1,5 +1,9 @@
 const trustProxy = ['1', 'true', 'yes'].includes(String(process.env.CMS_TRUST_PROXY || '').toLowerCase());
 
+export function isProxyTrusted() {
+  return trustProxy;
+}
+
 export function clientIp(request) {
   if (trustProxy) {
     const forwarded = String(request.headers['x-forwarded-for'] || '').split(',')[0].trim();

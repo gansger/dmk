@@ -40,7 +40,9 @@ const slider = {
   paused: false
 };
 const isEditMode = window.location.pathname === '/edit' || window.location.pathname === '/edit/';
-const currentPageId = normalizePageParam(serverPageId() || urlParams.get('page') || pageIdFromPath());
+const currentPageId = normalizePageParam(
+  serverPageId() || document.querySelector('meta[name="cms-page-id"]')?.content || urlParams.get('page') || pageIdFromPath()
+);
 let pageState = null;
 let pagesIndex = [];
 let selectedBuilderBlockId = null;
@@ -48,6 +50,7 @@ let selectedDesignTarget = null;
 let selectedSideMenuIndex = null;
 let selectedHeaderNavIndex = null;
 let selectedFooterIndex = null;
+let selectedAccordionSectionId = null;
 const builderPanelPositionKey = 'cms-builder-panel-position';
 
 if (isEditMode) {
@@ -70,6 +73,8 @@ const layoutDefaults = {
   backgroundColor: '#ffffff',
   textColor: '#18202f',
   fontSize: 16,
+  fontFamily: 'system-ui',
+  fontWeight: 400,
   borderRadius: 8,
   gridColumns: 0,
   flexWrap: 'nowrap'
@@ -99,6 +104,8 @@ const objectStyleDefaults = {
   backgroundColor: '#ffffff',
   textColor: '#18202f',
   fontSize: 16,
+  fontFamily: 'system-ui',
+  fontWeight: 400,
   padding: 14,
   borderRadius: 0,
   maxWidth: 1200,
@@ -145,6 +152,16 @@ const sectionObjectDefaults = {
   borderRadius: 8,
   maxWidth: 1200,
   height: 160
+};
+
+const accordionObjectDefaults = {
+  ...objectStyleDefaults,
+  backgroundColor: '#ffffff',
+  textColor: '#18202f',
+  padding: 0,
+  borderRadius: 0,
+  maxWidth: 1200,
+  height: 0
 };
 
 const imageObjectDefaults = {
@@ -228,6 +245,16 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+function googleDriveFileId(value) {
+  try {
+    const url = new URL(String(value || ''));
+    if (url.protocol !== 'https:' || url.hostname !== 'drive.google.com') return '';
+    return url.pathname.match(/^\/file\/d\/([a-zA-Z0-9_-]+)(?:\/|$)/)?.[1] || '';
+  } catch {
+    return '';
+  }
+}
+
 function sanitizePageId(value) {
   const map = {
     а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
@@ -285,10 +312,12 @@ function pageUrl(pageId, edit = false) {
 
 function normalizePublicHref(href) {
   const value = String(href || '').trim();
-  if (!value || value.startsWith('#') || /^(?:mailto:|tel:|javascript:)/i.test(value)) return value;
+  if (!value || value.startsWith('#') || /^(?:mailto:|tel:)/i.test(value)) return value;
+  if (/^(?:javascript:|data:|vbscript:)/i.test(value)) return '#';
 
   try {
     const url = new URL(value, `${window.location.origin}/`);
+    if (!['http:', 'https:'].includes(url.protocol)) return '#';
     if (url.origin !== window.location.origin) return value;
     const pageId = url.searchParams.get('page');
     const postSlug = url.searchParams.get('post');
@@ -296,7 +325,7 @@ function normalizePublicHref(href) {
     if (postSlug && ['/', '/site.html'].includes(url.pathname)) return `/news/${encodeURIComponent(postSlug)}`;
     if (url.pathname === '/site.html') return '/';
   } catch {
-    return value;
+    return '#';
   }
 
   return value;
@@ -526,6 +555,12 @@ function numericStyle(value, fallback, min, max) {
   return Math.min(max, Math.max(min, number));
 }
 
+const fontFamilyOptions = ['system-ui', 'Arial, sans-serif', 'Georgia, serif', '"Times New Roman", serif', 'Verdana, sans-serif'];
+
+function normalizedFontFamily(value, fallback = 'system-ui') {
+  return fontFamilyOptions.includes(value) ? value : fallback;
+}
+
 function normalizeLayoutStyles(styles = {}, defaults = layoutDefaults) {
   const displayOptions = ['block', 'flex', 'grid'];
   const directionOptions = ['row', 'row-reverse', 'column', 'column-reverse'];
@@ -546,6 +581,8 @@ function normalizeLayoutStyles(styles = {}, defaults = layoutDefaults) {
     backgroundColor: styles.backgroundColor || defaults.backgroundColor,
     textColor: styles.textColor || defaults.textColor,
     fontSize: numericStyle(styles.fontSize, defaults.fontSize, 10, 72),
+    fontFamily: normalizedFontFamily(styles.fontFamily, defaults.fontFamily),
+    fontWeight: numericStyle(styles.fontWeight, defaults.fontWeight, 100, 900),
     borderRadius: numericStyle(styles.borderRadius, defaults.borderRadius, 0, 48),
     gridColumns: numericStyle(styles.gridColumns, defaults.gridColumns || 0, 0, 12),
     flexWrap: ['nowrap', 'wrap', 'wrap-reverse'].includes(styles.flexWrap) ? styles.flexWrap : (defaults.flexWrap || 'nowrap')
@@ -557,6 +594,8 @@ function normalizeObjectStyles(styles = {}, defaults = objectStyleDefaults) {
     backgroundColor: styles.backgroundColor || defaults.backgroundColor,
     textColor: styles.textColor || defaults.textColor,
     fontSize: numericStyle(styles.fontSize, defaults.fontSize, 10, 72),
+    fontFamily: normalizedFontFamily(styles.fontFamily, defaults.fontFamily),
+    fontWeight: numericStyle(styles.fontWeight, defaults.fontWeight, 100, 900),
     padding: numericStyle(styles.padding, defaults.padding, 0, 120),
     borderRadius: numericStyle(styles.borderRadius, defaults.borderRadius, 0, 96),
     maxWidth: numericStyle(styles.maxWidth, defaults.maxWidth, 180, 2400),
@@ -570,6 +609,8 @@ function applyObjectStyles(element, styles = {}, options = {}, defaults = object
   element.style.backgroundColor = objectStyles.backgroundColor;
   element.style.color = objectStyles.textColor;
   element.style.fontSize = `${objectStyles.fontSize}px`;
+  element.style.fontFamily = objectStyles.fontFamily;
+  element.style.fontWeight = String(objectStyles.fontWeight);
   element.style.padding = `${objectStyles.padding}px`;
   element.style.borderRadius = `${objectStyles.borderRadius}px`;
   if (options.useMaxWidth !== false) {
@@ -612,6 +653,8 @@ function readInlineObjectStyles(element, defaults = objectStyleDefaults) {
       backgroundColor: colorToHex(element.style.backgroundColor, defaults.backgroundColor),
       textColor: colorToHex(element.style.color, defaults.textColor),
       fontSize: Number.parseFloat(element.style.fontSize),
+      fontFamily: element.style.fontFamily,
+      fontWeight: Number.parseFloat(element.style.fontWeight),
       padding: Number.parseFloat(element.style.padding),
       borderRadius: Number.parseFloat(element.style.borderRadius),
       maxWidth: Number.parseFloat(element.style.maxWidth),
@@ -715,6 +758,8 @@ function applyBlockLayout(element, styles = {}) {
   element.style.backgroundColor = layout.backgroundColor;
   element.style.color = layout.textColor;
   element.style.fontSize = `${layout.fontSize}px`;
+  element.style.fontFamily = layout.fontFamily;
+  element.style.fontWeight = String(layout.fontWeight);
   element.style.borderRadius = `${layout.borderRadius}px`;
 }
 
@@ -764,7 +809,7 @@ function selectedBuilderBlock() {
 
 function selectedDesignBlock() {
   if (!selectedDesignTarget) return null;
-  if (['card', 'section', 'widget', 'image'].includes(selectedDesignTarget.type)) {
+  if (['card', 'section', 'widget', 'image', 'accordion'].includes(selectedDesignTarget.type)) {
     const element = selectedDesignElement();
     return element ? { type: selectedDesignTarget.type, fields: { styles: readInlineObjectStyles(element, objectDefaultsForSelectedTarget()) } } : null;
   }
@@ -782,7 +827,7 @@ function selectedDesignElement() {
   if (selectedDesignTarget.type === 'block') {
     return document.querySelector(`[data-block-id="${selectedDesignTarget.id}"] .custom-block-content`);
   }
-  if (['card', 'section', 'widget', 'image'].includes(selectedDesignTarget.type)) {
+  if (['card', 'section', 'widget', 'image', 'accordion'].includes(selectedDesignTarget.type)) {
     return document.querySelector(`[data-builder-item-id="${escapeSelector(selectedDesignTarget.id)}"]`);
   }
   if (selectedDesignTarget.type === 'rightPanel') return siteRightPanel?.querySelector('.right-panel-content');
@@ -803,6 +848,7 @@ function objectDefaultsForSelectedTarget() {
   if (selectedDesignTarget?.type === 'footer') return footerObjectDefaults;
   if (selectedDesignTarget?.type === 'card') return cardObjectDefaults;
   if (selectedDesignTarget?.type === 'image') return imageObjectDefaults;
+  if (selectedDesignTarget?.type === 'accordion') return accordionObjectDefaults;
   if (['section', 'widget'].includes(selectedDesignTarget?.type)) return sectionObjectDefaults;
   return objectStyleDefaults;
 }
@@ -925,6 +971,25 @@ function widgetTemplate() {
       <p class="builder-widget-text">Добро пожаловать! Здесь можно добавить обращение, объявление или полезную ссылку.</p>
       <a class="builder-widget-link" href="#">Читать полностью</a>
     </article>
+  `;
+}
+
+function accordionSectionTemplate(title = 'Новый пункт', text = '') {
+  return `
+    <details class="builder-accordion-section" data-accordion-section-id="accordion-section-${crypto.randomUUID()}" open>
+      <summary class="builder-accordion-summary">${escapeHtml(title)}</summary>
+      <div class="builder-accordion-content">
+        ${text ? `<p>${escapeHtml(text)}</p>` : ''}
+      </div>
+    </details>
+  `;
+}
+
+function accordionTemplate() {
+  return `
+    <div class="builder-accordion-item">
+      ${accordionSectionTemplate()}
+    </div>
   `;
 }
 
@@ -1072,6 +1137,7 @@ function selectInlineItem(element, type) {
 
 function prepareContainerItems(container) {
   if (!container) return;
+  prepareAccordionItems(container);
   container.querySelectorAll('.builder-section-item').forEach((section) => {
     ensureBuilderItemId(section, 'section');
     section.querySelector('.builder-section-remove')?.remove();
@@ -1164,6 +1230,110 @@ function prepareContainerItems(container) {
   });
 }
 
+function selectedAccordionSection(accordion = selectedDesignElement()) {
+  if (!accordion || selectedDesignTarget?.type !== 'accordion') return null;
+  return (
+    accordion.querySelector(`[data-accordion-section-id="${escapeSelector(selectedAccordionSectionId || '')}"]`) ||
+    accordion.querySelector('.builder-accordion-section[open]') ||
+    accordion.querySelector('.builder-accordion-section')
+  );
+}
+
+function selectAccordionSection(accordion, section) {
+  if (!accordion || !section) return;
+  selectedAccordionSectionId =
+    section.dataset.accordionSectionId || `accordion-section-${crypto.randomUUID()}`;
+  section.dataset.accordionSectionId = selectedAccordionSectionId;
+  accordion.querySelectorAll('.builder-accordion-section').forEach((item) => {
+    item.classList.toggle('accordion-section-selected', item === section);
+  });
+  selectInlineItem(accordion, 'accordion');
+  syncAccordionControls();
+}
+
+function prepareAccordionItems(container) {
+  if (!container) return;
+  container.querySelectorAll('.builder-accordion-item').forEach((accordion) => {
+    ensureBuilderItemId(accordion, 'accordion');
+    if (
+      accordion.style.padding === '22px' &&
+      accordion.style.borderRadius === '8px' &&
+      accordion.style.minHeight === '160px'
+    ) {
+      accordion.style.padding = '0px';
+      accordion.style.borderRadius = '0px';
+      accordion.style.minHeight = '';
+    }
+    accordion.querySelector('.builder-accordion-remove')?.remove();
+    accordion.querySelectorAll('.builder-accordion-section-remove').forEach((button) => button.remove());
+
+    accordion.querySelectorAll('.builder-accordion-section').forEach((section) => {
+      if (!section.dataset.accordionSectionId) {
+        section.dataset.accordionSectionId = `accordion-section-${crypto.randomUUID()}`;
+      }
+      const summary = section.querySelector('.builder-accordion-summary');
+      const content = section.querySelector('.builder-accordion-content');
+      if (summary) {
+        summary.contentEditable = isEditMode ? 'true' : 'false';
+        summary.onkeydown = isEditMode
+          ? (event) => {
+              if (event.key !== ' ' || event.ctrlKey || event.altKey || event.metaKey) return;
+              event.preventDefault();
+              event.stopPropagation();
+              document.execCommand('insertText', false, ' ');
+            }
+          : null;
+      }
+      if (content) content.contentEditable = isEditMode ? 'true' : 'false';
+
+      if (!isEditMode) return;
+      section.insertAdjacentHTML(
+        'afterbegin',
+        '<button class="builder-accordion-section-remove" type="button" aria-label="Удалить пункт списка">×</button>'
+      );
+      section.querySelector('.builder-accordion-section-remove').onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (accordion.querySelectorAll('.builder-accordion-section').length <= 1) {
+          alert('В выпадающем списке должен остаться хотя бы один пункт.');
+          return;
+        }
+        section.remove();
+        selectedAccordionSectionId = accordion.querySelector('.builder-accordion-section')?.dataset.accordionSectionId || null;
+        syncAccordionControls();
+        recordDeletion();
+      };
+      section.onclick = (event) => {
+        if (event.target.closest('.builder-accordion-section-remove')) return;
+        event.stopPropagation();
+        selectAccordionSection(accordion, section);
+      };
+    });
+
+    if (!isEditMode) return;
+    accordion.insertAdjacentHTML(
+      'afterbegin',
+      '<button class="builder-accordion-remove" type="button" aria-label="Удалить выпадающий список">×</button>'
+    );
+    accordion.querySelector('.builder-accordion-remove').onclick = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      accordion.remove();
+      selectedDesignTarget = null;
+      selectedAccordionSectionId = null;
+      syncObjectControls();
+      syncLayoutControls();
+      recordDeletion();
+    };
+    accordion.onclick = (event) => {
+      if (event.target.closest('.builder-accordion-remove, .builder-accordion-section-remove')) return;
+      event.stopPropagation();
+      const section = event.target.closest('.builder-accordion-section') || accordion.querySelector('.builder-accordion-section');
+      if (section) selectAccordionSection(accordion, section);
+    };
+  });
+}
+
 function prepareImageItems(container) {
   if (!container) return;
   container.querySelectorAll('.builder-image-item').forEach((item) => {
@@ -1211,9 +1381,15 @@ function prepareImageItems(container) {
 function cleanBlockHtml(element) {
   if (!element) return '';
   const clone = element.cloneNode(true);
-  clone.querySelectorAll('.builder-card-remove, .builder-section-remove, .builder-widget-remove, .builder-image-remove').forEach((control) => control.remove());
+  clone
+    .querySelectorAll(
+      '.builder-card-remove, .builder-section-remove, .builder-widget-remove, .builder-image-remove, .builder-accordion-remove, .builder-accordion-section-remove'
+    )
+    .forEach((control) => control.remove());
   clone.querySelectorAll('[contenteditable]').forEach((editable) => editable.removeAttribute('contenteditable'));
-  clone.querySelectorAll('.design-selected, .uploading').forEach((item) => item.classList.remove('design-selected', 'uploading'));
+  clone.querySelectorAll('.design-selected, .uploading, .accordion-section-selected').forEach((item) => {
+    item.classList.remove('design-selected', 'uploading', 'accordion-section-selected');
+  });
   return clone.innerHTML;
 }
 
@@ -1504,14 +1680,13 @@ async function loadPage() {
 
 function generateVideoPlayer(url, isCard = false) {
   if (!url) return '';
-  const driveMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  const fileId = googleDriveFileId(url);
   const radius = isCard ? '8px 8px 0 0' : '8px';
   const margin = isCard ? '0' : '0 0 24px 0';
-  if (driveMatch) {
-    const fileId = driveMatch[1];
+  if (fileId) {
     return `
       <div style="position: relative; width: 100%; padding-top: 56.25%; border-radius: ${radius}; margin: ${margin}; overflow: hidden; background: #000;">
-        <iframe src="https://drive.google.com/file/d/${fileId}/preview" style="position: absolute; top: -56px; left: 0; width: 100%; height: calc(100% + 56px); border: none;" allow="autoplay" allowfullscreen></iframe>
+        <iframe src="https://drive.google.com/file/d/${escapeHtml(fileId)}/preview" style="position: absolute; top: -56px; left: 0; width: 100%; height: calc(100% + 56px); border: none;" allow="autoplay" allowfullscreen></iframe>
       </div>
     `;
   }
@@ -1527,12 +1702,12 @@ function renderPostCard(post) {
 
   return `
     <article class="site-post-card">
-      ${post.videoUrl ? generateVideoPlayer(post.videoUrl, true) : (cover ? `<a href="${href}"><img class="post-card-cover" src="${cover}" alt=""></a>` : '')}
+      ${post.videoUrl ? generateVideoPlayer(post.videoUrl, true) : (cover ? `<a href="${escapeHtml(href)}"><img class="post-card-cover" src="${escapeHtml(cover)}" alt="" loading="lazy" decoding="async"></a>` : '')}
       <div class="post-card-body">
         <p class="eyebrow">${escapeHtml(publishedAt)}</p>
-        <h2><a href="${href}">${escapeHtml(post.title)}</a></h2>
+        <h2><a href="${escapeHtml(href)}">${escapeHtml(post.title)}</a></h2>
         <p>${escapeHtml(post.excerpt || '')}</p>
-        <a class="read-link" href="${href}">Читать полностью</a>
+        <a class="read-link" href="${escapeHtml(href)}">Читать полностью</a>
       </div>
     </article>
   `;
@@ -1627,7 +1802,7 @@ function renderGalleryItems(items, settings) {
           .map(
             (item) => `
               <figure class="site-gallery-item">
-                <img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.alt || item.caption || 'Фото галереи')}" loading="lazy">
+                <img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.alt || item.caption || 'Фото галереи')}" loading="lazy" decoding="async">
                 ${item.caption ? `<figcaption>${escapeHtml(item.caption)}</figcaption>` : ''}
               </figure>
             `
@@ -1748,8 +1923,8 @@ function syncLayoutControls() {
   const block = selectedBuilderBlock();
   const isContainer = ['container', 'rightPanel'].includes(block?.type);
   const isCustomBlock = ['text', 'container', 'rightPanel'].includes(block?.type);
-  const canDelete = ['card', 'section', 'widget', 'image'].includes(selectedDesignTarget?.type) || isCustomBlock;
-  const canDuplicate = ['card', 'section', 'widget', 'image', 'block'].includes(selectedDesignTarget?.type) && selectedDesignTarget?.type !== 'rightPanel';
+  const canDelete = ['card', 'section', 'widget', 'image', 'accordion'].includes(selectedDesignTarget?.type) || isCustomBlock;
+  const canDuplicate = ['card', 'section', 'widget', 'image', 'accordion', 'block'].includes(selectedDesignTarget?.type) && selectedDesignTarget?.type !== 'rightPanel';
   
   form.hidden = !isContainer;
   cardActions.hidden = !isContainer;
@@ -2140,12 +2315,15 @@ function syncObjectControls() {
   form.hidden = !hasTarget;
   syncSideMenuControls();
   syncFooterControls();
+  syncAccordionControls();
   if (selectedDesignTarget?.type === 'card') {
     hint.textContent = 'Фон и текст меняют цвет только выбранной карточки.';
   } else if (selectedDesignTarget?.type === 'image') {
     hint.textContent = 'Кликните по фото-зоне, чтобы загрузить или заменить изображение.';
   } else if (selectedDesignTarget?.type === 'section') {
     hint.textContent = 'Настройки применяются только к выбранному разделу.';
+  } else if (selectedDesignTarget?.type === 'accordion') {
+    hint.textContent = 'Выберите пункт списка, чтобы добавлять в него текст и блоки.';
   } else if (selectedDesignTarget?.type === 'footer') {
     hint.textContent = 'Текст и ссылки подвала меняйте прямо на странице.';
   } else {
@@ -2196,11 +2374,13 @@ function syncObjectControls() {
 
   syncSideMenuControls();
   syncFooterControls();
+  syncAccordionControls();
 }
 
 function selectDesignTarget(target) {
   selectedDesignTarget = target;
   showBuilderTab('element');
+  if (target?.type !== 'accordion') selectedAccordionSectionId = null;
   if (target?.type !== 'sideMenu') selectedSideMenuIndex = null;
   if (target?.type !== 'headerNav') selectedHeaderNavIndex = null;
   if (target?.type !== 'footer') selectedFooterIndex = null;
@@ -2218,7 +2398,7 @@ function selectBuilderBlock(blockId) {
 function deleteSelectedBlock() {
   if (!selectedDesignTarget) return;
   
-  if (['card', 'section', 'widget', 'image'].includes(selectedDesignTarget.type)) {
+  if (['card', 'section', 'widget', 'image', 'accordion'].includes(selectedDesignTarget.type)) {
     const element = selectedDesignElement();
     if (element) element.remove();
   } else if (selectedDesignTarget.type === 'block') {
@@ -2251,7 +2431,7 @@ function duplicateSelectedItem() {
       pageState.blocks.splice(index + 1, 0, clone);
       renderCustomBlocks();
     }
-  } else if (['card', 'section', 'widget', 'image'].includes(selectedDesignTarget.type)) {
+  } else if (['card', 'section', 'widget', 'image', 'accordion'].includes(selectedDesignTarget.type)) {
     const element = selectedDesignElement();
     if (!element || !element.parentNode) return;
     const clone = element.cloneNode(true);
@@ -2376,7 +2556,7 @@ function updateObjectStyle(control) {
   const field = control.dataset.objectStyleField;
   const value = control.type === 'number' ? Number(control.value) : control.value;
 
-  if (['card', 'section', 'widget', 'image'].includes(selectedDesignTarget?.type)) {
+  if (['card', 'section', 'widget', 'image', 'accordion'].includes(selectedDesignTarget?.type)) {
     const defaults = objectDefaultsForSelectedTarget();
     const styles = normalizeObjectStyles(
       {
@@ -2572,40 +2752,90 @@ function setupSliderControls() {
   });
 }
 
-function addCardToSelectedDiv() {
+function selectedInsertionContainer() {
+  if (selectedDesignTarget?.type === 'accordion') {
+    return selectedAccordionSection()?.querySelector('.builder-accordion-content') || null;
+  }
   const block = selectedBuilderBlock();
-  if (!block || !['container', 'rightPanel'].includes(block.type)) return;
-  const container = block.type === 'rightPanel'
-    ? siteRightPanel?.querySelector('.right-panel-content')
+  if (!block || !['container', 'rightPanel'].includes(block.type)) return null;
+  return block.type === 'rightPanel'
+    ? siteRightPanel?.querySelector('.right-panel-content') || null
     : document.querySelector(`[data-block-id="${block.id}"] .custom-block-content`);
+}
+
+function addCardToSelectedDiv() {
+  const container = selectedInsertionContainer();
   if (!container) return;
   container.insertAdjacentHTML('beforeend', cardTemplate('00.00.00', 'Новая карточка'));
   prepareContainerItems(container);
 }
 
 function addSectionToSelectedDiv() {
-  const block = selectedBuilderBlock();
-  if (!block || !['container', 'rightPanel'].includes(block.type)) return;
-  const container = block.type === 'rightPanel'
-    ? siteRightPanel?.querySelector('.right-panel-content')
-    : document.querySelector(`[data-block-id="${block.id}"] .custom-block-content`);
+  const container = selectedInsertionContainer();
   if (!container) return;
   container.insertAdjacentHTML('beforeend', sectionTemplate());
   prepareContainerItems(container);
 }
 
 function addWidgetToSelectedDiv() {
-  const block = selectedBuilderBlock();
-  if (!block || !['container', 'rightPanel'].includes(block.type)) return;
-  const container = block.type === 'rightPanel'
-    ? siteRightPanel?.querySelector('.right-panel-content')
-    : document.querySelector(`[data-block-id="${block.id}"] .custom-block-content`);
+  const container = selectedInsertionContainer();
   if (!container) return;
   container.insertAdjacentHTML('beforeend', widgetTemplate());
   prepareContainerItems(container);
 }
 
+function addAccordionToSelectedDiv() {
+  const container = selectedInsertionContainer();
+  if (!container) return;
+  container.insertAdjacentHTML('beforeend', accordionTemplate());
+  prepareContainerItems(container);
+  const accordion = [...container.querySelectorAll('.builder-accordion-item')].pop();
+  const section = accordion?.querySelector('.builder-accordion-section');
+  if (accordion && section) selectAccordionSection(accordion, section);
+}
+
+function syncAccordionControls() {
+  const form = document.querySelector('#builderAccordionForm');
+  if (!form) return;
+  const accordion = selectedDesignTarget?.type === 'accordion' ? selectedDesignElement() : null;
+  form.hidden = !accordion;
+  if (!accordion) return;
+  const section = selectedAccordionSection(accordion);
+  form.querySelector('#builderDeleteAccordionSection').disabled =
+    !section || accordion.querySelectorAll('.builder-accordion-section').length <= 1;
+}
+
+function addAccordionSection() {
+  const accordion = selectedDesignTarget?.type === 'accordion' ? selectedDesignElement() : null;
+  if (!accordion) return;
+  accordion.insertAdjacentHTML('beforeend', accordionSectionTemplate());
+  prepareAccordionItems(accordion.parentElement);
+  const section = [...accordion.querySelectorAll('.builder-accordion-section')].pop();
+  if (section) selectAccordionSection(accordion, section);
+}
+
+function addTextToAccordionSection() {
+  const content = selectedAccordionSection()?.querySelector('.builder-accordion-content');
+  if (!content) return;
+  content.insertAdjacentHTML('beforeend', '<p>Новый текст. Нажмите и отредактируйте его.</p>');
+  content.contentEditable = 'true';
+  content.focus();
+}
+
+function deleteAccordionSection() {
+  const accordion = selectedDesignTarget?.type === 'accordion' ? selectedDesignElement() : null;
+  const section = selectedAccordionSection(accordion);
+  if (!accordion || !section || accordion.querySelectorAll('.builder-accordion-section').length <= 1) return;
+  section.remove();
+  selectedAccordionSectionId = accordion.querySelector('.builder-accordion-section')?.dataset.accordionSectionId || null;
+  syncAccordionControls();
+  recordDeletion();
+}
+
 function selectedContentContainer() {
+  if (selectedDesignTarget?.type === 'accordion') {
+    return selectedAccordionSection()?.querySelector('.builder-accordion-content') || null;
+  }
   const block = selectedBuilderBlock();
   if (!block) return null;
   if (block.type === 'rightPanel') return siteRightPanel?.querySelector('.right-panel-content') || null;
@@ -3342,6 +3572,7 @@ const builderTargetNames = {
   section: 'Раздел',
   widget: 'Карточка с фото и кнопкой',
   image: 'Фото',
+  accordion: 'Выпадающий список',
   headerNav: 'Верхнее меню',
   sideMenu: 'Боковое меню',
   footer: 'Подвал сайта',
@@ -3382,7 +3613,7 @@ function updatePanelContext() {
     posts: isShown('#builderPostsForm'),
     // The last selected section is remembered; show it only while it (or
     // something inside it) is the current selection.
-    layout: isShown('#builderLayoutForm') && ['block', 'rightPanel', 'card', 'section', 'widget', 'image'].includes(type),
+    layout: isShown('#builderLayoutForm') && ['block', 'rightPanel', 'card', 'section', 'widget', 'image', 'accordion'].includes(type),
     slider: type === 'slider'
   };
   panel.querySelectorAll('[data-builder-context]').forEach((section) => {
@@ -3392,7 +3623,7 @@ function updatePanelContext() {
   // With a card (or photo, section...) selected, its parent section offers only
   // the "add next to it" buttons, not its whole layout form.
   const layoutSection = panel.querySelector('[data-builder-context="layout"]');
-  const isInlineItem = ['card', 'section', 'widget', 'image'].includes(type);
+  const isInlineItem = ['card', 'section', 'widget', 'image', 'accordion'].includes(type);
   layoutSection.classList.toggle('is-compact', isInlineItem);
   layoutSection.querySelector('h2').textContent = isInlineItem ? 'Добавить в эту секцию' : 'Секция';
   panel.querySelector('#builderElementEmpty').hidden = Object.values(visible).some(Boolean);
@@ -3749,6 +3980,28 @@ function setupEditor() {
                 <input data-object-style-field="fontSize" type="number" min="10" max="72" step="1">
               </label>
               <label>
+                Шрифт
+                <select data-object-style-field="fontFamily">
+                  <option value="system-ui">Системный</option>
+                  <option value="Arial, sans-serif">Arial</option>
+                  <option value="Georgia, serif">Georgia</option>
+                  <option value="&quot;Times New Roman&quot;, serif">Times New Roman</option>
+                  <option value="Verdana, sans-serif">Verdana</option>
+                </select>
+              </label>
+              <label>
+                Жирность
+                <select data-object-style-field="fontWeight">
+                  <option value="300">Тонкий</option>
+                  <option value="400">Обычный</option>
+                  <option value="500">Средний</option>
+                  <option value="600">Полужирный</option>
+                  <option value="700">Жирный</option>
+                  <option value="800">Очень жирный</option>
+                  <option value="900">Максимальный</option>
+                </select>
+              </label>
+              <label>
                 Внутренний отступ
                 <input data-object-style-field="padding" type="number" min="0" max="120" step="1">
               </label>
@@ -3821,6 +4074,12 @@ function setupEditor() {
               <p id="builderSideMenuHint">Кликните по пункту меню слева.</p>
               <button id="builderAddSideItem" type="button">+ Пункт меню</button>
               <button id="builderDeleteSideItem" type="button" disabled>Удалить пункт</button>
+            </div>
+            <div id="builderAccordionForm" class="builder-accordion-form" hidden>
+              <p>Выбранный пункт подсвечен — в него добавляются текст и блоки.</p>
+              <button id="builderAddAccordionSection" type="button">+ Пункт списка</button>
+              <button id="builderAddAccordionText" type="button">+ Текст в пункт</button>
+              <button id="builderDeleteAccordionSection" type="button">Удалить пункт</button>
             </div>
             <div id="builderFooterActions" class="builder-footer-actions" hidden>
               <p id="builderFooterHint">Кликните по ссылке в подвале.</p>
@@ -3898,6 +4157,7 @@ function setupEditor() {
               <button id="builderAddSection" type="button">+ Раздел</button>
               <button id="builderAddImageInside" type="button">+ Фото</button>
               <button id="builderAddWidget" type="button">+ Карточка с фото и кнопкой</button>
+              <button id="builderAddAccordion" type="button">+ Выпадающий список</button>
             </div>
             <div id="builderLayoutForm" class="builder-layout-form" hidden>
               <label>
@@ -3982,6 +4242,32 @@ function setupEditor() {
               <label>
                 Цвет текста
                 <input data-style-field="textColor" type="color">
+              </label>
+              <label>
+                Размер текста
+                <input data-style-field="fontSize" type="number" min="10" max="72" step="1">
+              </label>
+              <label>
+                Шрифт
+                <select data-style-field="fontFamily">
+                  <option value="system-ui">Системный</option>
+                  <option value="Arial, sans-serif">Arial</option>
+                  <option value="Georgia, serif">Georgia</option>
+                  <option value="&quot;Times New Roman&quot;, serif">Times New Roman</option>
+                  <option value="Verdana, sans-serif">Verdana</option>
+                </select>
+              </label>
+              <label>
+                Жирность
+                <select data-style-field="fontWeight">
+                  <option value="300">Тонкий</option>
+                  <option value="400">Обычный</option>
+                  <option value="500">Средний</option>
+                  <option value="600">Полужирный</option>
+                  <option value="700">Жирный</option>
+                  <option value="800">Очень жирный</option>
+                  <option value="900">Максимальный</option>
+                </select>
               </label>
             </div>
           </section>
@@ -4102,6 +4388,10 @@ function setupEditor() {
   document.querySelector('#builderAddSection').addEventListener('click', addSectionToSelectedDiv);
   document.querySelector('#builderAddImageInside').addEventListener('click', addImageToSelectedBlock);
   document.querySelector('#builderAddWidget').addEventListener('click', addWidgetToSelectedDiv);
+  document.querySelector('#builderAddAccordion').addEventListener('click', addAccordionToSelectedDiv);
+  document.querySelector('#builderAddAccordionSection').addEventListener('click', addAccordionSection);
+  document.querySelector('#builderAddAccordionText').addEventListener('click', addTextToAccordionSection);
+  document.querySelector('#builderDeleteAccordionSection').addEventListener('click', deleteAccordionSection);
   document.querySelector('#builderLink').addEventListener('click', addLinkToSelection);
   setupBlockDrag();
   setupBlockSelection();

@@ -13,9 +13,12 @@ public/uploads/
 .git
 .gitignore
 .claude
+.codex
+.agents
 .codex-remote-attachments
 node_modules
 npm-debug.log*
+*.log
 Dockerfile
 docker-compose.yml
 .dockerignore

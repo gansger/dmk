@@ -4,32 +4,16 @@ import { clientIp } from '../core/rate-limit.js';
 import {
   adminCredentialsConfigured,
   authenticateAdmin,
+  canAttemptAdminLogin,
   changeAdminPassword,
+  clearFailedAdminLogins,
   createAdminSession,
   expiredSessionCookie,
+  recordFailedAdminLogin,
   revokeAdminSession,
   sessionCookie,
   sessionUser
 } from '../services/auth.js';
-
-const loginAttempts = new Map();
-
-function canAttemptLogin(request) {
-  const cutoff = Date.now() - 15 * 60 * 1000;
-  const key = clientIp(request);
-  const recent = (loginAttempts.get(key) || []).filter((timestamp) => timestamp > cutoff);
-  loginAttempts.set(key, recent);
-  return recent.length < 8;
-}
-
-function recordFailedLogin(request) {
-  const key = clientIp(request);
-  loginAttempts.set(key, [...(loginAttempts.get(key) || []), Date.now()]);
-}
-
-function clearFailedLogins(request) {
-  loginAttempts.delete(clientIp(request));
-}
 
 export async function handleAuthApi({ request, response, method, pathname }) {
   if (method === 'GET' && pathname === '/api/auth/session') {
@@ -43,19 +27,21 @@ export async function handleAuthApi({ request, response, method, pathname }) {
       sendJson(response, 503, { error: 'CMS admin credentials are not configured.' });
       return true;
     }
-    if (!canAttemptLogin(request)) {
+    // Failed attempts are kept in SQLite, so a restart does not reset the lockout.
+    const loginKey = clientIp(request);
+    if (!canAttemptAdminLogin(loginKey)) {
       sendJson(response, 429, { error: 'Too many login attempts. Try again later.' });
       return true;
     }
 
     const body = await readBody(request);
     if (!authenticateAdmin(body.username || '', body.password || '')) {
-      recordFailedLogin(request);
+      recordFailedAdminLogin(loginKey);
       sendJson(response, 401, { error: 'Неверный логин или пароль.' });
       return true;
     }
 
-    clearFailedLogins(request);
+    clearFailedAdminLogins(loginKey);
     const token = createAdminSession(body.username);
     await appendEvent('auth.login', { username: body.username });
     sendJson(response, 200, { authenticated: true }, { 'Set-Cookie': sessionCookie(token, request) });

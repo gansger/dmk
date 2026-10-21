@@ -192,6 +192,18 @@ function openDatabase() {
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS admin_login_attempts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      attempt_key TEXT NOT NULL,
+      attempted_at INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS admin_login_attempts_key_time
+      ON admin_login_attempts (attempt_key, attempted_at);
+
+    CREATE INDEX IF NOT EXISTS admin_login_attempts_time
+      ON admin_login_attempts (attempted_at);
   `);
   createKnowledgeIndex(database);
   return database;
@@ -300,14 +312,28 @@ export async function searchKnowledge(text, { limit = 6 } = {}) {
 }
 
 export async function appendEvent(type, payload = {}) {
-  const events = await read('events');
+  await ensureDataFiles();
   const event = {
     id: crypto.randomUUID(),
     type,
     payload: redactSensitiveValue(payload),
     createdAt: new Date().toISOString()
   };
-  events.unshift(event);
-  await write('events', events.slice(0, 500));
+
+  const db = openDatabase();
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    db.prepare('UPDATE cms_items SET position = position + 1 WHERE collection = ?').run('events');
+    db.prepare(`
+      INSERT INTO cms_items (collection, item_key, position, value_json, updated_at)
+      VALUES (?, ?, ?, ?, ?)
+    `).run('events', event.id, 0, JSON.stringify(event), event.createdAt);
+    db.prepare('DELETE FROM cms_items WHERE collection = ? AND position >= ?').run('events', 500);
+    db.prepare('UPDATE cms_collections SET updated_at = ? WHERE name = ?').run(event.createdAt, 'events');
+    db.exec('COMMIT');
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
   return event;
 }

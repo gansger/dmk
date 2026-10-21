@@ -7,7 +7,7 @@ export async function testBitrix(config) {
   const webhookUrl = normalizeWebhookUrl(config.webhookUrl);
   if (!webhookUrl) return { ok: false, message: 'Bitrix webhook URL is empty.' };
 
-  const response = await fetch(`${webhookUrl}profile.json`);
+  const response = await fetch(`${webhookUrl}profile.json`, { signal: AbortSignal.timeout(20000) });
   const payload = await response.json();
 
   if (!response.ok || payload.error) {
@@ -33,6 +33,7 @@ export async function createBitrixLead(config, lead) {
 
   const response = await fetch(`${webhookUrl}crm.lead.add.json`, {
     method: 'POST',
+    signal: AbortSignal.timeout(20000),
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ fields })
   });

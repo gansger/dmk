@@ -2,7 +2,7 @@ import http from 'node:http';
 import { getPublicDir } from './core/config.js';
 import { ensureDataFiles } from './core/store.js';
 import { applySecurityHeaders, sendJson, serveStatic } from './core/http.js';
-import { allowPublicApiRequest, isPublicApi } from './routes/access.js';
+import { allowPublicApiRequest, isPublicApi, isSameOriginRequest, requiresSameOrigin } from './routes/access.js';
 import { handleAiApi } from './routes/ai.js';
 import { handleAuthApi } from './routes/auth.js';
 import { handleGalleryApi } from './routes/gallery.js';
@@ -32,6 +32,10 @@ const apiHandlers = [
 
 async function handleApi(context) {
   const { request, response, method, pathname } = context;
+  if (requiresSameOrigin(method, pathname) && !isSameOriginRequest(request)) {
+    sendJson(response, 403, { error: 'Cross-origin request is not allowed.' });
+    return;
+  }
   if (await handleAuthApi(context)) return;
 
   const user = sessionUser(request);
@@ -63,7 +67,8 @@ async function handleRequest(request, response) {
     if (!served) sendJson(response, 404, { error: 'Not found' });
   } catch (error) {
     const statusCode = error.statusCode || 500;
-    sendJson(response, statusCode, { error: error.message || 'Server error' });
+    if (statusCode >= 500) console.error(error);
+    sendJson(response, statusCode, { error: statusCode >= 500 ? 'Server error' : error.message || 'Request failed' });
   }
 }
 

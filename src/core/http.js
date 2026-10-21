@@ -178,7 +178,7 @@ export async function serveFile(response, publicDir, fileName, options = {}) {
 
   // Only a URL carrying the current hash may be cached forever; anything else is
   // revalidated with ETag, which is a cheap 304 when the file has not changed.
-  const immutable = options.version === info.hash;
+  const immutable = options.immutable || options.version === info.hash;
   const headers = {
     'Content-Type': contentType,
     'Cache-Control': immutable ? 'public, max-age=31536000, immutable' : 'no-cache',
@@ -200,7 +200,9 @@ export async function serveStatic(request, response, publicDir) {
   const cleanPath = decodeURIComponent(url.pathname).replace(/^\/+/, '');
   return serveFile(response, publicDir, cleanPath || 'site.html', {
     request,
-    version: url.searchParams.get('v')
+    version: url.searchParams.get('v'),
+    // Uploaded files get a unique name and never change, so they can be cached forever.
+    immutable: cleanPath.startsWith('uploads/')
   });
 }
 

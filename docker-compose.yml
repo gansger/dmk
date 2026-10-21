@@ -1,6 +1,8 @@
 services:
   cms-engine:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env.local
     environment:
@@ -13,12 +15,19 @@ services:
       # Database and backups: a plain folder next to the project, easy to copy.
       - ./storage:/app/storage
       - ./public/uploads:/app/public/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3003/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
   caddy:
     image: caddy:2
     depends_on:
-      - cms-engine
+      cms-engine:
+        condition: service_healthy
     env_file:
       - .env.local
     ports:
