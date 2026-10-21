@@ -92,7 +92,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -205,7 +205,7 @@
         "enabled": true,
         "order": 15,
         "fields": {
-          "html": "\n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n  <article class=\"builder-widget-item\" data-builder-item-id=\"widget-c58eac11-153d-44ba-8961-3f7b0ec6302b\" data-builder-item-type=\"widget\" style=\"background-color: rgb(248, 250, 252); color: rgb(24, 32, 47); font-size: 16px; padding: 22px; border-radius: 8px; max-width: 1200px; min-height: 160px;\">\n    <h3 class=\"builder-widget-title\">&nbsp;обращение директора</h3>\n    <img class=\"builder-widget-image\" src=\"https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg\" alt=\"\" style=\"border-radius: 200px !important;\">\n    <strong class=\"builder-widget-subtitle\">Директор колледжа</strong>\n    <p class=\"builder-widget-text\">Добро пожаловать! Дорогие студенты, абитуриенты, родители, коллеги и партнёры!&nbsp;</p>\n    <a class=\"builder-widget-link\" href=\"?page=director-address\" style=\"font-size: 12px !important; justify-self: center !important; background-color: rgb(18, 60, 98) !important;\">Читать полностью</a>\n  </article>\n\n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    ",
+          "html": "\n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n  <article class=\"builder-widget-item\" data-builder-item-id=\"widget-c58eac11-153d-44ba-8961-3f7b0ec6302b\" data-builder-item-type=\"widget\" style=\"background-color: rgb(248, 250, 252); color: rgb(24, 32, 47); font-size: 16px; padding: 22px; border-radius: 8px; max-width: 1200px; min-height: 160px;\">\n    <h3 class=\"builder-widget-title\">&nbsp;обращение директора</h3>\n    <img class=\"builder-widget-image\" src=\"/images/placeholder-photo.svg\" alt=\"\" style=\"border-radius: 200px !important;\">\n    <strong class=\"builder-widget-subtitle\">Директор колледжа</strong>\n    <p class=\"builder-widget-text\">Добро пожаловать! Дорогие студенты, абитуриенты, родители, коллеги и партнёры!&nbsp;</p>\n    <a class=\"builder-widget-link\" href=\"?page=director-address\" style=\"font-size: 12px !important; justify-self: center !important; background-color: rgb(18, 60, 98) !important;\">Читать полностью</a>\n  </article>\n\n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    \n    ",
           "styles": {
             "display": "grid",
             "flexDirection": "column",
@@ -376,7 +376,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -545,7 +545,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -714,7 +714,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -875,7 +875,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -1039,7 +1039,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -1209,7 +1209,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -1379,7 +1379,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -1549,7 +1549,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -1719,7 +1719,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -1889,7 +1889,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -2059,7 +2059,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -2213,7 +2213,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -2376,7 +2376,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -2559,7 +2559,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -2729,7 +2729,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -2890,7 +2890,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -3051,7 +3051,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -3212,7 +3212,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },
@@ -3373,7 +3373,7 @@
             "height": 0
           },
           "titleHtml": "АНО ПО \"Дагестанский медицинский колледж\"",
-          "logoUrl": "https://dagmedcollege.ru/wp-content/uploads/2024/09/%D0%BB%D0%BE%D0%B3%D0%BE.jpg",
+          "logoUrl": "/images/placeholder-logo.svg",
           "logoText": "Лого"
         }
       },

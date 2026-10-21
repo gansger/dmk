@@ -1037,6 +1037,9 @@ textarea {
 .builder-widget-item {
   position: relative;
   display: grid;
+  /* When the column is taller than the card, keep rows at their natural height
+     instead of stretching the title, text and button to fill the space. */
+  align-content: start;
   gap: 12px;
   min-width: 0;
   background: #ffffff;

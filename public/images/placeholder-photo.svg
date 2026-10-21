@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
+  <title>Фото (заглушка)</title>
+  <rect width="320" height="320" fill="#e2e8f0"/>
+  <circle cx="160" cy="124" r="52" fill="#cbd5e1"/>
+  <path d="M68 268c10-52 48-82 92-82s82 30 92 82" fill="#cbd5e1"/>
+  <text x="160" y="302" fill="#64748b" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle">ФОТО</text>
+</svg>

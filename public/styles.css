@@ -1694,6 +1694,7 @@ textarea:focus {
 .builder-widget-item {
   position: relative;
   display: grid;
+  align-content: start;
   gap: 12px;
   min-width: 0;
   background: #ffffff;
