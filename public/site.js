@@ -632,12 +632,53 @@ function applyLinkedElementState(element) {
 
   element.dataset.linkUrl = linkUrl;
   element.classList.add('linked-block');
-  if (!isEditMode) {
-    element.addEventListener('click', (event) => {
-      if (event.target.closest('a, button, input, select, textarea')) return;
-      window.location.href = linkUrl;
-    });
+  if (isEditMode) return;
+
+  // A real link stretched over the card (see .linked-block-link): search engines
+  // follow it and the card title becomes its anchor text. Not added in the
+  // editor, so it never gets saved into the page.
+  let link = element.querySelector(':scope > .linked-block-link');
+  if (!link) {
+    const label = (element.querySelector('h2, h3, h4, strong')?.textContent || element.textContent || '').replace(/s+/g, ' ').trim();
+    link = document.createElement('a');
+    link.className = 'linked-block-link';
+    link.innerHTML = `<span class="visually-hidden">${escapeHtml(label)}</span>`;
+    element.append(link);
   }
+  link.href = linkUrl;
+}
+
+function plainText(html) {
+  const template = document.createElement('template');
+  template.innerHTML = String(html || '');
+  return template.content.textContent.replace(/s+/g, ' ').trim();
+}
+
+// Public site only: images without a description get the nearest heading or the
+// page title, so neither search engines nor screen readers meet an empty alt.
+function fillMissingAlts(container) {
+  if (isEditMode || !container) return;
+  container.querySelectorAll('img').forEach((image) => {
+    if (image.getAttribute('alt')?.trim()) return;
+    let alt = '';
+    for (let parent = image.parentElement, depth = 0; parent && depth < 3 && !alt; parent = parent.parentElement, depth += 1) {
+      alt = parent.querySelector('h2, h3, h4, strong, figcaption')?.textContent.trim() || '';
+    }
+    image.alt = alt || pageState?.title || '';
+  });
+}
+
+// One <h1> per page: the page heading from SEO settings or the page title.
+function renderPageHeading() {
+  if (!pageState) return;
+  let heading = document.querySelector('#pageH1');
+  if (!heading) {
+    heading = document.createElement('h1');
+    heading.id = 'pageH1';
+    document.querySelector('.site-main-column')?.prepend(heading);
+  }
+  heading.textContent = pageState.seo?.h1 || pageState.title || '';
+  heading.className = pageState.seo?.showH1 ? 'page-h1' : 'page-h1 visually-hidden';
 }
 
 function applyBlockLayout(element, styles = {}) {
@@ -1281,7 +1322,7 @@ function renderSideMenu() {
       <div class="side-brand-logo">
         ${
           logoUrl
-            ? `<img src="${escapeHtml(logoUrl)}" alt="">`
+            ? `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(`Логотип: ${plainText(titleHtml)}`)}">`
             : `<span>${escapeHtml(logoText)}</span>`
         }
       </div>
@@ -1389,6 +1430,8 @@ function applyPageContent() {
   setEditableHtml('#sliderLink', sliderBlock?.fields?.buttonHtml || 'Открыть пост', 'slider', 'buttonHtml');
   applySliderStyles(sliderBlock?.fields?.styles);
   renderRightPanel();
+  renderPageHeading();
+  fillMissingAlts(siteRightPanel);
 }
 
 function customPageBlocks() {
@@ -1424,6 +1467,7 @@ function renderCustomBlocks() {
     if (isEditMode && !isContainer) content.contentEditable = 'true';
     prepareImageItems(content);
     if (isContainer) prepareContainerItems(content);
+    fillMissingAlts(content);
     if (Number(block.order || 0) < postsOrder) {
       root.before(section);
     } else {
@@ -1919,6 +1963,13 @@ function syncSeoControls() {
 
   title.value = seo.title || '';
   description.value = seo.description || '';
+  const h1 = document.querySelector('#builderSeoH1');
+  if (h1) {
+    h1.value = seo.h1 || '';
+    h1.placeholder = pageState?.title || '';
+  }
+  const showH1 = document.querySelector('#builderSeoShowH1');
+  if (showH1) showH1.checked = Boolean(seo.showH1);
   image.value = seo.image || '';
   noIndex.checked = Boolean(seo.noIndex);
   publicUrl.href = pageUrl(currentPageId, false);
@@ -1930,8 +1981,11 @@ function updateSeoFromControls() {
     title: document.querySelector('#builderSeoTitle')?.value.trim() || '',
     description: document.querySelector('#builderSeoDescription')?.value.trim() || '',
     image: document.querySelector('#builderSeoImage')?.value.trim() || '',
-    noIndex: Boolean(document.querySelector('#builderSeoNoIndex')?.checked)
+    noIndex: Boolean(document.querySelector('#builderSeoNoIndex')?.checked),
+    h1: document.querySelector('#builderSeoH1')?.value.trim() || '',
+    showH1: Boolean(document.querySelector('#builderSeoShowH1')?.checked)
   };
+  renderPageHeading();
 }
 
 function pageTemplate(pageId, title) {
@@ -2704,6 +2758,7 @@ async function persistCurrentPage(statusText = 'Сохранено') {
   }
   pageState = await response.json();
   if (editorHistory.entries.length) markEditorSaved();
+  void updateSeoPreview();
 
   setBuilderStatus(statusText);
   setTimeout(() => {
@@ -3118,6 +3173,32 @@ async function replaceImageFromFile(applyUrl, doneText = 'Фото замене�
   }
 }
 
+function selectedImageElement() {
+  const element = ['image', 'widget'].includes(selectedDesignTarget?.type) ? selectedDesignElement() : null;
+  return element?.querySelector('.builder-image-preview, .builder-widget-image') || null;
+}
+
+// Shows what search engines get as the page snippet right now (saved version).
+async function updateSeoPreview() {
+  const preview = document.querySelector('#builderSeoPreview');
+  if (!preview) return;
+  if (document.querySelector('#builderSeoDescription')?.value.trim()) {
+    preview.textContent = '';
+    return;
+  }
+  try {
+    const html = await (await fetch(pageUrl(currentPageId, false), { cache: 'no-store' })).text();
+    const description = new DOMParser().parseFromString(html, 'text/html').querySelector('meta[name="description"]')?.content || '';
+    const weak = !description || description.startsWith(`${pageState?.title || ''} — `);
+    preview.classList.toggle('is-warning', weak);
+    preview.textContent = weak
+      ? 'На странице почти нет текста, и поисковик покажет только её название. Напишите описание выше.'
+      : `Сейчас в поиске (если оставить поле пустым): «${description}»`;
+  } catch {
+    preview.textContent = '';
+  }
+}
+
 function replaceSelectedImage() {
   const element = selectedDesignElement();
   if (!element) return;
@@ -3242,6 +3323,13 @@ function setupRichTextTools() {
   }, true);
 
   document.querySelector('#builderReplaceImage')?.addEventListener('click', replaceSelectedImage);
+  document.querySelector('#builderImageAlt')?.addEventListener('input', (event) => {
+    selectedImageElement()?.setAttribute('alt', event.target.value.trim());
+  });
+  document.querySelector('#builderSeoH1')?.addEventListener('input', updateSeoFromControls);
+  document.querySelector('#builderSeoShowH1')?.addEventListener('change', updateSeoFromControls);
+  document.querySelector('#builderSeoDescription')?.addEventListener('input', updateSeoPreview);
+  document.querySelector('[data-builder-tab="seo"]')?.addEventListener('click', updateSeoPreview);
   document.querySelector('#builderUploadLogo')?.addEventListener('click', uploadLogo);
   document.querySelector('#builderRemoveLogo')?.addEventListener('click', () => setLogoUrl(''));
   updateLogoControls();
@@ -3310,6 +3398,12 @@ function updatePanelContext() {
   panel.querySelector('#builderElementEmpty').hidden = Object.values(visible).some(Boolean);
 
   panel.querySelector('#builderReplaceImage').hidden = !['image', 'widget'].includes(type);
+  const altField = panel.querySelector('#builderImageAltField');
+  const selectedImage = selectedImageElement();
+  altField.hidden = !selectedImage;
+  if (selectedImage && document.activeElement !== altField.querySelector('input')) {
+    altField.querySelector('input').value = selectedImage.getAttribute('alt') || '';
+  }
   panel.querySelector('#builderSharedLayoutNote').hidden = currentPageId === 'home' || !['headerNav', 'sideMenu', 'footer'].includes(type);
 
   const name = selectedTargetName();
@@ -3637,6 +3731,10 @@ function setupEditor() {
             <p id="builderObjectHint"></p>
             <p id="builderSharedLayoutNote" class="builder-note" hidden>Меню, логотип и подвал общие для всех страниц и берутся с главной. Чтобы изменения сохранились, правьте их <a href="/edit">на главной странице</a>.</p>
             <button id="builderReplaceImage" type="button" hidden>Заменить фото с компьютера</button>
+            <label id="builderImageAltField" hidden>
+              Описание картинки (для поиска и незрячих)
+              <input id="builderImageAlt" type="text" maxlength="200" placeholder="Например: Здание колледжа">
+            </label>
             <div id="builderObjectForm" class="builder-object-form" hidden>
               <label>
                 Цвет фона
@@ -3952,6 +4050,15 @@ function setupEditor() {
             <label>
               Описание в поиске
               <textarea id="builderSeoDescription" rows="4" maxlength="500" placeholder="1–2 предложения о том, что есть на странице"></textarea>
+            </label>
+            <p id="builderSeoPreview" class="builder-seo-preview"></p>
+            <label>
+              Главный заголовок страницы (H1)
+              <input id="builderSeoH1" type="text" maxlength="180">
+            </label>
+            <label class="checkline">
+              <input id="builderSeoShowH1" type="checkbox">
+              Показывать этот заголовок на странице
             </label>
             <label>
               Картинка для соцсетей (ссылка)

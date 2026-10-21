@@ -1,6 +1,19 @@
 import { read } from '../core/store.js';
 import { sendJson } from '../core/http.js';
 
+// Problems in the server setup that the site owner should fix.
+export function configurationWarnings() {
+  const warnings = [];
+  if (!String(process.env.CMS_SITE_URL || '').trim()) {
+    warnings.push({
+      id: 'site-url',
+      title: 'Не задан адрес сайта (CMS_SITE_URL)',
+      text: 'Без него ссылки в sitemap.xml, robots.txt и canonical строятся из адреса, по которому открыт сайт, и могут получиться с http:// или внутренним адресом. Укажите в .env.local, например: CMS_SITE_URL="https://example.ru".'
+    });
+  }
+  return warnings;
+}
+
 export async function handleSystemApi({ response, method, pathname }) {
   if (method === 'GET' && pathname === '/api/health') {
     sendJson(response, 200, { ok: true, name: 'CMS Engine Starter', version: '0.1.0' });
@@ -29,7 +42,8 @@ export async function handleSystemApi({ response, method, pathname }) {
         bitrix: Boolean(integrations.bitrix?.enabled),
         ai: Boolean(integrations.ai?.enabled)
       },
-      events: events.slice(0, 8)
+      events: events.slice(0, 8),
+      warnings: configurationWarnings()
     });
     return true;
   }

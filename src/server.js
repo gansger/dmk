@@ -10,7 +10,7 @@ import { handleIntegrationsApi } from './routes/integrations.js';
 import { handlePagesApi } from './routes/pages.js';
 import { handlePostsApi } from './routes/posts.js';
 import { handleSiteRoute } from './routes/site.js';
-import { handleSystemApi } from './routes/system.js';
+import { configurationWarnings, handleSystemApi } from './routes/system.js';
 import { handleUploadsApi } from './routes/uploads.js';
 import { sessionUser } from './services/auth.js';
 import { startTelegramScheduler } from './services/scheduler.js';
@@ -72,4 +72,5 @@ startTelegramScheduler();
 
 http.createServer(handleRequest).listen(port, () => {
   console.log(`CMS Engine Starter is running at http://localhost:${port}`);
+  for (const warning of configurationWarnings()) console.warn(`Warning: ${warning.title}`);
 });

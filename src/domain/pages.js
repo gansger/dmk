@@ -49,7 +49,10 @@ function normalizePageSeo(input = {}, previous = {}) {
     title: String(input.title ?? previous.title ?? '').trim().slice(0, 180),
     description: String(input.description ?? previous.description ?? '').trim().slice(0, 500),
     image: String(input.image ?? previous.image ?? '').trim().slice(0, 2000),
-    noIndex: Boolean(input.noIndex ?? previous.noIndex ?? false)
+    noIndex: Boolean(input.noIndex ?? previous.noIndex ?? false),
+    // Page heading (<h1>); empty means the page title. Visually hidden unless showH1.
+    h1: String(input.h1 ?? previous.h1 ?? '').trim().slice(0, 180),
+    showH1: Boolean(input.showH1 ?? previous.showH1 ?? false)
   };
 }
 

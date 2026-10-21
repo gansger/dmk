@@ -149,7 +149,15 @@
   min-width: 32px;
 }
 
+/* Grid and flex children default to min-width: auto and would let a long title
+   ("Настройки: Карточка с фото и кнопкой") stretch the whole panel. */
+.builder-panel > * {
+  min-width: 0;
+}
+
 #builderPanelTitle {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -737,4 +745,20 @@
 .builder-panel .builder-note a {
   color: inherit;
   font-weight: 800;
+}
+
+.builder-panel .builder-seo-preview {
+  border-radius: 8px;
+  background: #f1f5f9;
+  padding: 8px 10px;
+  line-height: 1.45;
+}
+
+.builder-panel .builder-seo-preview:empty {
+  display: none;
+}
+
+.builder-panel .builder-seo-preview.is-warning {
+  background: #fef3c7;
+  color: #92400e;
 }

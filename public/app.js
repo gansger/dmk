@@ -10,6 +10,7 @@ const state = {
 const selectors = {
   apiStatus: document.querySelector('#apiStatus'),
   metrics: document.querySelector('#metrics'),
+  dashboardWarnings: document.querySelector('#dashboardWarnings'),
   eventList: document.querySelector('#eventList'),
   postList: document.querySelector('#postList'),
   sliderPostList: document.querySelector('#sliderPostList'),
@@ -89,6 +90,11 @@ async function uploadImageFile(file) {
 }
 
 function renderDashboard() {
+  const warnings = state.dashboard?.warnings || [];
+  selectors.dashboardWarnings.innerHTML = warnings
+    .map((warning) => `<div class="dashboard-warning"><strong>${escapeHtml(warning.title)}</strong><p>${escapeHtml(warning.text)}</p></div>`)
+    .join('');
+
   const totals = state.dashboard?.totals || {};
   const metrics = [
     ['Посты', totals.posts || 0],
