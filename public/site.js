@@ -216,6 +216,15 @@ const defaultFooterItems = [
   { id: 'news', label: 'Новости', href: '/novosti' },
   { id: 'contacts', label: 'Контакты', href: '#contacts' }
 ];
+// Cookie notice: its text lives in the (shared) footer block, so it is edited on
+// the home page like the rest of the footer. Consent is remembered per browser.
+const cookieConsentKey = 'cms-cookie-consent';
+const privacyPolicyPath = '/politika-konfidencialnosti';
+const cookieNoticeDefaults = {
+  html: `Мы используем файлы cookie, чтобы сайт работал корректно и был удобнее для вас. Продолжая пользоваться сайтом, вы соглашаетесь с обработкой файлов cookie и <a href="${privacyPolicyPath}">политикой конфиденциальности</a>.`,
+  button: 'Принять'
+};
+
 const footerDefaults = {
   brandHtml: 'АНО ПО «Дагестанский медицинский колледж»',
   textHtml: 'Образовательная организация. Новости, документы и полезная информация для студентов и абитуриентов.',
@@ -1591,11 +1600,58 @@ function renderFooter() {
 
 }
 
+function hasCookieConsent() {
+  try {
+    return Boolean(localStorage.getItem(cookieConsentKey));
+  } catch {
+    return false;
+  }
+}
+
+function acceptCookies() {
+  try {
+    localStorage.setItem(cookieConsentKey, JSON.stringify({ acceptedAt: new Date().toISOString() }));
+  } catch {
+    // Private mode: the notice will show again next visit, nothing else breaks.
+  }
+  document.querySelector('#cookieNotice')?.remove();
+  document.body.classList.remove('has-cookie-notice');
+  // Counters (e.g. Yandex Metrica) added later can wait for this event.
+  window.dispatchEvent(new CustomEvent('cms:cookie-consent'));
+}
+
+function renderCookieNotice() {
+  const fields = pageBlock('footer')?.fields || {};
+  let notice = document.querySelector('#cookieNotice');
+  // In the editor the notice is always shown, so its text can be edited.
+  if (fields.cookieNoticeEnabled === false || (!isEditMode && hasCookieConsent())) {
+    notice?.remove();
+    document.body.classList.remove('has-cookie-notice');
+    return;
+  }
+  if (!notice) {
+    notice = document.createElement('div');
+    notice.id = 'cookieNotice';
+    notice.className = 'cookie-notice';
+    notice.setAttribute('role', 'region');
+    notice.setAttribute('aria-label', 'Уведомление об использовании cookie');
+    document.body.append(notice);
+  }
+  const html = fields.cookieNoticeHtml || cookieNoticeDefaults.html;
+  const button = escapeHtml(fields.cookieButtonText || cookieNoticeDefaults.button);
+  notice.innerHTML = isEditMode
+    ? `<div class="cookie-notice-text" data-cookie-field="html" contenteditable="true">${html}</div><span class="cookie-notice-button" data-cookie-field="button" contenteditable="true">${button}</span>`
+    : `<div class="cookie-notice-text">${html}</div><button class="cookie-notice-button" type="button">${button}</button>`;
+  document.body.classList.add('has-cookie-notice');
+  notice.querySelector('button')?.addEventListener('click', acceptCookies);
+}
+
 function applyPageContent() {
   document.querySelector('.site-hero-copy')?.remove();
   renderHeaderNav();
   renderSideMenu();
   renderFooter();
+  renderCookieNotice();
   const hero = pageBlock('hero');
   const sliderBlock = pageBlock('slider');
   setHeroVisible(hero?.enabled === true || sliderBlock?.enabled === true);
@@ -2044,6 +2100,8 @@ function syncFooterControls() {
   const isFooter = selectedDesignTarget?.type === 'footer';
   actions.hidden = !isFooter;
   if (!isFooter) return;
+  const cookieToggle = document.querySelector('#builderCookieNoticeEnabled');
+  if (cookieToggle) cookieToggle.checked = pageBlock('footer')?.fields?.cookieNoticeEnabled !== false;
 
   const items = footerItemsFromDom();
   const selected = selectedFooterIndex !== null ? items[selectedFooterIndex] : null;
@@ -2912,6 +2970,9 @@ function collectPageFromDom() {
           contactHtml: siteFooter.querySelector('[data-footer-field="contactHtml"]')?.innerHTML || footerDefaults.contactHtml,
           copyrightHtml: siteFooter.querySelector('[data-footer-field="copyrightHtml"]')?.innerHTML || footerDefaults.copyrightHtml,
           items: footerItemsFromDom(),
+          cookieNoticeEnabled: block.fields?.cookieNoticeEnabled !== false,
+          cookieNoticeHtml: document.querySelector('#cookieNotice [data-cookie-field="html"]')?.innerHTML.trim() || block.fields?.cookieNoticeHtml || cookieNoticeDefaults.html,
+          cookieButtonText: document.querySelector('#cookieNotice [data-cookie-field="button"]')?.textContent.trim() || block.fields?.cookieButtonText || cookieNoticeDefaults.button,
           styles: normalizeObjectStyles(block.fields?.styles, footerObjectDefaults)
         }
       };
@@ -4085,6 +4146,11 @@ function setupEditor() {
               <p id="builderFooterHint">Кликните по ссылке в подвале.</p>
               <button id="builderAddFooterItem" type="button">+ Ссылка в подвале</button>
               <button id="builderDeleteFooterItem" type="button" disabled>Удалить ссылку</button>
+              <label class="checkline">
+                <input id="builderCookieNoticeEnabled" type="checkbox">
+                Показывать уведомление о cookie
+              </label>
+              <p>Текст уведомления и кнопки меняйте прямо в плашке внизу экрана.</p>
             </div>
           </section>
 
@@ -4384,6 +4450,12 @@ function setupEditor() {
   document.querySelector('#builderDeleteSideItem').addEventListener('click', deleteSelectedSideMenuItem);
   document.querySelector('#builderAddFooterItem').addEventListener('click', addFooterItem);
   document.querySelector('#builderDeleteFooterItem').addEventListener('click', deleteSelectedFooterItem);
+  document.querySelector('#builderCookieNoticeEnabled').addEventListener('change', (event) => {
+    const footer = pageBlock('footer');
+    if (!footer) return;
+    footer.fields = { ...(footer.fields || {}), cookieNoticeEnabled: event.target.checked };
+    renderCookieNotice();
+  });
   document.querySelector('#builderAddCard').addEventListener('click', addCardToSelectedDiv);
   document.querySelector('#builderAddSection').addEventListener('click', addSectionToSelectedDiv);
   document.querySelector('#builderAddImageInside').addEventListener('click', addImageToSelectedBlock);
