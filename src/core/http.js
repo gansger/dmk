@@ -84,12 +84,12 @@ export function sendNoContent(response) {
   response.end();
 }
 
-export async function readBody(request) {
+export async function readBody(request, { maxBytes = 1024 * 1024 } = {}) {
   const chunks = [];
   let size = 0;
   for await (const chunk of request) {
     size += chunk.length;
-    if (size > 1024 * 1024) {
+    if (size > maxBytes) {
       const error = new Error('Request body is too large');
       error.statusCode = 413;
       throw error;

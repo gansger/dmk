@@ -31,6 +31,10 @@ export function getRootDir() {
   return rootDir;
 }
 
+export function getPublicDir() {
+  return path.join(rootDir, 'public');
+}
+
 export function withRuntimeSecrets(integrations = {}) {
   const merged = structuredClone(integrations);
 

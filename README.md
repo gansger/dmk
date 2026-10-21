@@ -90,7 +90,9 @@ SEO title, description, изображение для соцсетей и зап
 
 ## Важные файлы
 
-- `src/server.js` — HTTP-сервер, маршруты и API.
+- `src/server.js` — точка входа: HTTP-сервер, проверка доступа и подключение маршрутов.
+- `src/routes/` — маршруты по разделам: `site.js` (публичные страницы, sitemap, вход в админку и редактор), `auth.js`, `posts.js` (посты и слайдер), `pages.js`, `gallery.js`, `uploads.js`, `integrations.js`, `ai.js` (ассистент, база знаний, память), `system.js`, `access.js` (публичные API и лимиты).
+- `src/domain/` — правила данных без HTTP: нормализация постов, страниц, галереи, настроек слайдера и интеграций.
 - `src/core/store.js` — SQLite-хранилище и импорт legacy JSON.
 - `src/services/auth.js` — сессии администратора.
 - `src/integrations/telegram.js` — импорт Telegram.

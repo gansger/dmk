@@ -65,3 +65,7 @@ export function maskSecret(value) {
   if (text.length <= 8) return '••••';
   return `${text.slice(0, 3)}••••${text.slice(-3)}`;
 }
+
+export function limitedString(value, maxLength) {
+  return String(value ?? '').trim().slice(0, maxLength);
+}
