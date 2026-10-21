@@ -53,7 +53,7 @@ const builderPanelPositionKey = 'cms-builder-panel-position';
 if (isEditMode) {
   const editorStyles = document.createElement('link');
   editorStyles.rel = 'stylesheet';
-  editorStyles.href = '/editor.css?v=3';
+  editorStyles.href = '/editor.css';
   document.head.appendChild(editorStyles);
 }
 
@@ -699,11 +699,9 @@ function renderRightPanel() {
 
   const styles = normalizeLayoutStyles(block.fields?.styles || rightPanelDefaults, rightPanelDefaults);
   setRightWidth(styles.maxWidth);
-  siteRightPanel.innerHTML = `
-    <div class="right-panel-content custom-block-content" data-block-id="${block.id}" data-edit-block="${block.id}" data-edit-field="html">
-      ${block.fields?.html || widgetTemplate()}
-    </div>
-  `;
+  // No whitespace around the saved html: it is read back with innerHTML on save,
+  // and template indentation would pile up in the database on every save.
+  siteRightPanel.innerHTML = `<div class="right-panel-content custom-block-content" data-block-id="${block.id}" data-edit-block="${block.id}" data-edit-field="html">${(block.fields?.html || widgetTemplate()).trim()}</div>`;
   const content = siteRightPanel.querySelector('.right-panel-content');
   applyBlockLayout(content, styles);
   prepareImageItems(content);
@@ -1053,6 +1051,7 @@ function prepareContainerItems(container) {
         syncObjectControls();
       }
       section.remove();
+      recordDeletion();
     });
     section.onclick = (event) => {
       if (event.target.closest('.builder-section-remove')) return;
@@ -1082,6 +1081,7 @@ function prepareContainerItems(container) {
         syncObjectControls();
       }
       card.remove();
+      recordDeletion();
     });
     card.onclick = (event) => {
       if (event.target.closest('.builder-card-remove')) return;
@@ -1111,6 +1111,7 @@ function prepareContainerItems(container) {
         syncObjectControls();
       }
       widget.remove();
+      recordDeletion();
     });
     widget.querySelector('.builder-widget-image')?.addEventListener('dblclick', (event) => {
       event.preventDefault();
@@ -1151,6 +1152,7 @@ function prepareImageItems(container) {
         syncObjectControls();
       }
       item.remove();
+      recordDeletion();
     };
 
     const drop = item.querySelector('.builder-image-drop') || item;
@@ -2175,8 +2177,7 @@ function deleteSelectedBlock() {
   selectedDesignTarget = null;
   syncLayoutControls();
   syncObjectControls();
-  const status = document.querySelector('#builderStatus');
-  if (status) status.textContent = 'Удалено';
+  recordDeletion();
 }
 
 function duplicateSelectedItem() {
@@ -2210,9 +2211,15 @@ function duplicateSelectedItem() {
   if (status) status.textContent = 'Скопировано';
 }
 
+// Blocks are re-rendered after adding, undo and redo; bind listeners once per element.
+const dragReadyBlocks = new WeakSet();
+const selectionReadyBlocks = new WeakSet();
+let draggedId = null;
+
 function setupBlockDrag() {
-  let draggedId = null;
   document.querySelectorAll('.custom-page-block, #publicPosts').forEach((block) => {
+    if (dragReadyBlocks.has(block)) return;
+    dragReadyBlocks.add(block);
     block.addEventListener('dragstart', () => {
       draggedId = block.dataset.blockId || (block.id === 'publicPosts' ? 'posts' : null);
       block.classList.add('dragging');
@@ -2232,6 +2239,8 @@ function setupBlockDrag() {
 
 function setupBlockSelection() {
   document.querySelectorAll('.custom-page-block').forEach((block) => {
+    if (selectionReadyBlocks.has(block)) return;
+    selectionReadyBlocks.add(block);
     block.addEventListener('click', (event) => {
       if (!event.target.closest('.custom-page-block')) return;
       selectBuilderBlock(block.dataset.blockId);
@@ -2689,6 +2698,7 @@ async function persistCurrentPage(statusText = 'Сохранено') {
     throw new Error(message);
   }
   pageState = await response.json();
+  if (editorHistory.entries.length) markEditorSaved();
 
   setBuilderStatus(statusText);
   setTimeout(() => {
@@ -2894,6 +2904,223 @@ function setupFloatingBuilderPanel() {
   });
 }
 
+// Editor safety net: unsaved-changes tracking, undo/redo and clean paste.
+// Every change is recorded as a snapshot of the whole page (collectPageFromDom),
+// so text edits, added/removed blocks, styles and drag-and-drop are all covered
+// without hooking into each editing function separately.
+const editorHistory = {
+  entries: [],
+  index: -1,
+  savedSnapshot: '',
+  timer: null,
+  observer: null,
+  noticeTimer: null,
+  maxEntries: 100
+};
+
+function currentEditorSnapshot() {
+  // updatedAt changes on every save and is not something the user edited.
+  const { updatedAt, ...page } = collectPageFromDom();
+  return JSON.stringify(page);
+}
+
+function hasUnsavedChanges() {
+  return editorHistory.entries[editorHistory.index] !== editorHistory.savedSnapshot;
+}
+
+function updateEditorHistoryControls() {
+  const dirty = hasUnsavedChanges();
+  const state = document.querySelector('#builderSaveState');
+  if (state) {
+    state.textContent = dirty ? 'Есть несохранённые изменения' : 'Все изменения сохранены';
+    state.classList.toggle('is-dirty', dirty);
+  }
+  document.querySelector('#builderSave')?.classList.toggle('is-dirty', dirty);
+  const undo = document.querySelector('#builderUndo');
+  const redo = document.querySelector('#builderRedo');
+  if (undo) undo.disabled = editorHistory.index <= 0;
+  if (redo) redo.disabled = editorHistory.index >= editorHistory.entries.length - 1;
+}
+
+function captureEditorState() {
+  clearTimeout(editorHistory.timer);
+  editorHistory.timer = null;
+  const snapshot = currentEditorSnapshot();
+  if (snapshot !== editorHistory.entries[editorHistory.index]) {
+    editorHistory.entries = editorHistory.entries.slice(0, editorHistory.index + 1);
+    editorHistory.entries.push(snapshot);
+    if (editorHistory.entries.length > editorHistory.maxEntries) editorHistory.entries.shift();
+    editorHistory.index = editorHistory.entries.length - 1;
+  }
+  updateEditorHistoryControls();
+}
+
+function scheduleEditorCapture() {
+  clearTimeout(editorHistory.timer);
+  editorHistory.timer = setTimeout(captureEditorState, 400);
+}
+
+function markEditorSaved() {
+  clearTimeout(editorHistory.timer);
+  editorHistory.timer = null;
+  const snapshot = currentEditorSnapshot();
+  // The server may normalize the page; keep that as the current step, not a new one.
+  editorHistory.entries[editorHistory.index] = snapshot;
+  editorHistory.savedSnapshot = snapshot;
+  updateEditorHistoryControls();
+}
+
+async function restoreEditorSnapshot(snapshot) {
+  const previousPosts = JSON.stringify(pageBlock('posts') || null);
+  pageState = { ...pageState, ...JSON.parse(snapshot) };
+  selectedBuilderBlockId = null;
+  selectedDesignTarget = null;
+  selectedSideMenuIndex = null;
+  selectedHeaderNavIndex = null;
+  selectedFooterIndex = null;
+
+  applyPageContent();
+  renderCustomBlocks();
+  if (JSON.stringify(pageBlock('posts') || null) !== previousPosts && !postSlug) await loadPosts();
+  setupBlockDrag();
+  setupBlockSelection();
+  syncLayoutControls();
+  syncObjectControls();
+  syncPostsControls();
+  syncSliderControls();
+  syncSeoControls();
+  syncPageControls();
+
+  // Re-rendering is not an edit: drop the mutations it caused.
+  editorHistory.observer?.takeRecords();
+  clearTimeout(editorHistory.timer);
+  editorHistory.timer = null;
+
+  // Rendering may normalize markup slightly; keep the history step in sync with
+  // what is on screen so the next keystroke does not wipe the redo history.
+  const rendered = currentEditorSnapshot();
+  if (rendered !== snapshot) {
+    if (editorHistory.savedSnapshot === snapshot) editorHistory.savedSnapshot = rendered;
+    editorHistory.entries[editorHistory.index] = rendered;
+  }
+}
+
+async function undoEditorChange() {
+  captureEditorState();
+  if (editorHistory.index <= 0) return;
+  editorHistory.index -= 1;
+  await restoreEditorSnapshot(editorHistory.entries[editorHistory.index]);
+  updateEditorHistoryControls();
+  setBuilderStatus('Отменено');
+}
+
+async function redoEditorChange() {
+  captureEditorState();
+  if (editorHistory.index >= editorHistory.entries.length - 1) return;
+  editorHistory.index += 1;
+  await restoreEditorSnapshot(editorHistory.entries[editorHistory.index]);
+  updateEditorHistoryControls();
+  setBuilderStatus('Возвращено');
+}
+
+// Shown after a deletion instead of a confirm dialog: one click brings it back.
+function showUndoNotice(text) {
+  const status = document.querySelector('#builderStatus');
+  if (!status) return;
+  status.innerHTML = `${escapeHtml(text)} <button type="button" class="builder-undo-notice">Отменить</button>`;
+  status.querySelector('button').addEventListener('click', undoEditorChange);
+  clearTimeout(editorHistory.noticeTimer);
+  editorHistory.noticeTimer = setTimeout(() => {
+    if (status.querySelector('.builder-undo-notice')) status.textContent = '';
+  }, 8000);
+}
+
+function recordDeletion(text = 'Удалено') {
+  captureEditorState();
+  showUndoNotice(text);
+}
+
+function isEditorChromeNode(node) {
+  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+  return Boolean(element?.closest('.builder-bar, .builder-panel, .chat-widget'));
+}
+
+// Rich text areas take formatted paste; titles, menu items and card labels take plain text.
+const richPasteSelector = '.custom-block-content, .right-panel-content';
+
+async function setupEditorSafetyNet() {
+  const { cleanPastedHtml, plainTextToHtml } = await import('./paste-cleaner.js');
+
+  editorHistory.entries = [currentEditorSnapshot()];
+  editorHistory.index = 0;
+  editorHistory.savedSnapshot = editorHistory.entries[0];
+
+  editorHistory.observer = new MutationObserver((mutations) => {
+    if (mutations.some((mutation) => !isEditorChromeNode(mutation.target))) scheduleEditorCapture();
+  });
+  editorHistory.observer.observe(document.body, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: ['style', 'src', 'href', 'data-page-link', 'data-link-url']
+  });
+  // Panel controls change pageState as well as the page, so listen to them too.
+  document.addEventListener('input', scheduleEditorCapture);
+  document.addEventListener('change', scheduleEditorCapture);
+
+  document.addEventListener(
+    'keydown',
+    (event) => {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
+      // event.code works the same with Russian and English keyboard layouts.
+      if (event.code === 'KeyS') {
+        event.preventDefault();
+        saveEditor();
+        return;
+      }
+      // Panel fields (SEO, colors...) keep the browser's own undo.
+      if (event.target.closest?.('.builder-panel input, .builder-panel textarea, .builder-panel select')) return;
+      if (event.code === 'KeyZ' && !event.shiftKey) {
+        event.preventDefault();
+        undoEditorChange();
+      } else if ((event.code === 'KeyZ' && event.shiftKey) || event.code === 'KeyY') {
+        event.preventDefault();
+        redoEditorChange();
+      }
+    },
+    true
+  );
+
+  document.addEventListener('paste', (event) => {
+    const editable = event.target.closest?.('[contenteditable="true"]');
+    if (!editable || isEditorChromeNode(editable)) return;
+    const html = event.clipboardData?.getData('text/html') || '';
+    const text = event.clipboardData?.getData('text/plain') || '';
+    // A copied image file has neither: let the browser handle it as before.
+    if (!html && !text) return;
+
+    event.preventDefault();
+    if (editable.closest(richPasteSelector)) {
+      const clean = html ? cleanPastedHtml(html) : plainTextToHtml(text);
+      document.execCommand('insertHTML', false, clean);
+    } else {
+      document.execCommand('insertText', false, text.replace(/\s+/g, ' ').trim());
+    }
+  });
+
+  window.addEventListener('beforeunload', (event) => {
+    if (editorHistory.timer) captureEditorState();
+    if (!hasUnsavedChanges()) return;
+    event.preventDefault();
+    event.returnValue = '';
+  });
+
+  document.querySelector('#builderUndo').addEventListener('click', undoEditorChange);
+  document.querySelector('#builderRedo').addEventListener('click', redoEditorChange);
+  updateEditorHistoryControls();
+}
+
 function setupEditor() {
   document.body.classList.add('builder-mode');
   document.querySelector('.site-hero').classList.add('builder-block');
@@ -2905,7 +3132,11 @@ function setupEditor() {
     `
       <div class="builder-bar">
         <strong>Редактор сайта</strong>
-        <button id="builderSave" type="button">Сохранить</button>
+        <button id="builderSave" type="button" title="Сохранить (Ctrl+S)">Сохранить</button>
+        <button id="builderUndo" type="button" title="Отменить (Ctrl+Z)" aria-label="Отменить" disabled>↶</button>
+        <button id="builderRedo" type="button" title="Вернуть (Ctrl+Shift+Z)" aria-label="Вернуть" disabled>↷</button>
+        <span id="builderSaveState" class="builder-save-state" aria-live="polite"></span>
+        <span id="builderStatus"></span>
         <button id="builderAddText" type="button">+ Текст</button>
         <button id="builderAddDiv" type="button">+ Div</button>
         <button id="builderAddImage" type="button">+ Фото</button>
@@ -2916,7 +3147,6 @@ function setupEditor() {
         <button id="builderLink" type="button">Ссылка</button>
         <a href="/">Выйти из редактора</a>
         <a href="/admin">CMS</a>
-        <span id="builderStatus"></span>
       </div>
       <aside class="builder-panel" id="builderPanel">
         <div class="builder-panel-head" id="builderPanelHandle">
@@ -3286,6 +3516,7 @@ await loadSlider();
 if (isEditMode) {
   await loadPagesIndex();
   setupEditor();
+  await setupEditorSafetyNet();
 }
 
 slider.prev.addEventListener('click', () => moveSlider(-1));

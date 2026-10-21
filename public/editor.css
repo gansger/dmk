@@ -44,6 +44,41 @@
 #builderStatus {
   color: #bbf7d0;
   font-weight: 800;
+  white-space: nowrap;
+}
+
+.builder-bar #builderUndo,
+.builder-bar #builderRedo {
+  min-width: 38px;
+  padding: 9px 10px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.builder-save-state {
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.builder-save-state.is-dirty {
+  color: #fcd34d;
+}
+
+.builder-save-state.is-dirty::before {
+  content: '● ';
+}
+
+.builder-bar #builderSave.is-dirty {
+  background: #facc15;
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.35);
+}
+
+.builder-bar .builder-undo-notice {
+  margin-left: 6px;
+  padding: 4px 10px;
+  background: #bbf7d0;
 }
 
 .builder-panel {
