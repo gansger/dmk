@@ -1,13 +1,14 @@
 import { withRuntimeSecrets } from '../core/config.js';
 import { limitedString } from '../core/format.js';
-import { appendEvent, read, write } from '../core/store.js';
+import { appendEvent, read, searchKnowledge, write } from '../core/store.js';
 import { readBody, routeParams, sendJson, sendNoContent } from '../core/http.js';
 import { askAssistant } from '../services/assistant.js';
 
 const assistantMessageMaxLength = 2000;
+const knowledgeContextLimit = 6;
 
 // Public AI assistant plus the knowledge base and memory it answers from.
-export async function handleAiApi({ request, response, method, pathname }) {
+export async function handleAiApi({ request, response, url, method, pathname }) {
   if (method === 'POST' && pathname === '/api/ai/assistant') {
     const body = await readBody(request);
     const message = String(body.message ?? '').trim();
@@ -22,9 +23,12 @@ export async function handleAiApi({ request, response, method, pathname }) {
     // "engine" is the shared memory scope; a visitor must not be able to claim it.
     const visitorId = limitedString(body.visitorId, 100).replace(/[^\w-]/g, '') || 'anonymous';
     const integrations = withRuntimeSecrets(await read('integrations'));
+    // Give the model the records that match the question; with no match fall back
+    // to the general records so it can still say what information is missing.
+    const relevantKnowledge = await searchKnowledge(message, { limit: knowledgeContextLimit });
     const result = await askAssistant({
       config: integrations.ai,
-      knowledge: await read('knowledge'),
+      knowledge: relevantKnowledge.length ? relevantKnowledge : await read('knowledge'),
       memory: await read('memory'),
       message,
       visitorId: visitorId === 'engine' ? 'anonymous' : visitorId
@@ -36,6 +40,13 @@ export async function handleAiApi({ request, response, method, pathname }) {
 
   if (method === 'GET' && pathname === '/api/knowledge') {
     sendJson(response, 200, await read('knowledge'));
+    return true;
+  }
+
+  // Lets the admin check which records the assistant would use for a question.
+  if (method === 'GET' && pathname === '/api/knowledge/search') {
+    const query = limitedString(url.searchParams.get('q'), assistantMessageMaxLength);
+    sendJson(response, 200, await searchKnowledge(query, { limit: knowledgeContextLimit }));
     return true;
   }
 

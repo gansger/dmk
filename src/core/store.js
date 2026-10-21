@@ -3,6 +3,7 @@ import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { getRootDir, redactSensitiveValue, stripIntegrationSecrets } from './config.js';
+import { createKnowledgeIndex, rebuildKnowledgeIndex, searchKnowledgeIds } from './knowledge-index.js';
 
 const rootDir = getRootDir();
 const dataDir = path.join(rootDir, 'data');
@@ -192,6 +193,7 @@ function openDatabase() {
       updated_at TEXT NOT NULL
     );
   `);
+  createKnowledgeIndex(database);
   return database;
 }
 
@@ -215,6 +217,7 @@ function writeCollection(collection, value) {
     for (const [key, item, position] of entries) {
       insert.run(collection, key, position, JSON.stringify(item), now);
     }
+    if (collection === 'knowledge') rebuildKnowledgeIndex(db, safeValue);
     db.prepare(`
       INSERT INTO cms_collections (name, kind, initialized_at, updated_at)
       VALUES (?, ?, ?, ?)
@@ -247,6 +250,18 @@ async function importLegacyData() {
     }
     writeCollection(collection, value);
   }
+
+  // Databases created before the index existed: build it from current records.
+  const db = openDatabase();
+  const indexed = db.prepare('SELECT count(*) AS count FROM knowledge_fts').get().count;
+  const stored = db.prepare("SELECT count(*) AS count FROM cms_items WHERE collection = 'knowledge'").get().count;
+  if (indexed !== stored) {
+    const records = db
+      .prepare("SELECT value_json FROM cms_items WHERE collection = 'knowledge' ORDER BY position, item_key")
+      .all()
+      .map((row) => JSON.parse(row.value_json));
+    rebuildKnowledgeIndex(db, records);
+  }
 }
 
 export function getDatabase() {
@@ -275,6 +290,13 @@ export async function read(collection) {
 export async function write(collection, value) {
   await ensureDataFiles();
   return writeCollection(collection, value);
+}
+
+export async function searchKnowledge(text, { limit = 6 } = {}) {
+  const ids = searchKnowledgeIds(openDatabase(), text, limit);
+  if (!ids.length) return [];
+  const byId = new Map((await read('knowledge')).map((record) => [String(record.id), record]));
+  return ids.map((id) => byId.get(id)).filter(Boolean);
 }
 
 export async function appendEvent(type, payload = {}) {

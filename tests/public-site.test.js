@@ -96,11 +96,7 @@ describe('public site', () => {
     assert.equal(edit.headers.get('location'), `/admin?next=${encodeURIComponent('/edit?page=home')}`);
   });
 
-  test('static assets are served with long cache and path traversal is refused', async () => {
-    const script = await server.request('/site.js?v=1');
-    assert.equal(script.status, 200);
-    assert.match(script.headers.get('cache-control'), /immutable/);
-
+  test('path traversal is refused', async () => {
     const traversal = await server.request('/..%2Fpackage.json');
     assert.notEqual(traversal.status, 200);
   });

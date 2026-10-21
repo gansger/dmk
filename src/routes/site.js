@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { getPublicDir } from '../core/config.js';
 import { read, write } from '../core/store.js';
-import { sendHtml, sendRedirect, sendText, serveFile } from '../core/http.js';
+import { sendHtml, sendRedirect, sendText, serveFile, versionAssetUrls } from '../core/http.js';
 import { ensurePublishedPostPages, postPageFromPost, postPageId, publishedPostForPage } from '../domain/posts.js';
 import {
   isGeneratedPostPage,
@@ -59,7 +59,7 @@ async function publicCollections() {
 
 async function serveRenderedPublicSite(request, response, { page, pages, posts, post = null, statusCode = 200, canonicalPath }) {
   const rendered = renderPublicSiteHtml({
-    template: await getPublicSiteTemplate(),
+    template: await versionAssetUrls(await getPublicSiteTemplate(), publicDir),
     request,
     page,
     pages,
