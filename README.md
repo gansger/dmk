@@ -77,6 +77,8 @@ SEO title, description, изображение для соцсетей и зап
 
 Старые ссылки вида `/?page=obrazovanie` и `/site.html?page=obrazovanie` перенаправляются на чистый URL `/obrazovanie`.
 
+Пошаговая настройка — адрес сайта, Яндекс.Вебмастер, Google Search Console, поля вкладки SEO и чек-лист — в [docs/SEO.md](docs/SEO.md).
+
 ## Что уже есть
 
 - Cookie-сессии и хеш пароля администратора в SQLite.
