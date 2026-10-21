@@ -33,7 +33,9 @@ npm test
 
 Рабочие данные находятся в SQLite-базе `data/cms.sqlite`. При первом запуске существующие данные из `data/*.json` импортируются автоматически. JSON-файлы сохранены только как legacy-источник для миграции.
 
-Для production храните SQLite-файл на локальном persistent-диске сервера, а не на сетевой файловой системе. В Docker Compose для него используется volume `cms-storage`.
+Для production храните SQLite-файл на локальном persistent-диске сервера, а не на сетевой файловой системе. В Docker Compose база лежит в папке `storage/` рядом с проектом. Резервная копия на ходу: `npm run backup` (или `docker compose exec -T cms-engine node scripts/backup-db.js`).
+
+Публикация на VDS (Selectel, Ubuntu 22.04), домен, запуск в Docker на портах 80/443 с автоматическим HTTPS (Caddy), перенос базы и резервные копии — в [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Секреты
 

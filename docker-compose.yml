@@ -1,16 +1,37 @@
-version: '3.8'
-
 services:
   cms-engine:
     build: .
     env_file:
       - .env.local
-    ports:
-      - "3003:3003"
+    environment:
+      # Requests always come through Caddy, which sets the real client address.
+      CMS_TRUST_PROXY: "1"
+    # No published ports: the site is reachable only through Caddy.
+    expose:
+      - "3003"
     volumes:
-      - cms-storage:/app/storage
+      # Database and backups: a plain folder next to the project, easy to copy.
+      - ./storage:/app/storage
       - ./public/uploads:/app/public/uploads
-    restart: always
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    depends_on:
+      - cms-engine
+    env_file:
+      - .env.local
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificates must survive restarts (Let's Encrypt limits how often they are issued).
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
 
 volumes:
-  cms-storage:
+  caddy-data:
+  caddy-config:
