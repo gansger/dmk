@@ -4751,6 +4751,9 @@ if (mobileNavToggle && siteSideMenu) {
     siteSideMenu.classList.toggle('open', open);
     document.body.classList.toggle('mobile-menu-open', open);
     mobileNavToggle.setAttribute('aria-expanded', String(open));
+    // The same button closes the menu, so it shows × while the menu is open.
+    mobileNavToggle.textContent = open ? '×' : '☰';
+    mobileNavToggle.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
   }
 
   mobileNavToggle.addEventListener('click', (event) => {

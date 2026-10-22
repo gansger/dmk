@@ -33,6 +33,9 @@ body {
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  /* clip, unlike hidden, does not turn the element into a scroll container,
+     so the sticky top bar keeps working (browsers without clip use hidden). */
+  overflow-x: clip;
 }
 
 button,
@@ -55,6 +58,7 @@ textarea {
 .public-site {
   background: #f8fafc;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .public-site.mobile-menu-open {
@@ -1717,5 +1721,178 @@ html.photo-viewer-open {
   .photo-viewer-prev,
   .photo-viewer-next {
     display: none;
+  }
+}
+
+/* ===== Phones and small tablets ===== */
+
+/* An empty news area (pages without news) must not leave a blank band. */
+.site-content:empty {
+  display: none;
+}
+
+@media (max-width: 920px) {
+  /* The top bar stays on screen and makes room for the menu button, so the
+     button never covers headings while scrolling. */
+  /* Fixed for the whole page (sticky would end with the main column and leave
+     the button floating over the footer). */
+  .public-site:not(.builder-mode) .site-top-nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 30;
+    align-items: center;
+    height: 60px;
+    min-height: 60px;
+    padding: 8px 12px 8px 68px;
+  }
+
+  .public-site:not(.builder-mode) .site-main-column {
+    padding-top: 60px;
+  }
+
+  .public-site:not(.builder-mode) .site-main-column:has(> .site-top-nav[style*='display: none']) {
+    padding-top: 0;
+  }
+
+  .site-top-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 4px;
+  }
+
+  .mobile-nav-toggle {
+    top: 8px;
+    left: 12px;
+    display: grid !important;
+    place-items: center;
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18);
+  }
+
+  /* Drawer: slides in quickly, leaves a strip of the page to tap for closing,
+     and casts no shadow while it is hidden off screen. */
+  .site-side-menu {
+    left: 0;
+    width: min(86vw, 340px) !important;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow: none;
+  }
+
+  .site-side-menu.open {
+    left: 0;
+    transform: none;
+    box-shadow: 18px 0 40px rgba(15, 23, 42, 0.25);
+  }
+
+  /* With the menu open the button turns into × on the dimmed part of the page. */
+  .mobile-menu-open .mobile-nav-toggle {
+    left: auto;
+    right: 12px;
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-side-menu {
+    width: min(86vw, 340px) !important;
+  }
+
+  /* Sections keep their designed inner spacing on large screens only. */
+  .custom-container-block .custom-block-content {
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+
+  .custom-block-title {
+    margin: 22px 16px 8px !important;
+    font-size: clamp(24px, 7vw, 30px) !important;
+  }
+
+  .posts-block-title,
+  .gallery-block-title {
+    font-size: clamp(24px, 7vw, 30px);
+  }
+
+  /* Specialty cards: full width, compact, long names wrap instead of being cut. */
+  .specialty-card {
+    width: 100%;
+    min-height: 0 !important;
+    gap: 14px;
+    padding: 20px !important;
+  }
+
+  .specialty-card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+  }
+
+  .specialty-card-icon svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .specialty-card .builder-card-title {
+    font-size: 21px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  /* The director's photo no longer fills the whole first screen. */
+  .builder-widget-image {
+    width: min(160px, 45vw) !important;
+    height: auto;
+    aspect-ratio: 1;
+    margin: 0 auto;
+  }
+
+  /* Comfortable tap targets for small links. */
+  .read-link,
+  .gallery-all-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .site-footer-nav a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  /* The AI button must not cover the last lines of the footer. */
+  .site-footer-bottom {
+    padding-bottom: 84px;
+  }
+}
+
+@media (max-width: 360px) {
+  /* One line on the narrowest phones: a two-line sticky bar eats the screen. */
+  .site-top-nav {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 6px;
+    padding-left: 64px;
+    font-size: 12px;
+  }
+
+  .site-top-nav a {
+    max-width: none;
+    padding: 0 2px;
+    white-space: nowrap;
+  }
+
+  .specialty-card {
+    padding: 18px !important;
+  }
+
+  .specialty-card .builder-card-title {
+    font-size: 19px;
   }
 }
