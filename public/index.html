@@ -115,50 +115,79 @@
 
         <section class="view" id="sliderView">
           <div class="split">
-            <form class="panel editor" id="sliderSettingsForm">
+            <form class="panel editor slider-settings" id="sliderSettingsForm">
               <div class="panel-heading">
-                <h2>Настройки</h2>
+                <h2>Настройки слайдера</h2>
                 <button class="button" type="submit">Сохранить</button>
               </div>
-              <label class="checkline"><input type="checkbox" id="sliderEnabled"> Включить слайдер</label>
-              <label class="checkline"><input type="checkbox" id="sliderAutoplay"> Автопрокрутка</label>
-              <label class="checkline"><input type="checkbox" id="sliderShowControls"> Кнопки управления</label>
-              <label class="checkline"><input type="checkbox" id="sliderShowDots"> Точки</label>
-              <label class="checkline"><input type="checkbox" id="sliderPauseOnHover"> Пауза при наведении</label>
-              <div class="form-grid">
-                <label>
-                  Скорость, мс
-                  <input id="sliderIntervalMs" type="number" min="1500" max="60000" step="500">
-                </label>
-                <label>
-                  Переход, мс
-                  <input id="sliderTransitionMs" type="number" min="100" max="3000" step="50">
-                </label>
-                <label>
-                  Макс. постов
-                  <input id="sliderMaxItems" type="number" min="1" max="20">
-                </label>
-                <label>
-                  Фото
-                  <select id="sliderImageFit">
-                    <option value="cover">Заполнить блок</option>
-                    <option value="contain">Показать целиком</option>
-                  </select>
-                </label>
-                <label>
-                  Фото X, %
-                  <input id="sliderImagePositionX" type="number" min="0" max="100" step="1">
-                </label>
-                <label>
-                  Фото Y, %
-                  <input id="sliderImagePositionY" type="number" min="0" max="100" step="1">
-                </label>
+              <label class="switch-row">
+                <input class="switch" type="checkbox" id="sliderEnabled">
+                <span><strong>Показывать слайдер на сайте</strong><small>В нём листаются новости с отметкой «В слайдере» (список справа).</small></span>
+              </label>
+              <div class="settings-groups" id="sliderOptions">
+                <fieldset class="settings-group">
+                  <legend>Прокрутка</legend>
+                  <label class="switch-row">
+                    <input class="switch" type="checkbox" id="sliderAutoplay">
+                    <span><strong>Листать автоматически</strong></span>
+                  </label>
+                  <label class="inline-field" data-needs-autoplay>
+                    Менять новость каждые
+                    <input id="sliderIntervalSeconds" type="number" min="1.5" max="60" step="0.5">
+                    сек.
+                  </label>
+                  <label class="switch-row" data-needs-autoplay>
+                    <input class="switch" type="checkbox" id="sliderPauseOnHover">
+                    <span><strong>Останавливать, когда на слайдер наводят мышь</strong><small>Чтобы успели дочитать.</small></span>
+                  </label>
+                  <label>
+                    Плавность смены
+                    <select id="sliderTransitionMs">
+                      <option value="250">Быстро</option>
+                      <option value="450">Обычно</option>
+                      <option value="700">Плавно</option>
+                      <option value="1000">Очень плавно</option>
+                    </select>
+                  </label>
+                </fieldset>
+                <fieldset class="settings-group">
+                  <legend>Управление</legend>
+                  <label class="switch-row">
+                    <input class="switch" type="checkbox" id="sliderShowControls">
+                    <span><strong>Стрелки ‹ › для перелистывания</strong></span>
+                  </label>
+                  <label class="switch-row">
+                    <input class="switch" type="checkbox" id="sliderShowDots">
+                    <span><strong>Точки внизу</strong><small>Показывают, сколько новостей и какая сейчас.</small></span>
+                  </label>
+                </fieldset>
+                <fieldset class="settings-group">
+                  <legend>Новости и фото</legend>
+                  <label class="inline-field">
+                    Показывать до
+                    <input id="sliderMaxItems" type="number" min="1" max="20">
+                    новостей
+                  </label>
+                  <label>
+                    Как вписать фото
+                    <select id="sliderImageFit">
+                      <option value="cover">Заполнить весь слайд</option>
+                      <option value="contain">Показать фото целиком</option>
+                    </select>
+                    <small class="muted">«Заполнить» — без пустых полей, но края фото могут обрезаться. «Целиком» — фото видно полностью, по краям могут быть поля.</small>
+                  </label>
+                  <div class="focus-field" data-needs-cover>
+                    <span class="focus-field-title">Что оставить в кадре, если фото обрезается</span>
+                    <div class="focus-picker" id="sliderFocusPicker"></div>
+                    <small class="muted">Для отдельной новости это можно изменить в списке справа.</small>
+                  </div>
+                </fieldset>
               </div>
               <span class="inline-status" id="sliderStatus"></span>
             </form>
             <div class="panel">
               <div class="panel-heading">
-                <h2>Посты в слайдере</h2>
+                <h2>Новости для слайдера</h2>
                 <button class="button ghost" id="sliderRefreshButton" type="button">Обновить</button>
               </div>
               <div class="slider-admin-list" id="sliderPostList"></div>

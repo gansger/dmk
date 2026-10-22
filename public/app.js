@@ -204,6 +204,62 @@ function renderPosts() {
     : '<p class="muted">Материалов пока нет.</p>';
 }
 
+// A 3×3 grid instead of X/Y percentages: click the part of the photo that must
+// stay visible when the slide crops it.
+const focusPoints = [
+  [0, 0, 'Сверху слева'], [50, 0, 'Сверху'], [100, 0, 'Сверху справа'],
+  [0, 50, 'Слева'], [50, 50, 'По центру'], [100, 50, 'Справа'],
+  [0, 100, 'Снизу слева'], [50, 100, 'Снизу'], [100, 100, 'Снизу справа']
+];
+
+function nearestFocusPoint(x, y) {
+  return focusPoints.reduce((best, point) =>
+    Math.hypot(point[0] - x, point[1] - y) < Math.hypot(best[0] - x, best[1] - y) ? point : best
+  );
+}
+
+function focusPickerHtml(x = 50, y = 50) {
+  const [activeX, activeY] = nearestFocusPoint(Number(x), Number(y));
+  return focusPoints
+    .map(
+      ([pointX, pointY, label]) =>
+        `<button type="button" class="focus-point ${pointX === activeX && pointY === activeY ? 'active' : ''}" data-focus-x="${pointX}" data-focus-y="${pointY}" title="${label}" aria-label="${label}" aria-pressed="${pointX === activeX && pointY === activeY}"></button>`
+    )
+    .join('');
+}
+
+function focusPickerValue(picker) {
+  const active = picker?.querySelector('.focus-point.active');
+  return { x: Number(active?.dataset.focusX ?? 50), y: Number(active?.dataset.focusY ?? 50) };
+}
+
+document.addEventListener('click', (event) => {
+  const point = event.target.closest('.focus-point');
+  if (!point) return;
+  point.parentElement.querySelectorAll('.focus-point').forEach((item) => {
+    item.classList.toggle('active', item === point);
+    item.setAttribute('aria-pressed', String(item === point));
+  });
+});
+
+// Options that make no sense in the current state are greyed out, not hidden.
+function syncSliderSettingsState() {
+  const enabled = document.querySelector('#sliderEnabled').checked;
+  const autoplay = document.querySelector('#sliderAutoplay').checked;
+  const cover = document.querySelector('#sliderImageFit').value !== 'contain';
+  document.querySelector('#sliderOptions').classList.toggle('is-off', !enabled);
+  document.querySelectorAll('#sliderOptions input, #sliderOptions select, #sliderOptions .focus-point').forEach((control) => {
+    control.disabled = !enabled;
+  });
+  document.querySelectorAll('[data-needs-autoplay]').forEach((row) => {
+    row.classList.toggle('is-off', !autoplay);
+    row.querySelectorAll('input').forEach((control) => {
+      control.disabled = !enabled || !autoplay;
+    });
+  });
+  document.querySelector('[data-needs-cover]').hidden = !cover;
+}
+
 function renderSliderSettings() {
   const settings = state.sliderSettings;
   if (!settings) return;
@@ -213,12 +269,17 @@ function renderSliderSettings() {
   document.querySelector('#sliderShowControls').checked = Boolean(settings.showControls);
   document.querySelector('#sliderShowDots').checked = Boolean(settings.showDots);
   document.querySelector('#sliderPauseOnHover').checked = Boolean(settings.pauseOnHover);
-  document.querySelector('#sliderIntervalMs').value = settings.intervalMs;
-  document.querySelector('#sliderTransitionMs').value = settings.transitionMs;
+  document.querySelector('#sliderIntervalSeconds').value = Number(settings.intervalMs || 6500) / 1000;
+  // Keep a custom transition time selectable even if it is not one of the presets.
+  const transition = document.querySelector('#sliderTransitionMs');
+  if (![...transition.options].some((option) => Number(option.value) === Number(settings.transitionMs))) {
+    transition.insertAdjacentHTML('beforeend', `<option value="${Number(settings.transitionMs)}">Своя: ${Number(settings.transitionMs) / 1000} сек.</option>`);
+  }
+  transition.value = String(settings.transitionMs);
   document.querySelector('#sliderMaxItems').value = settings.maxItems;
   document.querySelector('#sliderImageFit').value = settings.imageFit || 'cover';
-  document.querySelector('#sliderImagePositionX').value = settings.imagePositionX ?? 50;
-  document.querySelector('#sliderImagePositionY').value = settings.imagePositionY ?? 50;
+  document.querySelector('#sliderFocusPicker').innerHTML = focusPickerHtml(settings.imagePositionX ?? 50, settings.imagePositionY ?? 50);
+  syncSliderSettingsState();
 }
 
 function renderSliderAdmin() {
@@ -241,27 +302,26 @@ function renderSliderAdmin() {
                 </div>
               </div>
               <div class="slider-admin-controls">
-                <label class="checkline"><input type="checkbox" data-slider-toggle="${post.id}" ${post.showInSlider ? 'checked' : ''}> В слайдере</label>
-                <label>
-                  Порядок
-                  <input type="number" value="${post.sliderOrder || 0}" data-slider-order="${post.id}">
+                <label class="switch-row">
+                  <input class="switch" type="checkbox" data-slider-toggle="${post.id}" ${post.showInSlider ? 'checked' : ''}>
+                  <span><strong>В слайдере</strong></span>
                 </label>
                 <label>
-                  Фото
+                  Место в слайдере
+                  <input type="number" min="0" value="${post.sliderOrder || 0}" data-slider-order="${post.id}" title="Меньше число — раньше в слайдере">
+                </label>
+                <label>
+                  Как вписать фото
                   <select data-slider-image-fit="${post.id}">
                     <option value="" ${imageFit === '' ? 'selected' : ''}>Как в настройках</option>
-                    <option value="cover" ${imageFit === 'cover' ? 'selected' : ''}>Заполнить</option>
-                    <option value="contain" ${imageFit === 'contain' ? 'selected' : ''}>Целиком</option>
+                    <option value="cover" ${imageFit === 'cover' ? 'selected' : ''}>Заполнить слайд</option>
+                    <option value="contain" ${imageFit === 'contain' ? 'selected' : ''}>Фото целиком</option>
                   </select>
                 </label>
-                <label>
-                  Фото X, %
-                  <input type="number" min="0" max="100" step="1" value="${imagePositionX}" data-slider-image-x="${post.id}">
-                </label>
-                <label>
-                  Фото Y, %
-                  <input type="number" min="0" max="100" step="1" value="${imagePositionY}" data-slider-image-y="${post.id}">
-                </label>
+                <div class="focus-field">
+                  <span class="focus-field-title">Что оставить в кадре</span>
+                  <div class="focus-picker" data-slider-focus="${post.id}">${focusPickerHtml(imagePositionX, imagePositionY)}</div>
+                </div>
                 <button class="button ghost" type="button" data-save-slider-post="${post.id}">Сохранить</button>
               </div>
             </article>
@@ -502,17 +562,21 @@ document.querySelector('#sliderSettingsForm').addEventListener('submit', async (
       showControls: document.querySelector('#sliderShowControls').checked,
       showDots: document.querySelector('#sliderShowDots').checked,
       pauseOnHover: document.querySelector('#sliderPauseOnHover').checked,
-      intervalMs: Number(document.querySelector('#sliderIntervalMs').value || 6500),
+      intervalMs: Math.round(Number(document.querySelector('#sliderIntervalSeconds').value || 6.5) * 1000),
       transitionMs: Number(document.querySelector('#sliderTransitionMs').value || 450),
       maxItems: Number(document.querySelector('#sliderMaxItems').value || 6),
       imageFit: document.querySelector('#sliderImageFit').value || 'cover',
-      imagePositionX: Number(document.querySelector('#sliderImagePositionX').value || 50),
-      imagePositionY: Number(document.querySelector('#sliderImagePositionY').value || 50)
+      imagePositionX: focusPickerValue(document.querySelector('#sliderFocusPicker')).x,
+      imagePositionY: focusPickerValue(document.querySelector('#sliderFocusPicker')).y
     })
   });
   renderSliderSettings();
   selectors.sliderStatus.textContent = 'Сохранено';
   toast('Настройки слайдера сохранены');
+});
+
+['#sliderEnabled', '#sliderAutoplay', '#sliderImageFit'].forEach((selector) => {
+  document.querySelector(selector).addEventListener('change', syncSliderSettingsState);
 });
 
 document.querySelector('#sliderRefreshButton').addEventListener('click', async () => {
@@ -527,16 +591,15 @@ selectors.sliderPostList.addEventListener('click', async (event) => {
   const toggle = selectors.sliderPostList.querySelector(`[data-slider-toggle="${postId}"]`);
   const order = selectors.sliderPostList.querySelector(`[data-slider-order="${postId}"]`);
   const imageFit = selectors.sliderPostList.querySelector(`[data-slider-image-fit="${postId}"]`);
-  const imageX = selectors.sliderPostList.querySelector(`[data-slider-image-x="${postId}"]`);
-  const imageY = selectors.sliderPostList.querySelector(`[data-slider-image-y="${postId}"]`);
+  const focus = focusPickerValue(selectors.sliderPostList.querySelector(`[data-slider-focus="${postId}"]`));
   await api(`/api/posts/${postId}/slider`, {
     method: 'POST',
     body: JSON.stringify({
       showInSlider: toggle.checked,
       sliderOrder: Number(order.value || 0),
       sliderImageFit: imageFit.value,
-      sliderImagePositionX: Number(imageX.value || 50),
-      sliderImagePositionY: Number(imageY.value || 50)
+      sliderImagePositionX: focus.x,
+      sliderImagePositionY: focus.y
     })
   });
   await refreshAll();

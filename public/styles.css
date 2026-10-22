@@ -2106,3 +2106,177 @@ textarea:focus {
   width: 100%;
   font-size: 12px;
 }
+
+/* Checkboxes and radios keep their natural size (the generic input rule sets width: 100%). */
+input[type='checkbox'],
+input[type='radio'] {
+  width: auto;
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.inline-status:empty {
+  display: none;
+}
+
+/* On/off switch built on a checkbox. */
+input.switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  border: 0;
+  border-radius: 999px;
+  background: #cbd5e1;
+  padding: 0;
+  appearance: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+input.switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
+  transition: transform 0.15s ease;
+}
+
+input.switch:checked {
+  background: var(--accent, #246bfe);
+}
+
+input.switch:checked::after {
+  transform: translateX(18px);
+}
+
+input.switch:focus-visible {
+  outline: 3px solid rgba(36, 107, 254, 0.35);
+  outline-offset: 2px;
+}
+
+input.switch:disabled {
+  cursor: not-allowed;
+}
+
+.switch-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.switch-row span {
+  display: grid;
+  gap: 2px;
+  padding-top: 2px;
+}
+
+.switch-row strong {
+  color: var(--text, #0f172a);
+  font-size: 14px;
+}
+
+.switch-row small {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.slider-settings {
+  display: grid;
+  gap: 16px;
+}
+
+.settings-groups {
+  display: grid;
+  gap: 14px;
+  transition: opacity 0.15s ease;
+}
+
+.settings-groups.is-off,
+.is-off {
+  opacity: 0.45;
+}
+
+.settings-group {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  border: 1px solid var(--line, #dbe3ee);
+  border-radius: 10px;
+  padding: 14px 16px 16px;
+}
+
+.settings-group legend {
+  padding: 0 6px;
+  color: var(--text, #0f172a);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.inline-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--text, #0f172a);
+  font-size: 14px;
+}
+
+.inline-field input {
+  width: 80px;
+}
+
+.focus-field {
+  display: grid;
+  gap: 8px;
+}
+
+.focus-field[hidden] {
+  display: none;
+}
+
+.focus-field-title {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* 3×3 grid standing for the photo: the active cell stays visible when cropped. */
+.focus-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 34px);
+  grid-template-rows: repeat(3, 26px);
+  gap: 3px;
+  width: max-content;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+  padding: 4px;
+}
+
+.focus-point {
+  border: 0;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.35);
+  padding: 0;
+  cursor: pointer;
+}
+
+.focus-point:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.focus-point.active {
+  background: var(--accent, #246bfe);
+  box-shadow: inset 0 0 0 2px #ffffff;
+}
+
+.focus-point:disabled {
+  cursor: not-allowed;
+}
