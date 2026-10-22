@@ -1491,16 +1491,16 @@ textarea {
   vertical-align: middle;
 }
 
-/* Cookie notice (bottom of the screen until the visitor accepts). */
+/* Cookie notice: top centre of the screen until the visitor accepts. */
 .cookie-notice {
   position: fixed;
-  left: 16px;
-  bottom: 16px;
+  top: 16px;
+  left: 50%;
   z-index: 45;
   display: flex;
   align-items: center;
   gap: 16px;
-  max-width: min(680px, calc(100vw - 120px));
+  width: min(720px, calc(100vw - 32px));
   border-radius: 12px;
   background: #0f172a;
   color: #e2e8f0;
@@ -1508,6 +1508,7 @@ textarea {
   font-size: 14px;
   line-height: 1.45;
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.3);
+  transform: translateX(-50%);
 }
 
 .cookie-notice a {
@@ -1531,29 +1532,26 @@ textarea {
   background: #e0ecff;
 }
 
-/* Keep the end of the page reachable above the notice. */
-body.has-cookie-notice {
-  padding-bottom: 96px;
+/* In the editor the notice sits below the editor's top bar. */
+.builder-mode .cookie-notice {
+  top: 70px;
+}
+
+/* Phones and tablets: below the fixed top bar (60px). */
+@media (max-width: 920px) {
+  .cookie-notice {
+    top: 68px;
+  }
 }
 
 @media (max-width: 640px) {
   .cookie-notice {
     right: 8px;
     left: 8px;
-    bottom: 8px;
+    width: auto;
     flex-direction: column;
     align-items: stretch;
-    max-width: none;
-  }
-
-  body.has-cookie-notice {
-    padding-bottom: 190px;
-  }
-
-  /* The AI chat button moves above the notice instead of covering it
-     (the base mobile rule for .chat-widget uses !important). */
-  .has-cookie-notice .chat-widget {
-    bottom: calc(max(18px, env(safe-area-inset-bottom)) + 172px) !important;
+    transform: none;
   }
 }
 
