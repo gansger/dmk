@@ -1865,6 +1865,33 @@ function removeGalleryBlock() {
   root.querySelector('.site-gallery')?.remove();
 }
 
+function teacherCard(teacher) {
+  const photo = teacher.photoUrl
+    ? `<img class="teacher-photo" src="${escapeHtml(teacher.photoUrl)}" alt="${escapeHtml(teacher.name)}" loading="lazy">`
+    : '<div class="teacher-photo teacher-photo-empty" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="11"></circle><path d="M12 56c3-13 10-19 20-19s17 6 20 19"></path></svg></div>';
+  return `
+    <article class="teacher-card">
+      ${photo}
+      <h3>${escapeHtml(teacher.name)}</h3>
+      ${teacher.position ? `<p>${escapeHtml(teacher.position)}</p>` : ''}
+    </article>
+  `;
+}
+
+// The list itself is kept in the admin panel, so the editor only shows it.
+async function loadTeachers() {
+  const block = pageBlock('teachers');
+  if (!block || block.enabled === false) return;
+  const response = await fetch('/api/public/teachers');
+  if (!response.ok) return;
+  const teachers = await response.json();
+  const hint = isEditMode ? '<p class="teachers-hint">Педагоги добавляются в <a href="/admin">админке</a>, раздел «Педагоги».</p>' : '';
+  const list = teachers.length
+    ? `<div class="teachers-grid">${teachers.map(teacherCard).join('')}</div>`
+    : '<p class="teachers-empty">Список педагогов скоро появится.</p>';
+  root.insertAdjacentHTML('beforeend', `<section class="site-teachers" aria-label="Педагоги">${hint}${list}</section>`);
+}
+
 // Photo gallery, laid out like the photo app on a phone: a tight grid of square
 // previews (grouped by month on the full gallery page); a tap opens the photo
 // full screen with swiping. Photos come from the media library, which also
@@ -4682,6 +4709,7 @@ if (postSlug) {
 } else {
   await loadPosts();
   await loadGallery();
+  await loadTeachers();
 }
 
 await loadSlider();

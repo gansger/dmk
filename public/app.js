@@ -1,6 +1,7 @@
 const state = {
   posts: [],
   gallery: [],
+  teachers: [],
   knowledge: [],
   integrations: null,
   sliderSettings: null,
@@ -15,6 +16,8 @@ const selectors = {
   postList: document.querySelector('#postList'),
   sliderPostList: document.querySelector('#sliderPostList'),
   galleryList: document.querySelector('#galleryList'),
+  teacherList: document.querySelector('#teacherList'),
+  teacherStatus: document.querySelector('#teacherStatus'),
   knowledgeList: document.querySelector('#knowledgeList'),
   toast: document.querySelector('#toast'),
   viewTitle: document.querySelector('#viewTitle'),
@@ -377,6 +380,51 @@ function resetGalleryForm() {
   selectors.galleryStatus.className = 'inline-status';
 }
 
+function renderTeachersAdmin() {
+  const items = state.teachers;
+  selectors.teacherList.innerHTML = items.length
+    ? items
+        .map(
+          (item, index) => `
+            <article class="gallery-admin-item ${item.enabled ? '' : 'is-hidden'}">
+              ${
+                item.url
+                  ? `<img class="gallery-admin-thumb" src="${escapeHtml(safeUrl(item.thumbUrl || item.url))}" alt="" loading="lazy">`
+                  : '<div class="gallery-admin-thumb"></div>'
+              }
+              <div class="gallery-admin-info">
+                <strong>${escapeHtml(item.name)}</strong>
+                ${item.position ? `<div class="muted">${escapeHtml(item.position)}</div>` : ''}
+                <div class="badge-row">
+                  ${item.url ? '' : '<span class="badge draft">нет фото</span>'}
+                  ${item.enabled ? '' : '<span class="badge draft">скрыт на сайте</span>'}
+                </div>
+              </div>
+              <div class="item-actions">
+                <button class="button ghost" data-move-teacher="${item.id}" data-direction="-1" ${index === 0 ? 'disabled' : ''} aria-label="Выше">↑</button>
+                <button class="button ghost" data-move-teacher="${item.id}" data-direction="1" ${index === items.length - 1 ? 'disabled' : ''} aria-label="Ниже">↓</button>
+                <button class="button ghost" data-edit-teacher="${item.id}">Изменить</button>
+                <button class="button secondary" data-toggle-teacher="${item.id}">${item.enabled ? 'Скрыть' : 'Показать'}</button>
+                <button class="button ghost" data-delete-teacher="${item.id}">Удалить</button>
+              </div>
+            </article>
+          `
+        )
+        .join('')
+    : '<p class="muted">Педагогов пока нет. Добавьте первого слева.</p>';
+}
+
+function resetTeacherForm() {
+  document.querySelector('#teacherForm').reset();
+  document.querySelector('#teacherId').value = '';
+  document.querySelector('#teacherImageUrl').value = '';
+  document.querySelector('#teacherThumbUrl').value = '';
+  document.querySelector('#teacherEnabled').checked = true;
+  document.querySelector('#teacherCurrentImage').textContent = 'Лучше вертикальное фото: на сайте оно обрезается до формата 3×4, верх сохраняется.';
+  selectors.teacherStatus.textContent = '';
+  selectors.teacherStatus.className = 'inline-status';
+}
+
 function renderKnowledge() {
   selectors.knowledgeList.innerHTML = state.knowledge.length
     ? state.knowledge
@@ -417,14 +465,15 @@ function renderIntegrations() {
 }
 
 async function refreshAll() {
-  const [health, dashboard, posts, integrations, sliderSettings, knowledge, gallery] = await Promise.all([
+  const [health, dashboard, posts, integrations, sliderSettings, knowledge, gallery, teachers] = await Promise.all([
     api('/api/health'),
     api('/api/dashboard'),
     api('/api/posts'),
     api('/api/integrations'),
     api('/api/slider/settings'),
     api('/api/knowledge'),
-    api('/api/gallery')
+    api('/api/gallery'),
+    api('/api/teachers')
   ]);
   selectors.apiStatus.textContent = health.ok ? 'online' : 'offline';
   selectors.apiStatus.className = `status-pill ${health.ok ? 'ok' : 'error'}`;
@@ -434,11 +483,13 @@ async function refreshAll() {
   state.sliderSettings = sliderSettings;
   state.knowledge = knowledge;
   state.gallery = gallery;
+  state.teachers = teachers;
   renderDashboard();
   renderPosts();
   renderSliderSettings();
   renderSliderAdmin();
   renderGalleryAdmin();
+  renderTeachersAdmin();
   renderIntegrations();
   renderKnowledge();
 }
@@ -710,6 +761,87 @@ selectors.galleryList.addEventListener('click', async (event) => {
     resetGalleryForm();
     await refreshAll();
     toast('Фото удалено');
+  }
+});
+
+document.querySelector('#teacherForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  selectors.teacherStatus.textContent = 'Сохраняю...';
+  selectors.teacherStatus.className = 'inline-status';
+  try {
+    const id = document.querySelector('#teacherId').value;
+    const file = document.querySelector('#teacherFile').files[0];
+    const photo = file
+      ? await uploadPhotoWithPreview(file)
+      : { url: document.querySelector('#teacherImageUrl').value, thumbUrl: document.querySelector('#teacherThumbUrl').value };
+    await api(id ? `/api/teachers/${id}` : '/api/teachers', {
+      method: id ? 'PUT' : 'POST',
+      body: JSON.stringify({
+        name: document.querySelector('#teacherName').value,
+        position: document.querySelector('#teacherPosition').value,
+        url: photo.url,
+        thumbUrl: photo.thumbUrl,
+        enabled: document.querySelector('#teacherEnabled').checked
+      })
+    });
+    resetTeacherForm();
+    await refreshAll();
+    toast('Педагог сохранён');
+  } catch (error) {
+    selectors.teacherStatus.textContent = error.message;
+    selectors.teacherStatus.className = 'inline-status error';
+    toast(error.message);
+  }
+});
+
+document.querySelector('#teacherResetButton').addEventListener('click', resetTeacherForm);
+
+selectors.teacherList.addEventListener('click', async (event) => {
+  const { editTeacher, toggleTeacher, deleteTeacher, moveTeacher, direction } = event.target.dataset;
+  const item = state.teachers.find((entry) => entry.id === (editTeacher || toggleTeacher || deleteTeacher || moveTeacher));
+  if (!item) return;
+
+  try {
+    if (editTeacher) {
+      document.querySelector('#teacherId').value = item.id;
+      document.querySelector('#teacherImageUrl').value = item.url || '';
+      document.querySelector('#teacherThumbUrl').value = item.thumbUrl || '';
+      document.querySelector('#teacherName').value = item.name || '';
+      document.querySelector('#teacherPosition').value = item.position || '';
+      document.querySelector('#teacherEnabled').checked = Boolean(item.enabled);
+      document.querySelector('#teacherFile').value = '';
+      document.querySelector('#teacherCurrentImage').innerHTML = item.url
+        ? `Текущее фото: <a href="${escapeHtml(safeUrl(item.url))}" target="_blank" rel="noopener">открыть</a>. Можно выбрать новый файл для замены.`
+        : 'Фото пока нет. Выберите файл, чтобы добавить его.';
+      selectors.teacherStatus.textContent = 'Редактирование';
+      selectors.teacherStatus.className = 'inline-status';
+    }
+
+    if (toggleTeacher) {
+      await api(`/api/teachers/${item.id}`, { method: 'PUT', body: JSON.stringify({ enabled: !item.enabled }) });
+      await refreshAll();
+      toast(item.enabled ? 'Педагог скрыт на сайте' : 'Педагог показан на сайте');
+    }
+
+    if (moveTeacher) {
+      const ids = state.teachers.map((entry) => entry.id);
+      const from = ids.indexOf(item.id);
+      const to = from + Number(direction);
+      if (to < 0 || to >= ids.length) return;
+      [ids[from], ids[to]] = [ids[to], ids[from]];
+      await api('/api/teachers/order', { method: 'POST', body: JSON.stringify({ ids }) });
+      await refreshAll();
+    }
+
+    if (deleteTeacher) {
+      if (!window.confirm(`Удалить педагога «${item.name}»?`)) return;
+      await api(`/api/teachers/${item.id}`, { method: 'DELETE' });
+      resetTeacherForm();
+      await refreshAll();
+      toast('Педагог удалён');
+    }
+  } catch (error) {
+    toast(error.message);
   }
 });
 

@@ -21,6 +21,7 @@
           <button class="nav-item" data-view="posts">Посты</button>
           <button class="nav-item" data-view="slider">Слайдер</button>
           <button class="nav-item" data-view="gallery">Медиатека</button>
+          <button class="nav-item" data-view="teachers">Педагоги</button>
           <button class="nav-item" data-view="integrations">Интеграции</button>
           <button class="nav-item" data-view="assistant">AI</button>
           <button class="nav-item" data-view="knowledge">Знания</button>
@@ -235,6 +236,45 @@
                 <button class="button ghost" id="galleryRefreshButton" type="button">Обновить</button>
               </div>
               <div class="gallery-list" id="galleryList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="teachersView">
+          <div class="split">
+            <form class="panel editor" id="teacherForm">
+              <div class="panel-heading">
+                <h2>Педагог</h2>
+                <button class="button" type="submit">Сохранить</button>
+              </div>
+              <input type="hidden" id="teacherId">
+              <input type="hidden" id="teacherImageUrl">
+              <input type="hidden" id="teacherThumbUrl">
+              <label>
+                ФИО
+                <input id="teacherName" maxlength="180" required placeholder="Фамилия Имя Отчество">
+              </label>
+              <label>
+                Должность (необязательно)
+                <input id="teacherPosition" maxlength="180" placeholder="Например: преподаватель">
+              </label>
+              <label>
+                Фото
+                <input id="teacherFile" type="file" accept="image/*">
+              </label>
+              <p class="muted" id="teacherCurrentImage">Лучше вертикальное фото: на сайте оно обрезается до формата 3×4, верх сохраняется.</p>
+              <label class="checkline"><input type="checkbox" id="teacherEnabled" checked> Показывать на сайте</label>
+              <div class="form-actions">
+                <button class="button ghost" id="teacherResetButton" type="button">Новый педагог</button>
+                <span class="inline-status" id="teacherStatus"></span>
+              </div>
+            </form>
+            <div class="panel">
+              <div class="panel-heading">
+                <h2>Все педагоги</h2>
+                <a class="button ghost" href="/pedagogi" target="_blank" rel="noopener">Открыть страницу</a>
+              </div>
+              <div class="gallery-list" id="teacherList"></div>
             </div>
           </div>
         </section>

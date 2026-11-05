@@ -8,13 +8,14 @@ import { createKnowledgeIndex, rebuildKnowledgeIndex, searchKnowledgeIds } from 
 const rootDir = getRootDir();
 const dataDir = path.join(rootDir, 'data');
 const databasePath = path.resolve(rootDir, process.env.CMS_DB_PATH || path.join('data', 'cms.sqlite'));
-const arrayCollections = new Set(['posts', 'sites', 'knowledge', 'memory', 'events', 'gallery']);
+const arrayCollections = new Set(['posts', 'sites', 'knowledge', 'memory', 'events', 'gallery', 'teachers']);
 let database;
 let initialization;
 
 const defaults = {
   posts: [],
   gallery: [],
+  teachers: [],
   sites: [
     {
       id: 'main-site',

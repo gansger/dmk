@@ -49,6 +49,9 @@ function page(heroFields, cards, note = '') {
 
 const link = (id, label) => `<a href="/${id}">${label}</a>`;
 
+const teachersPageId = 'pedagogi';
+const teachersCardBody = `<p>${link(teachersPageId, 'Педагоги колледжа')}</p>`;
+
 const specialties = [
   { id: 'sestrinskoe-delo', code: '34.02.01', name: 'Сестринское дело', qualification: 'мед. сестра / мед. брат', bases: 'после 9 и 11 классов', forms: 'очно, очно-заочно', price: '90 тыс.' },
   { id: 'lechebnoe-delo', code: '31.02.01', name: 'Лечебное дело', qualification: 'фельдшер', bases: 'после 9 и 11 классов', forms: 'очно', price: '100 тыс.' },
@@ -91,7 +94,7 @@ export const infoPages = [
         card('Документы', `<p>Устав, лицензия и локальные акты: ${link('dokumentaciya', 'раздел «Документация»')}.</p>`),
         card('Образование', `<p>Программы и формы обучения: ${link('obrazovanie', 'раздел «Образование»')}.</p>`),
         card('Руководство', `<p>Директор: ${pending}</p><p>${link('director-address', 'Обращение директора')}</p>`),
-        card('Педагогический состав', `<p>${pending}</p>`),
+        card('Педагогический состав', teachersCardBody),
         card('Материально-техническое обеспечение и доступная среда', `<p>${pending}</p>`),
         card('Платные образовательные услуги', `<p>Стоимость по специальностям: ${link('abiturientu', 'раздел «Абитуриенту»')}. Договор и приказ о стоимости: ${pending}</p>`),
         card('Финансово-хозяйственная деятельность', `<p>${pending}</p>`),
@@ -356,6 +359,43 @@ function setSharedLinks(home, changes) {
   }
 }
 
+// The people on this page are kept in the admin panel, not in the page text.
+function addTeachersPage(pages, changes, kept) {
+  if (pages[teachersPageId]) {
+    kept.push(teachersPageId);
+  } else {
+    const heroHtml = `<section class="specialty-detail">${hero({ icon: 'person', label: 'О колледже', title: 'Педагоги', lead: 'Преподаватели Дагестанского медицинского колледжа.' })}</section>`;
+    pages[teachersPageId] = normalizePage({
+      id: teachersPageId,
+      title: 'Педагоги',
+      seo: { description: 'Педагоги Дагестанского медицинского колледжа: фамилии, имена и должности преподавателей.' },
+      blocks: [
+        textBlock('info-hero', 5, heroHtml),
+        { id: 'slider', type: 'slider', enabled: false, order: 10, fields: {} },
+        { id: 'posts', type: 'posts', enabled: false, order: 20, fields: {} },
+        { id: 'teachers', type: 'teachers', enabled: true, order: 30, fields: {} }
+      ]
+    });
+    changes.push(teachersPageId);
+  }
+
+  const href = `/site.html?page=${teachersPageId}`;
+  const items = pages.home?.blocks?.find((block) => block.type === 'sideMenu')?.fields?.items;
+  if (items && !items.some((item) => item.href === href || item.label === 'Педагоги')) {
+    const after = items.findIndex((item) => item.label === 'Образовательный процесс');
+    items.splice(after === -1 ? items.length : after + 1, 0, { id: 'item-pedagogi', label: 'Педагоги', href });
+    changes.push('меню: Педагоги');
+  }
+
+  // Filled earlier with a pending mark; a card edited by hand no longer matches and stays.
+  const pendingCard = card('Педагогический состав', `<p>${pending}</p>`);
+  const details = pages['svedeniya-ob-obrazovatelnoy-organizacii']?.blocks?.find((block) => block.id === 'info-content');
+  if (details?.fields?.html?.includes(pendingCard)) {
+    details.fields.html = details.fields.html.replace(pendingCard, card('Педагогический состав', teachersCardBody));
+    changes.push('сведения: Педагогический состав');
+  }
+}
+
 // Fills pages in place. Returns what changed and which edited pages were kept.
 export function applyInfoPages(pages) {
   const changes = [];
@@ -415,6 +455,7 @@ export function applyInfoPages(pages) {
     changes.push(info.id);
   }
 
+  addTeachersPage(pages, changes, kept);
   setSharedLinks(pages.home, changes);
   syncSharedLayoutBlocks(pages);
   return { changes, kept };

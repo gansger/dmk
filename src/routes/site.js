@@ -4,6 +4,7 @@ import { getPublicDir } from '../core/config.js';
 import { read, write } from '../core/store.js';
 import { sendHtml, sendRedirect, sendText, serveFile, versionAssetUrls } from '../core/http.js';
 import { publicGalleryItems } from '../domain/gallery.js';
+import { publicTeachers } from '../domain/teachers.js';
 import { ensurePublishedPostPages, postPageFromPost, postPageId, publishedPostForPage } from '../domain/posts.js';
 import {
   isGeneratedPostPage,
@@ -66,6 +67,7 @@ async function serveRenderedPublicSite(request, response, { page, pages, posts, 
     pages,
     posts,
     gallery: publicGalleryItems(await read('gallery'), posts),
+    teachers: publicTeachers(await read('teachers')),
     post,
     statusCode,
     canonicalPath

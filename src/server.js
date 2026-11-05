@@ -7,6 +7,7 @@ import { allowPublicApiRequest, isPublicApi, isSameOriginRequest, requiresSameOr
 import { handleAiApi } from './routes/ai.js';
 import { handleAuthApi } from './routes/auth.js';
 import { handleGalleryApi } from './routes/gallery.js';
+import { handleTeachersApi } from './routes/teachers.js';
 import { handleIntegrationsApi } from './routes/integrations.js';
 import { handlePagesApi } from './routes/pages.js';
 import { handlePostsApi } from './routes/posts.js';
@@ -25,6 +26,7 @@ const apiHandlers = [
   handleSystemApi,
   handleUploadsApi,
   handleGalleryApi,
+  handleTeachersApi,
   handlePostsApi,
   handlePagesApi,
   handleIntegrationsApi,

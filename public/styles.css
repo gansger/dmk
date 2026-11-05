@@ -2062,13 +2062,15 @@ textarea:focus {
 }
 
 /* Media library: a grid of square previews. */
-#galleryList.gallery-list {
+#galleryList.gallery-list,
+#teacherList.gallery-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 12px;
 }
 
-#galleryList .gallery-admin-item {
+#galleryList .gallery-admin-item,
+#teacherList .gallery-admin-item {
   display: grid;
   align-content: start;
   gap: 8px;
@@ -2077,7 +2079,8 @@ textarea:focus {
   padding: 10px;
 }
 
-#galleryList .gallery-admin-item.is-hidden {
+#galleryList .gallery-admin-item.is-hidden,
+#teacherList .gallery-admin-item.is-hidden {
   opacity: 0.55;
 }
 
@@ -2087,6 +2090,20 @@ textarea:focus {
   aspect-ratio: 1;
   object-fit: cover;
   border-radius: 8px;
+}
+
+#teacherList .gallery-admin-thumb {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 8px;
+  background: #eef2f7;
+}
+
+#teacherList .gallery-admin-info strong {
+  white-space: normal;
 }
 
 .gallery-admin-info {

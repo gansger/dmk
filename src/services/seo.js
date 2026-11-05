@@ -473,13 +473,26 @@ function renderGallery(page, gallery) {
   return `<section><h2>${escapeHtml(title)}</h2>${items}${more}</section>`;
 }
 
-function renderServerContent({ page, pages, posts, gallery }) {
+function renderTeachers(page, teachers) {
+  const block = blockOf(page, 'teachers');
+  if (!block || block.enabled === false || !teachers?.length) return '';
+  const items = teachers
+    .map((teacher) => {
+      const image = teacher.photoUrl ? `<img src="${escapeHtml(teacher.photoUrl)}" alt="${escapeHtml(teacher.name)}" loading="lazy">` : '';
+      const position = teacher.position ? `<p>${escapeHtml(teacher.position)}</p>` : '';
+      return `<article>${image}<h3>${escapeHtml(teacher.name)}</h3>${position}</article>`;
+    })
+    .join('');
+  return `<section>${items}</section>`;
+}
+
+function renderServerContent({ page, pages, posts, gallery, teachers }) {
   const context = { pageTitle: page?.title || '', posts };
   const content =
     visibleContentBlocks(page)
       .map((block) => renderContentBlock(block, context))
       .filter(Boolean)
-      .join('') + renderGallery(page, gallery);
+      .join('') + renderGallery(page, gallery) + renderTeachers(page, teachers);
   return `
     <div class="seo-fallback" data-seo-fallback>
       ${renderLayoutStart(page)}
@@ -493,7 +506,7 @@ export function pageHeading({ page, post }) {
   return String(post?.title || page?.seo?.h1 || page?.title || 'Страница').trim();
 }
 
-export function renderPublicSiteHtml({ template, request, page, pages, posts, gallery = [], post = null, statusCode = 200, canonicalPath }) {
+export function renderPublicSiteHtml({ template, request, page, pages, posts, gallery = [], teachers = [], post = null, statusCode = 200, canonicalPath }) {
   const baseUrl = siteBaseUrl(request);
   const path = canonicalPath || (post ? postPublicPath(post) : pagePublicPath(page?.id));
   const canonicalUrl = absoluteUrl(path, baseUrl);
@@ -509,7 +522,7 @@ export function renderPublicSiteHtml({ template, request, page, pages, posts, ga
       .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(metadata.title)}</title>`)
       .replace('<!-- CMS_SEO_HEAD -->', metadata.head)
       .replace('<!-- CMS_PAGE_H1 -->', h1)
-      .replace('<!-- CMS_SEO_BODY -->', renderServerContent({ page, pages, posts, gallery }))
+      .replace('<!-- CMS_SEO_BODY -->', renderServerContent({ page, pages, posts, gallery, teachers }))
       .replace('<!-- CMS_SEO_STATE -->', state),
     noIndex: metadata.noIndex
   };

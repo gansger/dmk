@@ -78,6 +78,33 @@ describe('applyInfoPages', () => {
     assert.equal(items[1].href, '/custom-page');
   });
 
+  test('adds the teachers page to the menu once and links it from the details page', () => {
+    const pages = basePages();
+    pages['svedeniya-ob-obrazovatelnoy-organizacii'] = {
+      id: 'svedeniya-ob-obrazovatelnoy-organizacii',
+      title: 'Сведения',
+      blocks: [{ id: 'info-content', type: 'text', enabled: true, order: 30, fields: { html: '<section class="specialty-detail"><article class="specialty-info-card"><h3>Педагогический состав</h3><p><span class="info-pending">уточняется</span></p></article></section>' } }]
+    };
+    applyInfoPages(pages);
+    assert.ok(pages.pedagogi.blocks.some((block) => block.type === 'teachers'));
+    assert.equal(pages.home.blocks.find((block) => block.id === 'side').fields.items.filter((item) => item.label === 'Педагоги').length, 1);
+    const details = html(pages['svedeniya-ob-obrazovatelnoy-organizacii']);
+    assert.match(details, /href="\/pedagogi"/);
+    assert.doesNotMatch(details, /info-pending/);
+  });
+
+  test('keeps a teachers card edited by hand', () => {
+    const pages = basePages();
+    const edited = '<section class="specialty-detail"><article class="specialty-info-card"><h3>Педагогический состав</h3><p>Свой текст</p></article></section>';
+    pages['svedeniya-ob-obrazovatelnoy-organizacii'] = {
+      id: 'svedeniya-ob-obrazovatelnoy-organizacii',
+      title: 'Сведения',
+      blocks: [{ id: 'info-content', type: 'text', enabled: true, order: 30, fields: { html: edited } }]
+    };
+    applyInfoPages(pages);
+    assert.equal(html(pages['svedeniya-ob-obrazovatelnoy-organizacii']), edited);
+  });
+
   test('a second run changes nothing', () => {
     const pages = basePages();
     applyInfoPages(pages);
