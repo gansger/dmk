@@ -2690,6 +2690,19 @@ function setupBlockDrag() {
   });
 }
 
+// Typing over a pending mark would keep its look, so it becomes plain selected text first.
+function unwrapPendingMark(target) {
+  const mark = isEditMode ? target.closest('.info-pending') : null;
+  if (!mark) return;
+  const text = document.createTextNode(mark.textContent);
+  mark.replaceWith(text);
+  const range = document.createRange();
+  range.selectNodeContents(text);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
 function setupBlockSelection() {
   document.querySelectorAll('.custom-page-block').forEach((block) => {
     if (selectionReadyBlocks.has(block)) return;
@@ -2702,6 +2715,7 @@ function setupBlockSelection() {
 }
 
 function setupDesignSelection() {
+  document.addEventListener('click', (event) => unwrapPendingMark(event.target), true);
   siteHeaderNav?.addEventListener('click', (event) => {
     if (!isEditMode) return;
     event.preventDefault();

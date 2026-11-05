@@ -1015,6 +1015,105 @@ textarea {
   font-weight: 900;
 }
 
+/* Information pages: the specialty design plus facts, notes and pending marks. */
+.specialty-info-card p {
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.specialty-info-card p:last-child {
+  margin-bottom: 0;
+}
+
+.specialty-info-card ul + p {
+  margin-top: 12px;
+}
+
+.specialty-info-card a,
+.specialty-qualification a {
+  color: #087789;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.specialty-info-card a:hover,
+.specialty-qualification a:hover {
+  color: #123c62;
+}
+
+.info-card-wide {
+  grid-column: 1 / -1;
+}
+
+.info-pending {
+  display: inline-block;
+  border-radius: 999px;
+  background: #fff3d6;
+  color: #7a5200;
+  padding: 2px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.info-facts {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.info-facts > div {
+  display: grid;
+  gap: 4px;
+  border-bottom: 1px solid #e6edf2;
+  padding-bottom: 12px;
+}
+
+.info-card-wide .info-facts > div {
+  grid-template-columns: minmax(150px, 240px) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.info-facts > div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.info-facts dt {
+  color: #526274;
+}
+
+.info-facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.info-director {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.info-director img {
+  width: 200px;
+  height: 200px;
+  border-radius: 22px;
+  object-fit: cover;
+}
+
+@media (max-width: 640px) {
+  .info-card-wide .info-facts > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .info-director {
+    grid-template-columns: 1fr;
+  }
+}
+
 .builder-section-item {
   position: relative;
   display: grid;
