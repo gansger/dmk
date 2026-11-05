@@ -219,6 +219,7 @@ const defaultFooterItems = [
 // Cookie notice: its text lives in the (shared) footer block, so it is edited on
 // the home page like the rest of the footer. Consent is remembered per browser.
 const cookieConsentKey = 'cms-cookie-consent';
+let cookieNoticeEditing = false;
 const privacyPolicyPath = '/politika-konfidencialnosti';
 const cookieNoticeDefaults = {
   html: `Мы используем файлы cookie, чтобы сайт работал корректно и был удобнее для вас. Продолжая пользоваться сайтом, вы соглашаетесь с обработкой файлов cookie и <a href="${privacyPolicyPath}">политикой конфиденциальности</a>.`,
@@ -1623,8 +1624,9 @@ function acceptCookies() {
 function renderCookieNotice() {
   const fields = pageBlock('footer')?.fields || {};
   let notice = document.querySelector('#cookieNotice');
-  // In the editor the notice is always shown, so its text can be edited.
-  if (fields.cookieNoticeEnabled === false || (!isEditMode && hasCookieConsent())) {
+  // In the editor the notice covers the page, so it appears only on request, to edit its text.
+  const hidden = isEditMode ? !cookieNoticeEditing : hasCookieConsent();
+  if (fields.cookieNoticeEnabled === false || hidden) {
     notice?.remove();
     document.body.classList.remove('has-cookie-notice');
     return;
@@ -1644,6 +1646,22 @@ function renderCookieNotice() {
     : `<div class="cookie-notice-text">${html}</div><button class="cookie-notice-button" type="button">${button}</button>`;
   document.body.classList.add('has-cookie-notice');
   notice.querySelector('button')?.addEventListener('click', acceptCookies);
+}
+
+function toggleCookieNoticeEditing(button) {
+  const footer = pageBlock('footer');
+  if (!footer) return;
+  // Keep what was typed: hiding the notice removes its fields from the page.
+  const html = document.querySelector('#cookieNotice [data-cookie-field="html"]')?.innerHTML.trim();
+  const text = document.querySelector('#cookieNotice [data-cookie-field="button"]')?.textContent.trim();
+  footer.fields = {
+    ...(footer.fields || {}),
+    ...(html ? { cookieNoticeHtml: html } : {}),
+    ...(text ? { cookieButtonText: text } : {})
+  };
+  cookieNoticeEditing = !cookieNoticeEditing;
+  button.textContent = cookieNoticeEditing ? 'Скрыть плашку cookie' : 'Изменить текст плашки cookie';
+  renderCookieNotice();
 }
 
 function applyPageContent() {
@@ -4321,7 +4339,7 @@ function setupEditor() {
                 <input id="builderCookieNoticeEnabled" type="checkbox">
                 Показывать уведомление о cookie
               </label>
-              <p>Текст уведомления и кнопки меняйте прямо в плашке внизу экрана.</p>
+              <button id="builderCookieNoticeEdit" type="button">Изменить текст плашки cookie</button>
             </div>
           </section>
 
@@ -4627,6 +4645,7 @@ function setupEditor() {
     footer.fields = { ...(footer.fields || {}), cookieNoticeEnabled: event.target.checked };
     renderCookieNotice();
   });
+  document.querySelector('#builderCookieNoticeEdit').addEventListener('click', (event) => toggleCookieNoticeEditing(event.currentTarget));
   document.querySelector('#builderAddCard').addEventListener('click', addCardToSelectedDiv);
   document.querySelector('#builderAddSection').addEventListener('click', addSectionToSelectedDiv);
   document.querySelector('#builderAddImageInside').addEventListener('click', addImageToSelectedBlock);
